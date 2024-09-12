@@ -27,6 +27,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'sed_id',
+        'rol_id',
+        'celular',
+        'activo',
     ];
 
     /**
@@ -50,6 +54,8 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+
+
     /**
      * Get the attributes that should be cast.
      *
@@ -61,5 +67,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (empty($user->rol_id)) {
+                $rolUsuario = Rol::where('rol_nombre', 'Usuario')->first();
+                if ($rolUsuario) {
+                    $user->rol_id = $rolUsuario->id;
+                } else {
+                    throw new \Exception('El rol "Usuario" no existe en la base de datos');
+                }
+            }
+        });
+    }
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'rol_id');
+    }
+
+    public function sede()
+    {
+        return $this->belongsTo(Sede::class, 'sed_id');
     }
 }
