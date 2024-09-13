@@ -22,7 +22,8 @@ Route::middleware([
         Route::get('/sedes', 'traer');
         Route::post('/sedes', 'store');
         Route::put('/sedes/{sede}', 'update');
-        Route::delete('/sedes/{sede}', 'destroy');
+        Route::delete('/sedes/{sede}/desactivar', 'desactivar');
+        Route::put('/sedes/{sede}/activar', 'activar');
     });
 
 

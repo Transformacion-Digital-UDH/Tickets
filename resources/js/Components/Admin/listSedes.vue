@@ -4,7 +4,8 @@ import Table from "../Table.vue";
 import ModalCrear from "../ModalCrear.vue";
 import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
-import ModalEliminar from "../ModalEliminar.vue";
+import ModalDesactivar from "../ModalDesactivar.vue";
+import ModalActivar from "../ModalActivar.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -17,7 +18,8 @@ const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
-const mostrarModalEliminar = ref(false);
+const mostrarModalDesactivar = ref(false);
+const mostrarModalActivar = ref(false);
 const itemSeleccionado = ref(null);
 
 const headers = ["N°", "Nombre", "Dirección", "Ciudad", "Teléfono", "Estado"];
@@ -68,14 +70,28 @@ const formFields = [
     { name: "sed_telefono", label: "Teléfono", type: "text" },
 ];
 
-const eliminarItem = async () => {
+const desactivarItem = async () => {
     if (itemSeleccionado.value) {
         try {
-            await axios.delete(`/sedes/${itemSeleccionado.value.id}`);
+            await axios.delete(
+                `/sedes/${itemSeleccionado.value.id}/desactivar`
+            );
             await fetchSedes();
-            mostrarModalEliminar.value = false;
+            mostrarModalDesactivar.value = false;
         } catch (error) {
-            console.error("Error al eliminar la sede:", error);
+            console.error("Error al desactivar la sede:", error);
+        }
+    }
+};
+
+const activarItem = async () => {
+    if (itemSeleccionado.value) {
+        try {
+            await axios.put(`/sedes/${itemSeleccionado.value.id}/activar`);
+            await fetchSedes();
+            mostrarModalActivar.value = false;
+        } catch (error) {
+            console.error("Error al activar la sede:", error);
         }
     }
 };
@@ -106,13 +122,22 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirEliminarModal = (sede) => {
+const abrirDesactivarModal = (sede) => {
     itemSeleccionado.value = sede;
-    mostrarModalEliminar.value = true;
+    mostrarModalDesactivar.value = true;
 };
 
-const cerrarEliminarModal = () => {
-    mostrarModalEliminar.value = false;
+const cerrarDesactivarModal = () => {
+    mostrarModalDesactivar.value = false;
+};
+
+const abrirActivarModal = (sede) => {
+    itemSeleccionado.value = sede;
+    mostrarModalActivar.value = true;
+};
+
+const cerrarActivarModal = () => {
+    mostrarModalActivar.value = false;
 };
 
 onMounted(() => fetchSedes());
@@ -151,7 +176,8 @@ onMounted(() => fetchSedes());
             :items="filtrarSedes"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
-            @delete="abrirEliminarModal"
+            @activar="abrirActivarModal"
+            @desactivar="abrirDesactivarModal"
         />
 
         <ModalCrear
@@ -183,13 +209,22 @@ onMounted(() => fetchSedes());
             @update="fetchSedes"
         />
 
-        <ModalEliminar
-            v-if="mostrarModalEliminar"
+        <ModalDesactivar
+            v-if="mostrarModalDesactivar"
             :item="itemSeleccionado"
             itemName="Sede"
             fieldName="sed_nombre"
-            @cancelar="cerrarEliminarModal"
-            @confirmar="eliminarItem"
+            @cancelar="cerrarDesactivarModal"
+            @confirmar="desactivarItem"
+        />
+
+        <ModalActivar
+            v-if="mostrarModalActivar"
+            :item="itemSeleccionado"
+            itemName="Sede"
+            fieldName="sed_nombre"
+            @cancelar="cerrarActivarModal"
+            @confirmar="activarItem"
         />
     </div>
 </template>
