@@ -20,19 +20,10 @@ watch(
     (newItem) => {
         if (newItem) {
             formData.value = { ...newItem };
-            if (!formData.value.sede) {
-                formData.value.sede = { sed_nombre: "No disponible" };
-            }
         }
     },
     { immediate: true }
 );
-
-const sedeNombre = computed(() => {
-    return formData.value.sede && formData.value.sede.sed_nombre
-        ? formData.value.sede.sed_nombre
-        : "No disponible";
-});
 
 const emit = defineEmits(["close"]);
 
@@ -55,11 +46,7 @@ const cerrarDetallesModal = () => {
                 :key="index"
                 class="mb-2 text-gray-500"
             >
-                <!-- Mostrar el nombre de la sede desde sede.sed_nombre -->
-                <p v-if="field.name === 'sed_id'">
-                    <strong>{{ field.label }}:</strong> {{ sedeNombre }}
-                </p>
-                <p v-else>
+                <p>
                     <strong>{{ field.label }}:</strong>
                     {{ item[field.name] || "No disponible" }}
                 </p>

@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import listDocente from "@/Components/Docente/listDocente.vue";
+import listDocente from "@/Components/Admin/listDocente.vue";
 </script>
 
 <template>

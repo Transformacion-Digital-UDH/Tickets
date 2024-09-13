@@ -36,7 +36,7 @@ class UsuarioController extends Controller
 
     public function traerDocente()
     {
-        $docentes = User::with('rol')
+        $docentes = User::with('rol', 'sede')
             ->whereHas('rol', function ($query) {
                 $query->where('rol_nombre', 'Docente');
             })
@@ -217,7 +217,7 @@ class UsuarioController extends Controller
         }
     }
 
-    public function destroyDocente($id)
+    public function desactivarDocente($id)
     {
         try {
             $user = User::findOrFail($id);
@@ -236,7 +236,7 @@ class UsuarioController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ocurrió un error al desactivar al docente: ' . $e->getMessage(),
+                'msg' => 'Ocurrió un error al desactivar el soporte técnico: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -261,6 +261,30 @@ class UsuarioController extends Controller
             return response()->json([
                 'status' => false,
                 'msg' => 'Ocurrió un error al activar el soporte técnico: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function activarDocente($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            $user->update(['activo' => 1]);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Docente activado exitosamente.',
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Docente no encontrado.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Ocurrió un error al activar al docente: ' . $e->getMessage(),
             ], 500);
         }
     }
