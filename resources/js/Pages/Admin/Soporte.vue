@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import listSoporte from "@/Components/Soporte/listSoporte.vue";
+import listSoporte from "@/Components/Admin/listSoporte.vue";
 </script>
 
 <template>
