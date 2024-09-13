@@ -11,7 +11,10 @@ const props = defineProps({
     item: Object,
     itemName: String,
     formFields: Array,
-    sedes: Array,
+    sedes: {
+        type: Array,
+        default: () => [],
+    },
     mostrarModalEditar: Boolean,
     endpoint: String,
 });
@@ -28,9 +31,6 @@ watch(
     (newItem) => {
         if (newItem) {
             formData.value = { ...newItem };
-            if (!formData.value.sed_id) {
-                formData.value.sed_id = "";
-            }
         }
     },
     { immediate: true }
@@ -88,15 +88,20 @@ const cerrarModal = () => emit("cerrar");
                     {{ field.label }}:
                 </label>
 
-                <template
-                    v-if="field.type === 'select' && field.name === 'sed_id'"
-                >
+                <template v-if="field.type === 'select'">
                     <select
                         :id="field.name"
-                        v-model="formData.sed_id"
-                        class="w-full p-2 mb-1 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                        :type="field.type"
+                        v-model="formData[field.name]"
+                        :class="{
+                            'text-gray-400': formData[field.name] === '',
+                            'text-gray-900': formData[field.name] !== '',
+                        }"
+                        class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                     >
-                        <option value="" disabled>Seleccione una sede</option>
+                        <option value="" disabled selected>
+                            Seleccione una sede
+                        </option>
                         <option
                             v-for="option in props.sedes"
                             :key="option.value"

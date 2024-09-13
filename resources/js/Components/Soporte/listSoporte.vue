@@ -103,7 +103,7 @@ formFields.value = [
         name: "sed_id",
         label: "Sede",
         type: "select",
-        options: [],
+        options: sedes.value,
     },
     { name: "email", label: "Correo", type: "email" },
     { name: "celular", label: "Teléfono", type: "text" },
@@ -142,9 +142,6 @@ const activarItem = async () => {
 };
 
 const abrirCrearModal = () => {
-    if (sedes.value.length === 0) {
-        fetchSedes();
-    }
     passwordGenerada.value = generarPassword();
     mostrarModalCrear.value = true;
 };
@@ -154,10 +151,7 @@ const cerrarCrearModal = () => {
 };
 
 const abrirDetallesModal = (soporte) => {
-    if (sedes.value.length === 0) {
-        fetchSedes();
-    }
-    itemSeleccionado.value = { ...soporte };
+    itemSeleccionado.value = soporte;
     mostrarModalDetalles.value = true;
 };
 
@@ -169,7 +163,7 @@ const abrirEditarModal = (soporte) => {
     if (sedes.value.length === 0) {
         fetchSedes();
     }
-    itemSeleccionado.value = { ...soporte };
+    itemSeleccionado.value = soporte;
     mostrarModalEditar.value = true;
 };
 

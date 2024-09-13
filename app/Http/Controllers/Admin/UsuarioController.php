@@ -20,7 +20,7 @@ class UsuarioController extends Controller
 
     public function traerSoporte()
     {
-        $soportes = User::with('rol')
+        $soportes = User::with('rol', 'sede')
             ->whereHas('rol', function ($query) {
                 $query->where('rol_nombre', 'Soporte');
             })
