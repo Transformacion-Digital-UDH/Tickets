@@ -48,9 +48,15 @@ class SedeController extends Controller
         return response()->json(['message' => 'Sede actualizada correctamente', 'sede' => $sede]);
     }
 
-    public function destroy(Sede $sede)
+    public function desactivar(Sede $sede)
     {
         $sede->update(['sed_activo' => 0]);
         return response()->json(['message' => 'Sede desactivada correctamente'], 200);
+    }
+
+    public function activar(Sede $sede)
+    {
+        $sede->update(['sed_activo' => 1]);
+        return response()->json(['message' => 'Sede activada correctamente'], 200);
     }
 }
