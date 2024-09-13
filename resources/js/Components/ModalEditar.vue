@@ -91,7 +91,6 @@ const cerrarModal = () => emit("cerrar");
                 <template v-if="field.type === 'select'">
                     <select
                         :id="field.name"
-                        :type="field.type"
                         v-model="formData[field.name]"
                         :class="{
                             'text-gray-400': formData[field.name] === '',
