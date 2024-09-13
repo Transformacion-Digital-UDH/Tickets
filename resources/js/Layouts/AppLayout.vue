@@ -138,6 +138,34 @@ defineProps({ title: String });
                         </NavLink>
 
                         <NavLink
+                            :href="route('categoria')"
+                            :active="route().current('categoria')"
+                            :class="linkClasses(route().current('categoria'))"
+                        >
+                            <font-awesome-icon
+                                icon="tachometer-alt"
+                                class="text-lg"
+                            />
+                            <span v-if="abrirSidebar" class="ml-2"
+                                >Categoria</span
+                            >
+                        </NavLink>
+
+                        <NavLink
+                            :href="route('subcategoria')"
+                            :active="route().current('subcategoria')"
+                            :class="linkClasses(route().current('subcategoria'))"
+                        >
+                            <font-awesome-icon
+                                icon="tachometer-alt"
+                                class="text-lg"
+                            />
+                            <span v-if="abrirSidebar" class="ml-2"
+                                >Sub Categoria</span
+                            >
+                        </NavLink>
+
+                        <NavLink
                             :href="route('ticket')"
                             :active="route().current('ticket')"
                             :class="linkClasses(route().current('ticket'))"

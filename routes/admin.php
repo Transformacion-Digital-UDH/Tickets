@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoriaController;
 use App\Http\Controllers\Admin\SedeController;
+use App\Http\Controllers\Admin\SubcategoriaController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\AulaController;
 use App\Http\Controllers\Admin\PabellonController;
@@ -54,6 +56,22 @@ Route::middleware([
         Route::post('/pabellons', 'store');
         Route::put('/pabellons/{pabellon}', 'update');
         Route::delete('/pabellons/{pabellon}', 'destroy');
+    });
+
+    Route::controller(CategoriaController::class)->group(function () {
+        Route::get('/categoria', 'index')->name('categoria');
+        Route::get('/categorias', 'traer');
+        Route::post('/categorias', 'store');
+        Route::put('/categorias/{categoria}', 'update');
+        Route::delete('/categorias/{categoria}', 'destroy');
+    });
+
+    Route::controller(SubcategoriaController::class)->group(function () {
+        Route::get('/subcategoria', 'index')->name('subcategoria');
+        Route::get('/subcategorias', 'traer');
+        Route::post('/subcategorias', 'store');
+        Route::put('/subcategorias/{subcategoria}', 'update');
+        Route::delete('/subcategorias/{subcategoria}', 'destroy');
     });
 
     Route::controller(AulaController::class)->group(function () {

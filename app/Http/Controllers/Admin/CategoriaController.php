@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
-
+use Inertia\Inertia;
 class CategoriaController extends Controller
 {
     /**
@@ -13,9 +13,14 @@ class CategoriaController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Admin/Categoria');
     }
 
+    public function traer()
+    {
+        $categorias = Categoria::all();
+        return response()->json($categorias);
+    }
     /**
      * Show the form for creating a new resource.
      */
