@@ -22,7 +22,7 @@ export default {
         },
         filteredItemKeys() {
             return (item) => {
-                const keysToExclude = ["id", this.getStatusKey];
+                const keysToExclude = ["id", "sed_id", this.getStatusKey];
                 return Object.keys(item).filter(
                     (key) => !keysToExclude.includes(key)
                 );

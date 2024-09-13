@@ -25,7 +25,7 @@ const mostrarModalActivar = ref(false);
 const itemSeleccionado = ref(null);
 const passwordGenerada = ref("");
 
-const headers = ["N°", "Nombres", "Correo", "Teléfono", "Estado"];
+const headers = ["N°", "Nombres", "Correo", "Teléfono", "Sede", "Estado"];
 
 const generarPassword = () => {
     const caracteres =
@@ -69,6 +69,8 @@ const fetchSoportes = async () => {
             name: soporte.name,
             email: soporte.email,
             celular: validatePhoneNumber(soporte.celular),
+            sed_id: soporte.sed_id,
+            sed_nombre: soporte.sede.sed_nombre,
             activo: soporte.activo,
         }));
     } catch (error) {
