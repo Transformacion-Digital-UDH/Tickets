@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Subcategoria;
 use Illuminate\Http\Request;
-
+use Inertia\Inertia;
 class SubcategoriaController extends Controller
 {
     /**
@@ -13,7 +13,7 @@ class SubcategoriaController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Admin/Subcategoria');
     }
 
     /**
