@@ -33,7 +33,8 @@ Route::middleware([
         Route::get('/soportes', 'traerSoporte');
         Route::post('/soportes', 'storeSoporte');
         Route::put('/soportes/{soporte}', 'updateSoporte');
-        Route::delete('/soportes/{soporte}', 'destroySoporte');
+        Route::delete('/soportes/{soporte}/desactivar', 'desactivarSoporte');
+        Route::put('/soportes/{soporte}/activar', 'activarSoporte');
         /** DOCENTE **/
         Route::get('/docente', 'docente')->name('docente');
         Route::get('/docentes', 'traerDocente');

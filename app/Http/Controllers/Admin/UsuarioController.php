@@ -193,7 +193,7 @@ class UsuarioController extends Controller
         }
     }
 
-    public function destroySoporte($id)
+    public function desactivarSoporte($id)
     {
         try {
             $user = User::findOrFail($id);
@@ -237,6 +237,30 @@ class UsuarioController extends Controller
             return response()->json([
                 'status' => false,
                 'msg' => 'Ocurrió un error al desactivar al docente: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function activarSoporte($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            $user->update(['activo' => 1]);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Soporte técnico activado exitosamente.',
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Soporte técnico no encontrado.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Ocurrió un error al activar el soporte técnico: ' . $e->getMessage(),
             ], 500);
         }
     }

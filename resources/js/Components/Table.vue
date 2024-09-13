@@ -11,9 +11,18 @@ export default {
         },
     },
     computed: {
+        getStatusKey() {
+            if (this.items.length > 0) {
+                const statusKeys = ["sed_activo", "activo"];
+                return Object.keys(this.items[0]).find((key) =>
+                    statusKeys.includes(key)
+                );
+            }
+            return null;
+        },
         filteredItemKeys() {
             return (item) => {
-                const keysToExclude = ["sed_activo", "id"];
+                const keysToExclude = ["id", this.getStatusKey];
                 return Object.keys(item).filter(
                     (key) => !keysToExclude.includes(key)
                 );
@@ -62,13 +71,15 @@ export default {
                         <span
                             :class="{
                                 'bg-green-100 text-green-800':
-                                    item.sed_activo === 1,
+                                    item[getStatusKey] === 1,
                                 'bg-red-100 text-red-800':
-                                    item.sed_activo === 0,
+                                    item[getStatusKey] === 0,
                             }"
                             class="px-2 py-1 text-xs font-semibold rounded-full"
                         >
-                            {{ item.sed_activo === 1 ? "Activo" : "Inactivo" }}
+                            {{
+                                item[getStatusKey] === 1 ? "Activo" : "Inactivo"
+                            }}
                         </span>
                     </td>
                     <td class="flex items-center justify-center py-3 space-x-3">
@@ -87,7 +98,7 @@ export default {
                             <i class="fas fa-edit"></i>
                         </button>
                         <button
-                            v-if="item.sed_activo === 1"
+                            v-if="item[getStatusKey] === 1"
                             @click="$emit('desactivar', item)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-red-300 to-red-500 hover:from-red-400 hover:to-red-600"
                             title="Desactivar"

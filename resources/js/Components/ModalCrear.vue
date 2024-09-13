@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faSave, faTimes, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -17,6 +17,10 @@ const props = defineProps({
         required: true,
     },
     itemName: String,
+    sedes: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(["cerrar", "crear"]);
@@ -31,6 +35,23 @@ onMounted(() => {
         formData.value[field.name] = field.default || "";
     });
 });
+
+watch(
+    () => props.sedes,
+    (newSedes) => {
+        if (newSedes && newSedes.length > 0) {
+            props.formFields.forEach((field) => {
+                if (field.name === "sed_id") {
+                    field.options = newSedes.map((sede) => ({
+                        value: sede.value,
+                        label: sede.text,
+                    }));
+                }
+            });
+        }
+    },
+    { immediate: true }
+);
 
 const submitForm = async () => {
     loading.value = true;
@@ -79,16 +100,40 @@ const cerrarModal = () => emit("cerrar");
                 {{ successMessage }}
             </p>
             <div v-for="(field, index) in formFields" :key="index">
-                <label :for="field.name" class="block mb-2 text-gray-500"
-                    >{{ field.label }}:</label
-                >
-                <input
-                    :id="field.name"
-                    :type="field.type"
-                    v-model="formData[field.name]"
-                    :placeholder="`Ingrese ${field.label.toLowerCase()}`"
-                    class="flex-grow w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                />
+                <label :for="field.name" class="block mb-2 text-gray-500">
+                    {{ field.label }}:
+                </label>
+                <template v-if="field.type === 'select'">
+                    <select
+                        :id="field.name"
+                        v-model="formData[field.name]"
+                        :class="{
+                            'text-gray-400': formData[field.name] === '',
+                            'text-gray-900': formData[field.name] !== '',
+                        }"
+                        class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                    >
+                        <option value="" disabled selected>
+                            Seleccione una sede
+                        </option>
+                        <option
+                            v-for="option in field.options"
+                            :key="option.value"
+                            :value="option.value"
+                        >
+                            {{ option.label }}
+                        </option>
+                    </select>
+                </template>
+                <template v-else>
+                    <input
+                        :id="field.name"
+                        :type="field.type"
+                        v-model="formData[field.name]"
+                        :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                        class="flex-grow w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                    />
+                </template>
                 <p v-if="errores[field.name]" class="text-sm text-red-500">
                     {{ errores[field.name][0] }}
                 </p>

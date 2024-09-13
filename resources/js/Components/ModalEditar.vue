@@ -11,6 +11,7 @@ const props = defineProps({
     item: Object,
     itemName: String,
     formFields: Array,
+    sedes: Array,
     mostrarModalEditar: Boolean,
     endpoint: String,
 });
@@ -27,6 +28,9 @@ watch(
     (newItem) => {
         if (newItem) {
             formData.value = { ...newItem };
+            if (!formData.value.sed_id) {
+                formData.value.sed_id = "";
+            }
         }
     },
     { immediate: true }
@@ -80,15 +84,37 @@ const cerrarModal = () => emit("cerrar");
                 {{ successMessage }}
             </p>
             <div v-for="(field, index) in formFields" :key="index" class="mb-4">
-                <label :for="field.name" class="block mb-2 text-gray-500"
-                    >{{ field.label }}:</label
+                <label :for="field.name" class="block mb-2 text-gray-500">
+                    {{ field.label }}:
+                </label>
+
+                <template
+                    v-if="field.type === 'select' && field.name === 'sed_id'"
                 >
-                <input
-                    :id="field.name"
-                    :type="field.type"
-                    v-model="formData[field.name]"
-                    class="flex-grow w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                />
+                    <select
+                        :id="field.name"
+                        v-model="formData.sed_id"
+                        class="w-full p-2 mb-1 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                    >
+                        <option value="" disabled>Seleccione una sede</option>
+                        <option
+                            v-for="option in props.sedes"
+                            :key="option.value"
+                            :value="option.value"
+                        >
+                            {{ option.text }}
+                        </option>
+                    </select>
+                </template>
+                <template v-else>
+                    <input
+                        :id="field.name"
+                        :type="field.type"
+                        v-model="formData[field.name]"
+                        :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                        class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                    />
+                </template>
                 <p v-if="errores[field.name]" class="text-sm text-red-500">
                     {{ errores[field.name][0] }}
                 </p>

@@ -96,11 +96,11 @@ const activarItem = async () => {
     }
 };
 
-const abrirCrearSedeModal = () => {
+const abrirCrearModal = () => {
     mostrarModalCrear.value = true;
 };
 
-const cerrarCrearSedeModal = () => {
+const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
 };
 
@@ -163,7 +163,7 @@ onMounted(() => fetchSedes());
             </div>
 
             <button
-                @click="abrirCrearSedeModal"
+                @click="abrirCrearModal"
                 class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
             >
                 <font-awesome-icon icon="plus" class="mr-2 text-lg" />
@@ -185,7 +185,7 @@ onMounted(() => fetchSedes());
             :formFields="formFields"
             itemName="Sede"
             endpoint="/sedes"
-            @cerrar="cerrarCrearSedeModal"
+            @cerrar="cerrarCrearModal"
             @crear="fetchSedes"
         />
 
