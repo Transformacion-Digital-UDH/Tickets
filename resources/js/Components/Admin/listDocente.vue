@@ -13,7 +13,7 @@ import axios from "axios";
 
 library.add(faPlus);
 
-const soportes = ref([]);
+const docentes = ref([]);
 const sedes = ref([]);
 const formFields = ref([]);
 const buscarQuery = ref("");
@@ -46,35 +46,35 @@ const validatePhoneNumber = (telefono) => {
     return phone.startsWith("+51") ? phone : `+51 ${phone}`;
 };
 
-const filtrarSoportes = computed(() => {
-    return soportes.value.filter(
-        (soporte) =>
-            soporte.name
+const filtrarDocentes = computed(() => {
+    return docentes.value.filter(
+        (docente) =>
+            docente.name
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase()) ||
-            soporte.email
+            docente.email
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase()) ||
-            soporte.celular
+            docente.celular
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase())
     );
 });
 
-const fetchSoportes = async () => {
+const fetchDocentes = async () => {
     try {
-        const response = await axios.get("/soportes");
-        soportes.value = response.data.map((soporte) => ({
-            id: soporte.id,
-            name: soporte.name,
-            email: soporte.email,
-            celular: validatePhoneNumber(soporte.celular),
-            sed_id: soporte.sed_id,
-            sed_nombre: soporte.sede.sed_nombre,
-            activo: soporte.activo,
+        const response = await axios.get("/docentes");
+        docentes.value = response.data.map((docente) => ({
+            id: docente.id,
+            name: docente.name,
+            email: docente.email,
+            celular: validatePhoneNumber(docente.celular),
+            sed_id: docente.sed_id,
+            sed_nombre: docente.sede.sed_nombre,
+            activo: docente.activo,
         }));
     } catch (error) {
-        console.error("Error al cargar los soportes técnicos:", error);
+        console.error("Error al cargar los docentes:", error);
     }
 };
 
@@ -121,12 +121,12 @@ const desactivarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/soportes/${itemSeleccionado.value.id}/desactivar`
+                `/docentes/${itemSeleccionado.value.id}/desactivar`
             );
-            await fetchSoportes();
+            await fetchDocentes();
             mostrarModalDesactivar.value = false;
         } catch (error) {
-            console.error("Error al desactivar al soporte técnico:", error);
+            console.error("Error al desactivar al docente:", error);
         }
     }
 };
@@ -134,11 +134,11 @@ const desactivarItem = async () => {
 const activarItem = async () => {
     if (itemSeleccionado.value) {
         try {
-            await axios.put(`/soportes/${itemSeleccionado.value.id}/activar`);
-            await fetchSoportes();
+            await axios.put(`/docentes/${itemSeleccionado.value.id}/activar`);
+            await fetchDocentes();
             mostrarModalActivar.value = false;
         } catch (error) {
-            console.error("Error al eliminar al soporte técnico:", error);
+            console.error("Error al eliminar al docente:", error);
         }
     }
 };
@@ -152,8 +152,8 @@ const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
 };
 
-const abrirDetallesModal = (soporte) => {
-    itemSeleccionado.value = soporte;
+const abrirDetallesModal = (docente) => {
+    itemSeleccionado.value = docente;
     mostrarModalDetalles.value = true;
 };
 
@@ -161,11 +161,11 @@ const cerrarDetallesModal = () => {
     mostrarModalDetalles.value = false;
 };
 
-const abrirEditarModal = (soporte) => {
+const abrirEditarModal = (docente) => {
     if (sedes.value.length === 0) {
         fetchSedes();
     }
-    itemSeleccionado.value = soporte;
+    itemSeleccionado.value = docente;
     mostrarModalEditar.value = true;
 };
 
@@ -173,8 +173,8 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (soporte) => {
-    itemSeleccionado.value = soporte;
+const abrirDesactivarModal = (docente) => {
+    itemSeleccionado.value = docente;
     mostrarModalDesactivar.value = true;
 };
 
@@ -182,8 +182,8 @@ const cerrarDesactivarModal = () => {
     mostrarModalDesactivar.value = false;
 };
 
-const abrirActivarModal = (soporte) => {
-    itemSeleccionado.value = soporte;
+const abrirActivarModal = (docente) => {
+    itemSeleccionado.value = docente;
     mostrarModalActivar.value = true;
 };
 
@@ -192,7 +192,7 @@ const cerrarActivarModal = () => {
 };
 
 onMounted(() => {
-    fetchSoportes();
+    fetchDocentes();
     fetchSedes();
 });
 </script>
@@ -200,7 +200,7 @@ onMounted(() => {
 <template>
     <div class="p-6">
         <h1 class="mb-6 text-[20px] font-bold text-gray-500">
-            Lista de Soportes Técnicos
+            Lista de Docentes
         </h1>
 
         <div class="flex items-center justify-between mb-4">
@@ -229,7 +229,7 @@ onMounted(() => {
 
         <Table
             :headers="headers"
-            :items="filtrarSoportes"
+            :items="filtrarDocentes"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @activar="abrirActivarModal"
@@ -240,16 +240,16 @@ onMounted(() => {
             v-if="mostrarModalCrear"
             :formFields="formFields"
             :sedes="sedes"
-            itemName="Soporte"
-            endpoint="/soportes"
+            itemName="Docente"
+            endpoint="/docentes"
             @cerrar="cerrarCrearModal"
-            @crear="fetchSoportes"
+            @crear="fetchDocentes"
         />
 
         <ModalVer
             v-if="mostrarModalDetalles"
             :item="itemSeleccionado"
-            itemName="Soporte"
+            itemName="Docente"
             :formFields="formFields"
             :mostrarModalDetalles="mostrarModalDetalles"
             @close="cerrarDetallesModal"
@@ -258,19 +258,19 @@ onMounted(() => {
         <ModalEditar
             v-if="mostrarModalEditar"
             :item="itemSeleccionado"
-            itemName="Soporte"
+            itemName="Docente"
             :formFields="formFields"
             :sedes="sedes"
             :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/soportes"
+            endpoint="/docentes"
             @cerrar="cerrarEditarModal"
-            @update="fetchSoportes"
+            @update="fetchDocentes"
         />
 
         <ModalDesactivar
             v-if="mostrarModalDesactivar"
             :item="itemSeleccionado"
-            itemName="Soporte"
+            itemName="Docente"
             fieldName="name"
             @cancelar="cerrarDesactivarModal"
             @confirmar="desactivarItem"
@@ -279,7 +279,7 @@ onMounted(() => {
         <ModalActivar
             v-if="mostrarModalActivar"
             :item="itemSeleccionado"
-            itemName="Soporte"
+            itemName="Docente"
             fieldName="name"
             @cancelar="cerrarActivarModal"
             @confirmar="activarItem"

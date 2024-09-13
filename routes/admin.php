@@ -40,7 +40,8 @@ Route::middleware([
         Route::get('/docentes', 'traerDocente');
         Route::post('/docentes', 'storeDocente');
         Route::put('/docentes/{docente}', 'updateDocente');
-        Route::delete('/docentes/{docente}', 'destroyDocente');
+        Route::delete('/docentes/{docente}/desactivar', 'desactivarDocente');
+        Route::put('/docentes/{docente}/activar', 'activarDocente');
     });
 
     Route::controller(TicketController::class)->group(function () {
