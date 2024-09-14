@@ -165,9 +165,6 @@ const cerrarDetallesModal = () => {
 };
 
 const abrirEditarModal = (docente) => {
-    if (sedes.value.length === 0) {
-        fetchSedes();
-    }
     itemSeleccionado.value = docente;
     mostrarModalEditar.value = true;
 };

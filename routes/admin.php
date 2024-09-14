@@ -64,11 +64,16 @@ Route::middleware([
         Route::put('/pabellons/{pabellon}/activar', 'activar');
     });
 
-    Route::controller(TicketController::class)->group(function () {
-        Route::get('/ticket', 'index')->name('ticket');
-    });
-
     Route::controller(AulaController::class)->group(function () {
         Route::get('/aula', 'index')->name('aula');
+        Route::get('/aulas', 'traer');
+        Route::post('/aulas', 'store');
+        Route::put('/aulas/{aula}', 'update');
+        Route::delete('/aulas/{aula}/desactivar', 'desactivar');
+        Route::put('/aulas/{aula}/activar', 'activar');
+    });
+
+    Route::controller(TicketController::class)->group(function () {
+        Route::get('/ticket', 'index')->name('ticket');
     });
 });

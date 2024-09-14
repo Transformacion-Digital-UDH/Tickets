@@ -13,8 +13,8 @@ import axios from "axios";
 
 library.add(faPlus);
 
-const docentes = ref([]);
-const sedes = ref([]);
+const aulas = ref([]);
+const pabellons = ref([]);
 const formFields = ref([]);
 const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
@@ -23,100 +23,61 @@ const mostrarModalEditar = ref(false);
 const mostrarModalDesactivar = ref(false);
 const mostrarModalActivar = ref(false);
 const itemSeleccionado = ref(null);
-const passwordGenerada = ref("");
 
-const headers = ["N°", "Nombres", "Correo", "Teléfono", "Sede", "Estado"];
+const headers = ["N°", "Aula", "Pabellon", "Estado"];
 
-const generarPassword = () => {
-    const caracteres =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let password = "";
-    for (let i = 0; i < 10; i++) {
-        password += caracteres.charAt(
-            Math.floor(Math.random() * caracteres.length)
-        );
-    }
-    return password;
-};
-
-passwordGenerada.value = generarPassword();
-
-const validatePhoneNumber = (telefono) => {
-    if (telefono === null) {
-        return "";
-    }
-    const phone = telefono.toString();
-    return phone.startsWith("+51") ? phone : `+51 ${phone}`;
-};
-
-const filtrarDocentes = computed(() => {
-    return docentes.value.filter(
-        (docente) =>
-            docente.name
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            docente.email
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            docente.celular
+const filtrarAulas = computed(() => {
+    return aulas.value.filter(
+        (aula) =>
+            aula.aul_numero
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase())
     );
 });
 
-const fetchDocentes = async () => {
+const fetchAulas = async () => {
     try {
-        const response = await axios.get("/docentes");
-        docentes.value = response.data.map((docente) => ({
-            id: docente.id,
-            name: docente.name,
-            email: docente.email,
-            celular: validatePhoneNumber(docente.celular),
-            sed_id: docente.sed_id,
-            sed_nombre: docente.sede.sed_nombre,
-            activo: docente.activo,
+        const response = await axios.get("/aulas");
+        aulas.value = response.data.map((aula) => ({
+            id: aula.id,
+            aul_numero: aula.aul_numero,
+            pab_id: aula.pab_id,
+            pab_nombre: aula.pabellon.pab_nombre,
+            aul_activo: aula.aul_activo,
         }));
     } catch (error) {
-        console.error("Error al cargar los docentes:", error);
+        console.error("Error al cargar las aulas:", error);
     }
 };
 
-const fetchSedes = async () => {
+const fetchPabellones = async () => {
     try {
-        const response = await axios.get("/sedes");
-        sedes.value = response.data.map((sede) => ({
-            value: sede.id,
-            text: sede.sed_nombre,
+        const response = await axios.get("/pabellons");
+        pabellons.value = response.data.map((pabellon) => ({
+            value: pabellon.id,
+            text: pabellon.pab_nombre,
         }));
         formFields.value = formFields.value.map((field) => {
-            if (field.name === "sed_id") {
+            if (field.name === "pab_id") {
                 return {
                     ...field,
-                    options: sedes.value,
+                    options: pabellons.value,
                 };
             }
             return field;
         });
     } catch (error) {
-        console.error("Error al cargar las sedes:", error);
+        console.error("Error al cargar los pabellones:", error);
     }
 };
 
 formFields.value = [
-    { name: "name", label: "Nombre", type: "text" },
+    { name: "aul_numero", label: "Aula", type: "text" },
     {
-        name: "sed_id",
-        label: "Sede",
+        name: "pab_id",
+        label: "Pabellon",
         type: "select",
-        options: sedes.value,
-    },
-    { name: "email", label: "Correo", type: "email" },
-    { name: "celular", label: "Teléfono", type: "text" },
-    {
-        name: "password",
-        label: "Contraseña",
-        type: "text",
-        default: computed(() => passwordGenerada.value),
+        options: pabellons.value,
     },
 ];
 
@@ -124,12 +85,12 @@ const desactivarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/docentes/${itemSeleccionado.value.id}/desactivar`
+                `/aulas/${itemSeleccionado.value.id}/desactivar`
             );
-            await fetchDocentes();
+            await fetchAulas();
             mostrarModalDesactivar.value = false;
         } catch (error) {
-            console.error("Error al desactivar al docente:", error);
+            console.error("Error al desactivar el aula:", error);
         }
     }
 };
@@ -137,17 +98,16 @@ const desactivarItem = async () => {
 const activarItem = async () => {
     if (itemSeleccionado.value) {
         try {
-            await axios.put(`/docentes/${itemSeleccionado.value.id}/activar`);
-            await fetchDocentes();
+            await axios.put(`/aulas/${itemSeleccionado.value.id}/activar`);
+            await fetchAulas();
             mostrarModalActivar.value = false;
         } catch (error) {
-            console.error("Error al eliminar al docente:", error);
+            console.error("Error al eliminar el aula:", error);
         }
     }
 };
 
 const abrirCrearModal = () => {
-    passwordGenerada.value = generarPassword();
     mostrarModalCrear.value = true;
 };
 
@@ -155,8 +115,8 @@ const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
 };
 
-const abrirDetallesModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirDetallesModal = (aula) => {
+    itemSeleccionado.value = aula;
     mostrarModalDetalles.value = true;
 };
 
@@ -164,11 +124,8 @@ const cerrarDetallesModal = () => {
     mostrarModalDetalles.value = false;
 };
 
-const abrirEditarModal = (docente) => {
-    if (sedes.value.length === 0) {
-        fetchSedes();
-    }
-    itemSeleccionado.value = docente;
+const abrirEditarModal = (aula) => {
+    itemSeleccionado.value = aula;
     mostrarModalEditar.value = true;
 };
 
@@ -176,8 +133,8 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirDesactivarModal = (aula) => {
+    itemSeleccionado.value = aula;
     mostrarModalDesactivar.value = true;
 };
 
@@ -185,8 +142,8 @@ const cerrarDesactivarModal = () => {
     mostrarModalDesactivar.value = false;
 };
 
-const abrirActivarModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirActivarModal = (aula) => {
+    itemSeleccionado.value = aula;
     mostrarModalActivar.value = true;
 };
 
@@ -195,15 +152,15 @@ const cerrarActivarModal = () => {
 };
 
 onMounted(() => {
-    fetchDocentes();
-    fetchSedes();
+    fetchAulas();
+    fetchPabellones();
 });
 </script>
 
 <template>
     <div class="p-6">
         <h1 class="mb-6 text-[20px] font-bold text-gray-500">
-            Lista de Docentes
+            Lista de Aulas
         </h1>
 
         <div class="flex items-center justify-between mb-4">
@@ -222,23 +179,23 @@ onMounted(() => {
             </button>
         </div>
 
-        <Table :headers="headers" :items="filtrarDocentes" @view="abrirDetallesModal" @edit="abrirEditarModal"
+        <Table :headers="headers" :items="filtrarAulas" @view="abrirDetallesModal" @edit="abrirEditarModal"
             @activar="abrirActivarModal" @desactivar="abrirDesactivarModal" />
 
-        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :sedes="sedes" itemName="Docente"
-            endpoint="/docentes" @cerrar="cerrarCrearModal" @crear="fetchDocentes" />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :pabellons="pabellons" itemName="Aula"
+            endpoint="/aulas" @cerrar="cerrarCrearModal" @crear="fetchAulas" />
 
-        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Docente" :formFields="formFields"
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Aula" :formFields="formFields"
             :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Docente" :formFields="formFields"
-            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/docentes" @cerrar="cerrarEditarModal"
-            @update="fetchDocentes" />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Aula" :formFields="formFields"
+            :pabellons="pabellons" :mostrarModalEditar="mostrarModalEditar" endpoint="/aulas" @cerrar="cerrarEditarModal"
+            @update="fetchAulas" />
 
-        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Docente" fieldName="name"
+        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Aula" fieldName="name"
             @cancelar="cerrarDesactivarModal" @confirmar="desactivarItem" />
 
-        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Docente" fieldName="name"
+        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Aula" fieldName="name"
             @cancelar="cerrarActivarModal" @confirmar="activarItem" />
     </div>
 </template>

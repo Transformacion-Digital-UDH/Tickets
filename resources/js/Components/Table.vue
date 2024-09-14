@@ -13,7 +13,7 @@ export default {
     computed: {
         getStatusKey() {
             if (this.items.length > 0) {
-                const statusKeys = ["sed_activo", "activo", "cat_activo", "pab_activo"];
+                const statusKeys = ["sed_activo", "activo", "cat_activo", "aul_activo", "pab_activo"];
                 return Object.keys(this.items[0]).find((key) =>
                     statusKeys.includes(key)
                 );
@@ -22,7 +22,7 @@ export default {
         },
         filteredItemKeys() {
             return (item) => {
-                const keysToExclude = ["id", "sed_id", this.getStatusKey];
+                const keysToExclude = ["id", "sed_id", "pab_id", this.getStatusKey];
                 return Object.keys(item).filter(
                     (key) => !keysToExclude.includes(key)
                 );
