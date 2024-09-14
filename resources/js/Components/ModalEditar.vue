@@ -15,6 +15,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    pabellons: {
+        type: Array,
+        default: () => [],
+    },
     mostrarModalEditar: Boolean,
     endpoint: String,
 });
@@ -70,13 +74,9 @@ const cerrarModal = () => emit("cerrar");
 </script>
 
 <template>
-    <div
-        v-if="mostrarModalEditar"
-        class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50"
-    >
-        <div
-            class="w-full max-w-lg p-6 transition-transform transform bg-white rounded-lg shadow-lg"
-        >
+    <div v-if="mostrarModalEditar"
+        class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50">
+        <div class="w-full max-w-lg p-6 transition-transform transform bg-white rounded-lg shadow-lg">
             <h2 class="mb-4 text-xl font-bold text-gray-600">
                 Editar {{ itemName }}
             </h2>
@@ -87,65 +87,55 @@ const cerrarModal = () => emit("cerrar");
                 <label :for="field.name" class="block mb-2 text-gray-500">
                     {{ field.label }}:
                 </label>
-
                 <template v-if="field.type === 'select'">
-                    <select
-                        :id="field.name"
-                        v-model="formData[field.name]"
-                        :class="{
+                    <template v-if="field.name === 'sed_id'">
+                        <select :id="field.name" v-model="formData[field.name]" :class="{
                             'text-gray-400': formData[field.name] === '',
                             'text-gray-900': formData[field.name] !== '',
-                        }"
-                        class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                    >
-                        <option value="" disabled selected>
-                            Seleccione una sede
-                        </option>
-                        <option
-                            v-for="option in props.sedes"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.text }}
-                        </option>
-                    </select>
+                        }" class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
+                            <option value="" disabled selected>
+                                Seleccione una sede
+                            </option>
+
+                            <option v-for="option in props.sedes" :key="option.value" :value="option.value">
+                                {{ option.text }}
+                            </option>
+                        </select>
+                    </template>
+                    <template v-if="field.name === 'pab_id'">
+                        <select :id="field.name" v-model="formData[field.name]" :class="{
+                            'text-gray-400': formData[field.name] === '',
+                            'text-gray-900': formData[field.name] !== '',
+                        }" class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
+
+                            <option value="" disabled selected>
+                                Seleccione un pabellón
+                            </option>
+
+                            <option v-for="option in props.pabellons" :key="option.value" :value="option.value">
+                                {{ option.text }}
+                            </option>
+                        </select>
+                    </template>
                 </template>
                 <template v-else>
-                    <input
-                        :id="field.name"
-                        :type="field.type"
-                        v-model="formData[field.name]"
+                    <input :id="field.name" :type="field.type" v-model="formData[field.name]"
                         :placeholder="`Ingrese ${field.label.toLowerCase()}`"
-                        class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                    />
+                        class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50" />
                 </template>
                 <p v-if="errores[field.name]" class="text-sm text-red-500">
                     {{ errores[field.name][0] }}
                 </p>
             </div>
             <div class="flex justify-end mt-6 space-x-4">
-                <button
-                    @click="editarItem"
-                    :disabled="loading"
-                    class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-300 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1] focus:outline-none focus:ring-2 focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                >
-                    <font-awesome-icon
-                        v-if="loading"
-                        icon="spinner"
-                        class="mr-2 animate-spin"
-                    />
-                    <font-awesome-icon
-                        v-else
-                        icon="save"
-                        class="mr-2 text-lg"
-                    />
+                <button @click="editarItem" :disabled="loading"
+                    class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-300 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1] focus:outline-none focus:ring-2 focus:ring-[#2EBAA1] focus:ring-opacity-50">
+                    <font-awesome-icon v-if="loading" icon="spinner" class="mr-2 animate-spin" />
+                    <font-awesome-icon v-else icon="save" class="mr-2 text-lg" />
                     Actualizar
                 </button>
-                <button
-                    @click="cerrarModal"
-                    :disabled="loading"
-                    class="flex justify-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-gray-300 to-gray-400 rounded-lg shadow-md hover:from-gray-300 hover:to-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-                >
+                <button @click="cerrarModal" :disabled="loading"
+                    class="flex justify-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-gray-300 to-gray-400 rounded-lg shadow-md hover:from-gray-300 hover:to-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
                     <font-awesome-icon icon="times" class="mr-2 text-lg" />
                     Cerrar
                 </button>

@@ -4,63 +4,124 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Aula;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Validator;
 class AulaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return Inertia::render('Admin/Aula');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function traer()
     {
-        //
+        $aulas = Aula::with('pabellon')->get();
+        return response()->json($aulas);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validarDatos = $request->validate([
+            'aul_numero' => 'required|string|max:255',
+            'pab_id' => 'required|exists:pabellons,id',
+            'aul_activo' => 'boolean',
+        ]);
+
+        $aula = Aula::create($validarDatos);
+
+        return response()->json([
+            'message' => 'Aula creada exitosamente',
+            'aula' => $aula
+        ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Aula $aula)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            $aula = Aula::findOrFail($id);
+
+            $validator = Validator::make($request->all(), [
+                'aul_numero' => 'required|string|max:255',
+                'pab_id' => 'required|exists:pabellons,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'Hubo errores en la validación',
+                    'errors' => $validator->errors()->toArray(),
+                ], 422);
+            }
+
+            $data = $request->only(['aul_numero', 'pab_id']);
+
+            $aula->update($data);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Aula actualizada correctamente',
+                'aula' => $aula
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Aula no encontrada'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Error al actualizar el aula: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Aula $aula)
+    public function desactivar($id)
     {
-        //
+        try {
+            $aula = Aula::findOrFail($id);
+
+            $aula->update(['aul_activo' => 0]);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Aula desactivada exitosamente.',
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Aula no encontrada.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Ocurrió un error al desactivar el aula: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Aula $aula)
+    public function activar($id)
     {
-        //
-    }
+        try {
+            $aula = Aula::findOrFail($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Aula $aula)
-    {
-        //
+            $aula->update(['aul_activo' => 1]);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Aula desactivada exitosamente.',
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Aula no encontrada.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Ocurrió un error al desactivar el aula: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }
