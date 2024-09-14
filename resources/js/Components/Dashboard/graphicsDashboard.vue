@@ -85,7 +85,7 @@ export default {
 
 /* Nueva tarjeta de estilo unificado */
 .card {
-  background-color: #2ecc71;
+  background-color: #757776;
   border-radius: 15px;
   padding: 20px;
   display: flex;

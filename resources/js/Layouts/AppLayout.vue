@@ -101,6 +101,17 @@ defineProps({ title: String });
                         </NavLink>
 
                         <NavLink
+                            :href="route('ticket')"
+                            :active="route().current('ticket')"
+                            :class="linkClasses(route().current('ticket'))"
+                        >
+                            <font-awesome-icon icon="ticket" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2"
+                                >Tickets</span
+                            >
+                        </NavLink>
+
+                        <NavLink
                             :href="route('sede')"
                             :active="route().current('sede')"
                             :class="linkClasses(route().current('sede'))"
@@ -166,17 +177,6 @@ defineProps({ title: String });
                         </NavLink>
 
                         <NavLink
-                            :href="route('ticket')"
-                            :active="route().current('ticket')"
-                            :class="linkClasses(route().current('ticket'))"
-                        >
-                            <font-awesome-icon icon="ticket" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Tickets</span
-                            >
-                        </NavLink>
-
-                        <NavLink
                             :href="route('aula')"
                             :active="route().current('aula')"
                             :class="linkClasses(route().current('aula'))"
@@ -206,7 +206,7 @@ defineProps({ title: String });
             </nav>
 
             <div class="flex flex-col flex-1">
-                <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
+                <nav class="bg-[#6775f5] border-b border-[#757877]">
                     <div
                         class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
                     >
