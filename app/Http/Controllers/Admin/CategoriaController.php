@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 class CategoriaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return Inertia::render('Admin/Categoria');
@@ -21,51 +18,38 @@ class CategoriaController extends Controller
         $categorias = Categoria::all();
         return response()->json($categorias);
     }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validarDatos = $request->validate([
+            'cat_nombre' => 'required|string|max:255',
+            'cat_activo' => 'boolean',
+        ]);
+
+        $categoria = Categoria::create($validarDatos);
+        return response()->json($categoria, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Categoria $categoria)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Categoria $categoria)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Categoria $categoria)
     {
-        //
+        $validarDatos = $request->validate([
+            'cat_nombre' => 'required|string|max:255',
+        ]);
+
+        $categoria->update($validarDatos);
+
+        return response()->json(['message' => 'Categoría actualizada correctamente', 'categoria' => $categoria]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Categoria $categoria)
+    public function desactivar(Categoria $categoria)
     {
-        //
+        $categoria->update(['cat_activo' => 0]);
+        return response()->json(['message' => 'Categoría desactivada correctamente'], 200);
+    }
+
+    public function activar(Categoria $categoria)
+    {
+        $categoria->update(['cat_activo' => 1]);
+        return response()->json(['message' => 'Categoría activada correctamente'], 200);
     }
 }

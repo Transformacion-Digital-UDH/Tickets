@@ -13,7 +13,7 @@ export default {
     computed: {
         getStatusKey() {
             if (this.items.length > 0) {
-                const statusKeys = ["sed_activo", "activo"];
+                const statusKeys = ["sed_activo", "activo", "cat_activo"];
                 return Object.keys(this.items[0]).find((key) =>
                     statusKeys.includes(key)
                 );

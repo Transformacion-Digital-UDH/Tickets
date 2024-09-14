@@ -24,20 +24,20 @@ const itemSeleccionado = ref(null);
 
 const headers = ["N°", "Nombre", "Estado"];
 
-const filtrarSedes = computed(() => {
-    return sedes.value.filter(
-        (sede) =>
-            sede.sed_nombre
+const filtrarCategorias = computed(() => {
+    return categorias.value.filter(
+        (categoria) =>
+            categoria.cat_nombre
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase())
     );
 });
 
-const fetchSedes = async () => {
+const fetchCategorias = async () => {
     try {
         const response = await axios.get("/categorias");
         categorias.value = response.data.map((categoria) => ({
-            id: sede.id,
+            id: categoria.id,
             cat_nombre: categoria.cat_nombre,
             cat_activo: categoria.cat_activo,
         }));
@@ -47,22 +47,19 @@ const fetchSedes = async () => {
 };
 
 const formFields = [
-    { name: "sed_nombre", label: "Nombre", type: "text" },
-    { name: "sed_direccion", label: "Dirección", type: "text" },
-    { name: "sed_ciudad", label: "Ciudad", type: "text" },
-    { name: "sed_telefono", label: "Teléfono", type: "text" },
+    { name: "cat_nombre", label: "Nombre", type: "text" },
 ];
 
 const desactivarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/sedes/${itemSeleccionado.value.id}/desactivar`
+                `/categorias/${itemSeleccionado.value.id}/desactivar`
             );
-            await fetchSedes();
+            await fetchCategorias();
             mostrarModalDesactivar.value = false;
         } catch (error) {
-            console.error("Error al desactivar la sede:", error);
+            console.error("Error al desactivar la categoría:", error);
         }
     }
 };
@@ -70,11 +67,11 @@ const desactivarItem = async () => {
 const activarItem = async () => {
     if (itemSeleccionado.value) {
         try {
-            await axios.put(`/sedes/${itemSeleccionado.value.id}/activar`);
-            await fetchSedes();
+            await axios.put(`/categorias/${itemSeleccionado.value.id}/activar`);
+            await fetchCategorias();
             mostrarModalActivar.value = false;
         } catch (error) {
-            console.error("Error al activar la sede:", error);
+            console.error("Error al activar la categoría:", error);
         }
     }
 };
@@ -87,8 +84,8 @@ const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
 };
 
-const abrirDetallesModal = (sede) => {
-    itemSeleccionado.value = sede;
+const abrirDetallesModal = (categoria) => {
+    itemSeleccionado.value = categoria;
     mostrarModalDetalles.value = true;
 };
 
@@ -96,8 +93,8 @@ const cerrarDetallesModal = () => {
     mostrarModalDetalles.value = false;
 };
 
-const abrirEditarModal = (sede) => {
-    itemSeleccionado.value = sede;
+const abrirEditarModal = (categoria) => {
+    itemSeleccionado.value = categoria;
     mostrarModalEditar.value = true;
 };
 
@@ -105,8 +102,8 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (sede) => {
-    itemSeleccionado.value = sede;
+const abrirDesactivarModal = (categoria) => {
+    itemSeleccionado.value = categoria;
     mostrarModalDesactivar.value = true;
 };
 
@@ -114,8 +111,8 @@ const cerrarDesactivarModal = () => {
     mostrarModalDesactivar.value = false;
 };
 
-const abrirActivarModal = (sede) => {
-    itemSeleccionado.value = sede;
+const abrirActivarModal = (categoria) => {
+    itemSeleccionado.value = categoria;
     mostrarModalActivar.value = true;
 };
 
@@ -123,12 +120,12 @@ const cerrarActivarModal = () => {
     mostrarModalActivar.value = false;
 };
 
-onMounted(() => fetchSedes());
+onMounted(() => fetchCategorias());
 </script>
 
 <template>
     <div class="p-6">
-        <h1 class="mb-6 text-[20px] font-bold text-gray-500">Lista de Sedes</h1>
+        <h1 class="mb-6 text-[20px] font-bold text-gray-500">Lista de Categorías</h1>
 
         <div class="flex items-center justify-between mb-4">
             <div class="relative">
@@ -147,7 +144,7 @@ onMounted(() => fetchSedes());
 
             <button
                 @click="abrirCrearModal"
-                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
+                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-300 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
             >
                 <font-awesome-icon icon="plus" class="mr-2 text-lg" />
                 Nuevo
@@ -156,7 +153,7 @@ onMounted(() => fetchSedes());
 
         <Table
             :headers="headers"
-            :items="filtrarSedes"
+            :items="filtrarCategorias"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @activar="abrirActivarModal"
@@ -166,16 +163,16 @@ onMounted(() => fetchSedes());
         <ModalCrear
             v-if="mostrarModalCrear"
             :formFields="formFields"
-            itemName="Sede"
-            endpoint="/sedes"
+            itemName="Categoría"
+            endpoint="/categorias"
             @cerrar="cerrarCrearModal"
-            @crear="fetchSedes"
+            @crear="fetchCategorias"
         />
 
         <ModalVer
             v-if="mostrarModalDetalles"
             :item="itemSeleccionado"
-            itemName="Sede"
+            itemName="Categoría"
             :formFields="formFields"
             :mostrarModalDetalles="mostrarModalDetalles"
             @close="cerrarDetallesModal"
@@ -184,19 +181,19 @@ onMounted(() => fetchSedes());
         <ModalEditar
             v-if="mostrarModalEditar"
             :item="itemSeleccionado"
-            itemName="Sede"
+            itemName="Categoría"
             :formFields="formFields"
             :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/sedes"
+            endpoint="/categorias"
             @cerrar="cerrarEditarModal"
-            @update="fetchSedes"
+            @update="fetchCategorias"
         />
 
         <ModalDesactivar
             v-if="mostrarModalDesactivar"
             :item="itemSeleccionado"
-            itemName="Sede"
-            fieldName="sed_nombre"
+            itemName="Categoría"
+            fieldName="cat_nombre"
             @cancelar="cerrarDesactivarModal"
             @confirmar="desactivarItem"
         />
@@ -204,8 +201,8 @@ onMounted(() => fetchSedes());
         <ModalActivar
             v-if="mostrarModalActivar"
             :item="itemSeleccionado"
-            itemName="Sede"
-            fieldName="sed_nombre"
+            itemName="Categoría"
+            fieldName="cat_nombre"
             @cancelar="cerrarActivarModal"
             @confirmar="activarItem"
         />
