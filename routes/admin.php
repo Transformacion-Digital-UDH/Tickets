@@ -55,14 +55,6 @@ Route::middleware([
         Route::put('/categorias/{categoria}/activar', 'activar');
     });
 
-    Route::controller(SubcategoriaController::class)->group(function () {
-        Route::get('/subcategoria', 'index')->name('subcategoria');
-        Route::get('/subcategorias', 'traer');
-        Route::post('/subcategorias', 'store');
-        Route::put('/subcategorias/{subcategoria}', 'update');
-        Route::delete('/subcategorias/{subcategoria}', 'destroy');
-    });
-
     Route::controller(TicketController::class)->group(function () {
         Route::get('/ticket', 'index')->name('ticket');
     });
