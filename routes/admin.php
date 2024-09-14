@@ -55,16 +55,17 @@ Route::middleware([
         Route::put('/categorias/{categoria}/activar', 'activar');
     });
 
-    Route::controller(TicketController::class)->group(function () {
-        Route::get('/ticket', 'index')->name('ticket');
-    });
-
     Route::controller(PabellonController::class)->group(function () {
         Route::get('/pabellon', 'index')->name('pabellon');
         Route::get('/pabellons', 'traer');
         Route::post('/pabellons', 'store');
         Route::put('/pabellons/{pabellon}', 'update');
-        Route::delete('/pabellons/{pabellon}', 'destroy');
+        Route::delete('/pabellons/{pabellon}/desactivar', 'desactivar');
+        Route::put('/pabellons/{pabellon}/activar', 'activar');
+    });
+
+    Route::controller(TicketController::class)->group(function () {
+        Route::get('/ticket', 'index')->name('ticket');
     });
 
     Route::controller(AulaController::class)->group(function () {
