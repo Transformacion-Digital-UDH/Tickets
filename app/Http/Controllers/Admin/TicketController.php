@@ -16,6 +16,12 @@ class TicketController extends Controller
         return Inertia::render('Admin/Ticket');
     }
 
+    public function traer()
+    {
+        $tickets = Ticket::with('prioridad', 'user', 'categoria')->get();
+        return response()->json($tickets);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

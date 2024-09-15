@@ -55,6 +55,20 @@ Route::middleware([
         Route::put('/categorias/{categoria}/activar', 'activar');
     });
 
+    Route::controller(SubcategoriaController::class)->group(function () {
+        Route::get('/subcategoria', 'index')->name('subcategoria');
+        Route::get('/subcategorias', 'traer');
+        Route::post('/subcategorias', 'store');
+        Route::put('/subcategorias/{subcategoria}', 'update');
+        Route::delete('/subcategorias/{subcategoria}', 'destroy');
+    });
+
+    Route::controller(TicketController::class)->group(function () {
+        Route::get('/ticket', 'index')->name('ticket');
+        Route::get('/tickets', 'traer');
+        Route::post('/tickets', 'store');
+    });
+
     Route::controller(PabellonController::class)->group(function () {
         Route::get('/pabellon', 'index')->name('pabellon');
         Route::get('/pabellons', 'traer');
@@ -71,9 +85,5 @@ Route::middleware([
         Route::put('/aulas/{aula}', 'update');
         Route::delete('/aulas/{aula}/desactivar', 'desactivar');
         Route::put('/aulas/{aula}/activar', 'activar');
-    });
-
-    Route::controller(TicketController::class)->group(function () {
-        Route::get('/ticket', 'index')->name('ticket');
     });
 });

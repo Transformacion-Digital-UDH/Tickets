@@ -1,4 +1,6 @@
 <script>
+import axios from 'axios';
+import { ref, reactive, onMounted } from 'vue';
 export default {
   data() {
     return {
@@ -16,35 +18,7 @@ export default {
       },
       soporteAsignado: '',
       searchQuery: '', // Barra de búsqueda
-      tickets: [
-        {
-          id: 1,
-          tic_titulo: 'Problema con el servidor',
-          tic_descripcion: 'El servidor principal no responde correctamente.',
-          prioridad: 'Alta',
-          estado: 'Abierto',
-          usuario: 'Juan Perez',
-          categoria: 'Infraestructura',
-        },
-        {
-          id: 2,
-          tic_titulo: 'Error en la base de datos',
-          tic_descripcion: 'Los datos no se están guardando correctamente.',
-          prioridad: 'Media',
-          estado: 'En proceso',
-          usuario: 'Maria Lopez',
-          categoria: 'Desarrollo',
-        },
-        {
-          id: 3,
-          tic_titulo: 'Solicitud de acceso',
-          tic_descripcion: 'Necesito acceso a una aplicación correctamente.',
-          prioridad: 'Baja',
-          estado: 'Cerrado',
-          usuario: 'Carlos Garcia',
-          categoria: 'Soporte Técnico',
-        },
-      ],
+      tickets: [], // Inicialmente vacío
     };
   },
   computed: {
@@ -53,50 +27,58 @@ export default {
         const search = this.searchQuery.toLowerCase();
         return (
           ticket.tic_titulo.toLowerCase().includes(search) ||
-          ticket.estado.toLowerCase().includes(search) ||
-          ticket.prioridad.toLowerCase().includes(search) ||
-          ticket.usuario.toLowerCase().includes(search) ||
-          ticket.categoria.toLowerCase().includes(search)
+          ticket.tic_descripcion.toLowerCase().includes(search) ||
+          ticket.tic_estado.toLowerCase().includes(search) ||
+          ticket.prioridad.pri_nombre.toLowerCase().includes(search) ||
+          ticket.user.name.toLowerCase().includes(search) ||
+          ticket.categoria.cat_nombre.toLowerCase().includes(search)
         );
       });
     }
   },
+  created() {
+    this.fetchTickets();
+  },
   methods: {
+    async fetchTickets() {
+      try {
+        const response = await axios.get('/tickets'); // Ajusta la URL según tu ruta API
+        this.tickets = response.data;
+      } catch (error) {
+        console.error('Error al traer los tickets:', error);
+      }
+    },
     toggleView() {
       this.isCardView = !this.isCardView;
     },
-
     showCrearTicketModal() {
       this.mostrarModalCrearTicket = true;
     },
-
     cerrarCrearTicketModal() {
       this.mostrarModalCrearTicket = false;
     },
-
-    crearTicket() {
-      const nuevo = {
-        id: this.tickets.length + 1,
-        tic_titulo: this.nuevoTicket.titulo,
-        tic_descripcion: this.nuevoTicket.descripcion,
-        prioridad: this.nuevoTicket.prioridad,
-        estado: 'Abierto',
-        usuario: this.nuevoTicket.usuario,
-        categoria: this.nuevoTicket.categoria
-      };
-      this.tickets.push(nuevo);
-      this.cerrarCrearTicketModal();
+    async crearTicket() {
+      try {
+        const response = await axios.post('/tickets', {
+          tic_titulo: this.nuevoTicket.titulo,
+          tic_descripcion: this.nuevoTicket.descripcion,
+          tic_estado: 'Abierto',
+          tic_activo: true,
+          // Añade los campos adicionales que puedas necesitar, como `tic_archivo`
+        });
+        this.tickets.push(response.data);
+        this.cerrarCrearTicketModal();
+      } catch (error) {
+        console.error('Error creating ticket:', error);
+      }
     },
-
     showDetallesModal(ticket) {
       this.ticketSeleccionado = ticket;
       this.mostrarModalDetalles = true;
     },
-
     cerrarDetallesModal() {
       this.mostrarModalDetalles = false;
     },
-
     showAsignarSoporteModal(ticket) {
       this.ticketSeleccionado = ticket;
       this.mostrarModalAsignarSoporte = true;
@@ -105,13 +87,14 @@ export default {
       this.mostrarModalAsignarSoporte = false;
     },
     asignarSoporte() {
+      // Implementa la lógica para asignar soporte si es necesario
       alert(`El ticket "${this.ticketSeleccionado.tic_titulo}" ha sido asignado a ${this.soporteAsignado}`);
       this.cerrarAsignarSoporteModal();
     },
   },
 };
-</script>
 
+</script>
 
 <template>
   <div class="p-6">
@@ -119,12 +102,8 @@ export default {
 
     <!-- Barra de búsqueda -->
     <div class="mb-4">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Buscar por título, estado, prioridad, usuario o categoría..."
-        class="border p-2 w-full rounded"
-      />
+      <input v-model="searchQuery" type="text"
+        placeholder="Buscar por título, estado, prioridad, usuario o categoría..." class="border p-2 w-full rounded" />
     </div>
 
     <div class="mb-4 flex justify-end">
@@ -133,7 +112,7 @@ export default {
         Crear Ticket
       </button>
       <button @click="toggleView"
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300">
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">
         <i :class="isCardView ? 'fas fa-list' : 'fas fa-table'"></i>
       </button>
     </div>
@@ -141,26 +120,26 @@ export default {
     <!-- Vista en tarjetas -->
     <div v-if="isCardView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div v-for="ticket in filteredTickets" :key="ticket.id"
-        class="relative bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105">
-        <div class="absolute top-2 right-2 px-2 py-1 rounded text-xs" :class="{
-          'bg-green-700 text-white': ticket.estado === 'Abierto',
-          'bg-yellow-700 text-white': ticket.estado === 'En proceso',
-          'bg-red-700 text-white': ticket.estado === 'Cerrado'
-        }">
-          {{ ticket.estado }}
+        class="relative bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 min-h-[100px] max-h-[150px] flex flex-col justify-between">
+        <div>
+          <div class="absolute top-2 right-2 px-2 py-1 rounded text-xs" :class="{
+            'bg-orange-700 text-white': ticket.tic_estado === 'Pendiente',
+            'bg-blue-700 text-white': ticket.tic_estado === 'En progreso',
+            'bg-green-700 text-white': ticket.tic_estado === 'Finalizado',
+            'bg-red-700 text-white': ticket.tic_estado === 'Cerrado',
+          }">
+            {{ ticket.tic_estado }}
+          </div>
+          <h2 class="text-xl font-semibold uppercase">{{ ticket.tic_titulo }}</h2>
+          <hr>
+          <!-- Prioridad, Usuario y Categoría alineados -->
+          <div class="flex flex-col mt-4">
+            <span class="text-sm text-gray-500">Prioridad: {{ ticket.prioridad.pri_nombre }}</span>
+            <span class="text-sm text-gray-500">Usuario: {{ ticket.user.name }}</span>
+            <span class="text-sm text-gray-500">Categoría: {{ ticket.categoria.cat_nombre }}</span>
+          </div>
         </div>
-        <h2 class="text-xl font-semibold">{{ ticket.tic_titulo }}</h2>
-        <p class="text-gray-600">{{ ticket.tic_descripcion }}</p>
-        <div class="mt-2">
-          <span class="text-sm text-gray-500">Prioridad: {{ ticket.prioridad }}</span>
-        </div>
-        <div class="mt-1">
-          <span class="text-sm text-gray-500">Usuario: {{ ticket.usuario }}</span>
-        </div>
-        <div class="mt-1">
-          <span class="text-sm text-gray-500">Categoría: {{ ticket.categoria }}</span>
-        </div>
-        <div class="mt-4 flex justify-between items-center space-x-2">
+        <div class="flex justify-end items-center space-x-2">
           <button @click="showDetallesModal(ticket)" class="text-blue-500 hover:text-blue-700 transition duration-300">
             <i class="fas fa-eye"></i>
           </button>
@@ -170,6 +149,7 @@ export default {
           </button>
         </div>
       </div>
+
     </div>
 
     <!-- Vista en tabla -->
@@ -190,10 +170,10 @@ export default {
           <tr v-for="ticket in filteredTickets" :key="ticket.id" class="border-t">
             <td class="px-4 py-2 border">{{ ticket.tic_titulo }}</td>
             <td class="px-4 py-2 border">{{ ticket.tic_descripcion }}</td>
-            <td class="px-4 py-2 border">{{ ticket.prioridad }}</td>
-            <td class="px-4 py-2 border">{{ ticket.estado }}</td>
-            <td class="px-4 py-2 border">{{ ticket.usuario }}</td>
-            <td class="px-4 py-2 border">{{ ticket.categoria }}</td>
+            <td class="px-4 py-2 border">{{ ticket.prioridad.pri_nombre }}</td>
+            <td class="px-4 py-2 border">{{ ticket.tic_estado }}</td>
+            <td class="px-4 py-2 border">{{ ticket.user.name }}</td>
+            <td class="px-4 py-2 border">{{ ticket.categoria.cat_nombre }}</td>
             <td class="px-4 py-2 border flex justify-between space-x-2">
               <button @click="showDetallesModal(ticket)"
                 class="text-blue-500 hover:text-blue-700 transition duration-300">
@@ -235,17 +215,17 @@ export default {
         </button>
       </div>
     </div>
-    
+
     <!-- Modal Detalles Ticket -->
     <div v-if="mostrarModalDetalles" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-        <h2 class="text-xl font-bold mb-4">Detalles del Ticket</h2>
+        <h2 class="text-xl font-bold mb-4 uppercase">Detalles del Ticket</h2>
         <p><strong>Título:</strong> {{ ticketSeleccionado.tic_titulo }}</p>
         <p><strong>Descripción:</strong> {{ ticketSeleccionado.tic_descripcion }}</p>
-        <p><strong>Prioridad:</strong> {{ ticketSeleccionado.prioridad }}</p>
-        <p><strong>Estado:</strong> {{ ticketSeleccionado.estado }}</p>
-        <p><strong>Usuario:</strong> {{ ticketSeleccionado.usuario }}</p>
-        <p><strong>Categoría:</strong> {{ ticketSeleccionado.categoria }}</p>
+        <p><strong>Prioridad:</strong> {{ ticketSeleccionado.prioridad.pri_nombre }}</p>
+        <p><strong>Estado:</strong> {{ ticketSeleccionado.tic_estado }}</p>
+        <p><strong>Usuario:</strong> {{ ticketSeleccionado.user.name }}</p>
+        <p><strong>Categoría:</strong> {{ ticketSeleccionado.categoria.cat_nombre }}</p>
         <button @click="cerrarDetallesModal" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
           Cerrar
         </button>
@@ -271,26 +251,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style scoped>
-.space-x-2 {
-  gap: 0.5rem;
-}
-
-.flex {
-  display: flex;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.w-full {
-  width: 100%;
-}
-</style>
-  
