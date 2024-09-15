@@ -16,6 +16,7 @@ import {
     faBuilding,
     faUserShield,
     faUserGraduate,
+    faTags,
     faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -29,6 +30,7 @@ library.add(
     faBuilding,
     faUserShield,
     faUserGraduate,
+    faTags,
     faChevronDown
 );
 
@@ -154,38 +156,12 @@ defineProps({ title: String });
                             :class="linkClasses(route().current('categoria'))"
                         >
                             <font-awesome-icon
-                                icon="tachometer-alt"
+                                icon="tags"
                                 class="text-lg"
                             />
                             <span v-if="abrirSidebar" class="ml-2"
                                 >Categoria</span
                             >
-                        </NavLink>
-
-                        <NavLink
-                            :href="route('subcategoria')"
-                            :active="route().current('subcategoria')"
-                            :class="linkClasses(route().current('subcategoria'))"
-                        >
-                            <font-awesome-icon
-                                icon="tachometer-alt"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Sub Categoria</span
-                            >
-                        </NavLink>
-
-                        <NavLink
-                            :href="route('aula')"
-                            :active="route().current('aula')"
-                            :class="linkClasses(route().current('aula'))"
-                        >
-                            <font-awesome-icon
-                                icon="chalkboard"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2">Aulas</span>
                         </NavLink>
 
                         <NavLink
@@ -200,6 +176,18 @@ defineProps({ title: String });
                             <span v-if="abrirSidebar" class="ml-2"
                                 >Pabellones</span
                             >
+                        </NavLink>
+
+                        <NavLink
+                            :href="route('aula')"
+                            :active="route().current('aula')"
+                            :class="linkClasses(route().current('aula'))"
+                        >
+                            <font-awesome-icon
+                                icon="chalkboard"
+                                class="text-lg"
+                            />
+                            <span v-if="abrirSidebar" class="ml-2">Aulas</span>
                         </NavLink>
                     </div>
                 </div>

@@ -13,7 +13,7 @@ import axios from "axios";
 
 library.add(faPlus);
 
-const docentes = ref([]);
+const pabellons = ref([]);
 const sedes = ref([]);
 const formFields = ref([]);
 const buscarQuery = ref("");
@@ -23,61 +23,30 @@ const mostrarModalEditar = ref(false);
 const mostrarModalDesactivar = ref(false);
 const mostrarModalActivar = ref(false);
 const itemSeleccionado = ref(null);
-const passwordGenerada = ref("");
 
-const headers = ["N°", "Nombres", "Correo", "Teléfono", "Sede", "Estado"];
+const headers = ["N°", "Pabellones", "Sede", "Estado"];
 
-const generarPassword = () => {
-    const caracteres =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let password = "";
-    for (let i = 0; i < 10; i++) {
-        password += caracteres.charAt(
-            Math.floor(Math.random() * caracteres.length)
-        );
-    }
-    return password;
-};
-
-passwordGenerada.value = generarPassword();
-
-const validatePhoneNumber = (telefono) => {
-    if (telefono === null) {
-        return "";
-    }
-    const phone = telefono.toString();
-    return phone.startsWith("+51") ? phone : `+51 ${phone}`;
-};
-
-const filtrarDocentes = computed(() => {
-    return docentes.value.filter(
-        (docente) =>
-            docente.name
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            docente.email
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            docente.celular
+const filtrarPabellones = computed(() => {
+    return pabellons.value.filter(
+        (pabellon) =>
+            pabellon.pab_nombre
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase())
     );
 });
 
-const fetchDocentes = async () => {
+const fetchPabellones = async () => {
     try {
-        const response = await axios.get("/docentes");
-        docentes.value = response.data.map((docente) => ({
-            id: docente.id,
-            name: docente.name,
-            email: docente.email,
-            celular: validatePhoneNumber(docente.celular),
-            sed_id: docente.sed_id,
-            sed_nombre: docente.sede.sed_nombre,
-            activo: docente.activo,
+        const response = await axios.get("/pabellons");
+        pabellons.value = response.data.map((pabellon) => ({
+            id: pabellon.id,
+            pab_nombre: pabellon.pab_nombre,
+            sed_id: pabellon.sed_id,
+            sed_nombre: pabellon.sede.sed_nombre,
+            pab_activo: pabellon.pab_activo,
         }));
     } catch (error) {
-        console.error("Error al cargar los docentes:", error);
+        console.error("Error al cargar los pabellones:", error);
     }
 };
 
@@ -103,20 +72,12 @@ const fetchSedes = async () => {
 };
 
 formFields.value = [
-    { name: "name", label: "Nombre", type: "text" },
+    { name: "pab_nombre", label: "Pabellon", type: "text" },
     {
         name: "sed_id",
         label: "Sede",
         type: "select",
         options: sedes.value,
-    },
-    { name: "email", label: "Correo", type: "email" },
-    { name: "celular", label: "Teléfono", type: "text" },
-    {
-        name: "password",
-        label: "Contraseña",
-        type: "text",
-        default: computed(() => passwordGenerada.value),
     },
 ];
 
@@ -124,12 +85,12 @@ const desactivarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/docentes/${itemSeleccionado.value.id}/desactivar`
+                `/pabellons/${itemSeleccionado.value.id}/desactivar`
             );
-            await fetchDocentes();
+            await fetchPabellones();
             mostrarModalDesactivar.value = false;
         } catch (error) {
-            console.error("Error al desactivar al docente:", error);
+            console.error("Error al desactivar el pabellon:", error);
         }
     }
 };
@@ -137,17 +98,16 @@ const desactivarItem = async () => {
 const activarItem = async () => {
     if (itemSeleccionado.value) {
         try {
-            await axios.put(`/docentes/${itemSeleccionado.value.id}/activar`);
-            await fetchDocentes();
+            await axios.put(`/pabellons/${itemSeleccionado.value.id}/activar`);
+            await fetchPabellones();
             mostrarModalActivar.value = false;
         } catch (error) {
-            console.error("Error al eliminar al docente:", error);
+            console.error("Error al eliminar el pabellon:", error);
         }
     }
 };
 
 const abrirCrearModal = () => {
-    passwordGenerada.value = generarPassword();
     mostrarModalCrear.value = true;
 };
 
@@ -155,8 +115,8 @@ const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
 };
 
-const abrirDetallesModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirDetallesModal = (pabellon) => {
+    itemSeleccionado.value = pabellon;
     mostrarModalDetalles.value = true;
 };
 
@@ -164,8 +124,8 @@ const cerrarDetallesModal = () => {
     mostrarModalDetalles.value = false;
 };
 
-const abrirEditarModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirEditarModal = (pabellon) => {
+    itemSeleccionado.value = pabellon;
     mostrarModalEditar.value = true;
 };
 
@@ -173,8 +133,8 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirDesactivarModal = (pabellon) => {
+    itemSeleccionado.value = pabellon;
     mostrarModalDesactivar.value = true;
 };
 
@@ -182,8 +142,8 @@ const cerrarDesactivarModal = () => {
     mostrarModalDesactivar.value = false;
 };
 
-const abrirActivarModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirActivarModal = (pabellon) => {
+    itemSeleccionado.value = pabellon;
     mostrarModalActivar.value = true;
 };
 
@@ -192,7 +152,7 @@ const cerrarActivarModal = () => {
 };
 
 onMounted(() => {
-    fetchDocentes();
+    fetchPabellones();
     fetchSedes();
 });
 </script>
@@ -200,7 +160,7 @@ onMounted(() => {
 <template>
     <div class="p-6">
         <h1 class="mb-6 text-[20px] font-bold text-gray-500">
-            Lista de Docentes
+            Lista de Pabellones
         </h1>
 
         <div class="flex items-center justify-between mb-4">
@@ -219,23 +179,23 @@ onMounted(() => {
             </button>
         </div>
 
-        <Table :headers="headers" :items="filtrarDocentes" @view="abrirDetallesModal" @edit="abrirEditarModal"
+        <Table :headers="headers" :items="filtrarPabellones" @view="abrirDetallesModal" @edit="abrirEditarModal"
             @activar="abrirActivarModal" @desactivar="abrirDesactivarModal" />
 
-        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :sedes="sedes" itemName="Docente"
-            endpoint="/docentes" @cerrar="cerrarCrearModal" @crear="fetchDocentes" />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :sedes="sedes" itemName="Pabellon"
+            endpoint="/pabellons" @cerrar="cerrarCrearModal" @crear="fetchPabellones" />
 
-        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Docente" :formFields="formFields"
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Pabellon" :formFields="formFields"
             :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Docente" :formFields="formFields"
-            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/docentes" @cerrar="cerrarEditarModal"
-            @update="fetchDocentes" />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Pabellon" :formFields="formFields"
+            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/pabellons" @cerrar="cerrarEditarModal"
+            @update="fetchPabellones" />
 
-        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Docente" fieldName="name"
+        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Pabellon" fieldName="name"
             @cancelar="cerrarDesactivarModal" @confirmar="desactivarItem" />
 
-        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Docente" fieldName="name"
+        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Pabellon" fieldName="name"
             @cancelar="cerrarActivarModal" @confirmar="activarItem" />
     </div>
 </template>
