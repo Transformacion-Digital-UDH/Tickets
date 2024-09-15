@@ -65,6 +65,8 @@ Route::middleware([
 
     Route::controller(TicketController::class)->group(function () {
         Route::get('/ticket', 'index')->name('ticket');
+        Route::get('/tickets', 'traer');
+        Route::post('/tickets', 'store');
     });
 
     Route::controller(PabellonController::class)->group(function () {

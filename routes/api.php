@@ -17,3 +17,4 @@ Route::get('/sedes', function () {
 Route::get('/pabellon', function () {
     return Pabellon::all();
 });
+
