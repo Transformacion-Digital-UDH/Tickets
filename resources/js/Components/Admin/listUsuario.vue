@@ -6,14 +6,10 @@ import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
 import ModalDesactivar from "../ModalDesactivar.vue";
 import ModalActivar from "../ModalActivar.vue";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import ButtonNuevo from "../ButtonNuevo.vue";
 import axios from "axios";
 
-library.add(faPlus);
-
-const docentes = ref([]);
+const usuarios = ref([]);
 const sedes = ref([]);
 const formFields = ref([]);
 const buscarQuery = ref("");
@@ -49,35 +45,35 @@ const validatePhoneNumber = (telefono) => {
     return phone.startsWith("+51") ? phone : `+51 ${phone}`;
 };
 
-const filtrarDocentes = computed(() => {
-    return docentes.value.filter(
-        (docente) =>
-            docente.name
+const filtrarUsuarios = computed(() => {
+    return usuarios.value.filter(
+        (usuario) =>
+            usuario.name
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase()) ||
-            docente.email
+            usuario.email
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase()) ||
-            docente.celular
+            usuario.celular
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase())
     );
 });
 
-const fetchDocentes = async () => {
+const fetchUsuarios = async () => {
     try {
-        const response = await axios.get("/docentes");
-        docentes.value = response.data.map((docente) => ({
-            id: docente.id,
-            name: docente.name,
-            email: docente.email,
-            celular: validatePhoneNumber(docente.celular),
-            sed_id: docente.sed_id,
-            sed_nombre: docente.sede ? docente.sede.sed_nombre : "",
-            activo: docente.activo,
+        const response = await axios.get("/usuarios");
+        usuarios.value = response.data.map((usuario) => ({
+            id: usuario.id,
+            name: usuario.name,
+            email: usuario.email,
+            celular: validatePhoneNumber(usuario.celular),
+            sed_id: usuario.sed_id,
+            sed_nombre: usuario.sede ? usuario.sede.sed_nombre : "",
+            activo: usuario.activo,
         }));
     } catch (error) {
-        console.error("Error al cargar los docentes:", error);
+        console.error("Error al cargar los usuarios:", error);
     }
 };
 
@@ -124,12 +120,12 @@ const desactivarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/docentes/${itemSeleccionado.value.id}/desactivar`
+                `/usuarios/${itemSeleccionado.value.id}/desactivar`
             );
-            await fetchDocentes();
+            await fetchUsuarios();
             mostrarModalDesactivar.value = false;
         } catch (error) {
-            console.error("Error al desactivar al docente:", error);
+            console.error("Error al desactivar al usuario:", error);
         }
     }
 };
@@ -137,26 +133,21 @@ const desactivarItem = async () => {
 const activarItem = async () => {
     if (itemSeleccionado.value) {
         try {
-            await axios.put(`/docentes/${itemSeleccionado.value.id}/activar`);
-            await fetchDocentes();
+            await axios.put(`/usuarios/${itemSeleccionado.value.id}/activar`);
+            await fetchUsuarios();
             mostrarModalActivar.value = false;
         } catch (error) {
-            console.error("Error al eliminar al docente:", error);
+            console.error("Error al eliminar al usuario:", error);
         }
     }
-};
-
-const abrirCrearModal = () => {
-    passwordGenerada.value = generarPassword();
-    mostrarModalCrear.value = true;
 };
 
 const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
 };
 
-const abrirDetallesModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirDetallesModal = (usuario) => {
+    itemSeleccionado.value = usuario;
     mostrarModalDetalles.value = true;
 };
 
@@ -164,8 +155,8 @@ const cerrarDetallesModal = () => {
     mostrarModalDetalles.value = false;
 };
 
-const abrirEditarModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirEditarModal = (usuario) => {
+    itemSeleccionado.value = usuario;
     mostrarModalEditar.value = true;
 };
 
@@ -173,8 +164,8 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirDesactivarModal = (usuario) => {
+    itemSeleccionado.value = usuario;
     mostrarModalDesactivar.value = true;
 };
 
@@ -182,8 +173,8 @@ const cerrarDesactivarModal = () => {
     mostrarModalDesactivar.value = false;
 };
 
-const abrirActivarModal = (docente) => {
-    itemSeleccionado.value = docente;
+const abrirActivarModal = (usuario) => {
+    itemSeleccionado.value = usuario;
     mostrarModalActivar.value = true;
 };
 
@@ -192,7 +183,7 @@ const cerrarActivarModal = () => {
 };
 
 onMounted(() => {
-    fetchDocentes();
+    fetchUsuarios();
     fetchSedes();
 });
 </script>
@@ -200,7 +191,7 @@ onMounted(() => {
 <template>
     <div class="p-6">
         <h1 class="mb-6 text-[20px] font-bold text-gray-500">
-            Lista de Docentes
+            Lista de Usuarios
         </h1>
 
         <div class="flex items-center justify-between mb-4">
@@ -217,19 +208,12 @@ onMounted(() => {
                     class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
                 />
             </div>
-
-            <button
-                @click="abrirCrearModal"
-                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
-            >
-                <font-awesome-icon icon="plus" class="mr-2 text-lg" />
-                Nuevo
-            </button>
+            <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
         <Table
             :headers="headers"
-            :items="filtrarDocentes"
+            :items="filtrarUsuarios"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @activar="abrirActivarModal"
@@ -240,16 +224,16 @@ onMounted(() => {
             v-if="mostrarModalCrear"
             :formFields="formFields"
             :sedes="sedes"
-            itemName="Docente"
-            endpoint="/docentes"
+            itemName="Usuario"
+            endpoint="/usuarios"
             @cerrar="cerrarCrearModal"
-            @crear="fetchDocentes"
+            @crear="fetchUsuarios"
         />
 
         <ModalVer
             v-if="mostrarModalDetalles"
             :item="itemSeleccionado"
-            itemName="Docente"
+            itemName="Usuario"
             :formFields="formFields"
             :mostrarModalDetalles="mostrarModalDetalles"
             @close="cerrarDetallesModal"
@@ -258,19 +242,19 @@ onMounted(() => {
         <ModalEditar
             v-if="mostrarModalEditar"
             :item="itemSeleccionado"
-            itemName="Docente"
+            itemName="Usuario"
             :formFields="formFields"
             :sedes="sedes"
             :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/docentes"
+            endpoint="/usuarios"
             @cerrar="cerrarEditarModal"
-            @update="fetchDocentes"
+            @update="fetchUsuarios"
         />
 
         <ModalDesactivar
             v-if="mostrarModalDesactivar"
             :item="itemSeleccionado"
-            itemName="Docente"
+            itemName="Usuario"
             fieldName="name"
             @cancelar="cerrarDesactivarModal"
             @confirmar="desactivarItem"
@@ -279,7 +263,7 @@ onMounted(() => {
         <ModalActivar
             v-if="mostrarModalActivar"
             :item="itemSeleccionado"
-            itemName="Docente"
+            itemName="Usuario"
             fieldName="name"
             @cancelar="cerrarActivarModal"
             @confirmar="activarItem"

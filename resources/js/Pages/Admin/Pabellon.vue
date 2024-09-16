@@ -5,7 +5,7 @@ import listPabellon from '@/Components/Admin/listPabellon.vue';
 
 <template>
     <AppLayout title="Pabellones">
-        <div class="py-6">
+        <div class="py-2">
             <listPabellon />
         </div>
     </AppLayout>

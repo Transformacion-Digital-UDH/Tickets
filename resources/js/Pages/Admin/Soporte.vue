@@ -5,7 +5,7 @@ import listSoporte from "@/Components/Admin/listSoporte.vue";
 
 <template>
     <AppLayout title="Sedes">
-        <div class="py-6">
+        <div class="py-2">
             <listSoporte />
         </div>
     </AppLayout>

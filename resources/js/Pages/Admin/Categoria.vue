@@ -5,7 +5,7 @@ import listCategoria from '@/Components/Admin/listCategoria.vue';
 
 <template>
     <AppLayout title="Aulas">
-        <div class="py-6">
+        <div class="py-2">
             <listCategoria/>
         </div>
     </AppLayout>

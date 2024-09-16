@@ -137,16 +137,16 @@ defineProps({ title: String });
                         </NavLink>
 
                         <NavLink
-                            :href="route('docente')"
-                            :active="route().current('docente')"
-                            :class="linkClasses(route().current('docente'))"
+                            :href="route('usuario')"
+                            :active="route().current('usuario')"
+                            :class="linkClasses(route().current('usuario'))"
                         >
                             <font-awesome-icon
                                 icon="user-graduate"
                                 class="text-lg"
                             />
                             <span v-if="abrirSidebar" class="ml-2"
-                                >Docentes</span
+                                >Usuarios</span
                             >
                         </NavLink>
 
@@ -275,7 +275,7 @@ defineProps({ title: String });
                     </div>
                 </header>
 
-                <main class="flex-1 p-4">
+                <main class="flex-1">
                     <slot />
                 </main>
             </div>

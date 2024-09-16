@@ -5,7 +5,7 @@ import listTicket from '@/Components/Ticket/listTicket.vue';
 
 <template>
     <AppLayout title="Tickets">
-        <div class="py-6">
+        <div class="py-2">
             <listTicket />
         </div>
     </AppLayout>

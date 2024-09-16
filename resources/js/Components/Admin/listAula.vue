@@ -6,12 +6,8 @@ import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
 import ModalDesactivar from "../ModalDesactivar.vue";
 import ModalActivar from "../ModalActivar.vue";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import ButtonNuevo from "../ButtonNuevo.vue";
 import axios from "axios";
-
-library.add(faPlus);
 
 const aulas = ref([]);
 const pabellons = ref([]);
@@ -107,10 +103,6 @@ const activarItem = async () => {
     }
 };
 
-const abrirCrearModal = () => {
-    mostrarModalCrear.value = true;
-};
-
 const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
 };
@@ -172,11 +164,7 @@ onMounted(() => {
                     class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
             </div>
 
-            <button @click="abrirCrearModal"
-                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]">
-                <font-awesome-icon icon="plus" class="mr-2 text-lg" />
-                Nuevo
-            </button>
+            <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
         <Table :headers="headers" :items="filtrarAulas" @view="abrirDetallesModal" @edit="abrirEditarModal"

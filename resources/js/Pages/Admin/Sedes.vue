@@ -5,7 +5,7 @@ import listSedes from "@/Components/Admin/listSedes.vue";
 
 <template>
     <AppLayout title="Sedes">
-        <div class="py-68">
+        <div class="py-2">
             <listSedes />
         </div>
     </AppLayout>
