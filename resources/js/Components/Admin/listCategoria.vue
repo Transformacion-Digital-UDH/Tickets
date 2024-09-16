@@ -6,12 +6,8 @@ import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
 import ModalDesactivar from "../ModalDesactivar.vue";
 import ModalActivar from "../ModalActivar.vue";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import ButtonNuevo from "../ButtonNuevo.vue";
 import axios from "axios";
-
-library.add(faPlus);
 
 const categorias = ref([]);
 const buscarQuery = ref("");
@@ -76,10 +72,6 @@ const activarItem = async () => {
     }
 };
 
-const abrirCrearModal = () => {
-    mostrarModalCrear.value = true;
-};
-
 const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
 };
@@ -129,82 +121,33 @@ onMounted(() => fetchCategorias());
 
         <div class="flex items-center justify-between mb-4">
             <div class="relative">
-                <span
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input
-                    type="text"
-                    v-model="buscarQuery"
-                    placeholder="Buscar..."
-                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-                />
+                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
+                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
             </div>
 
-            <button
-                @click="abrirCrearModal"
-                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-300 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
-            >
-                <font-awesome-icon icon="plus" class="mr-2 text-lg" />
-                Nuevo
-            </button>
+            <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
-        <Table
-            :headers="headers"
-            :items="filtrarCategorias"
-            @view="abrirDetallesModal"
-            @edit="abrirEditarModal"
-            @activar="abrirActivarModal"
-            @desactivar="abrirDesactivarModal"
-        />
+        <Table :headers="headers" :items="filtrarCategorias" @view="abrirDetallesModal" @edit="abrirEditarModal"
+            @activar="abrirActivarModal" @desactivar="abrirDesactivarModal" />
 
-        <ModalCrear
-            v-if="mostrarModalCrear"
-            :formFields="formFields"
-            itemName="Categoría"
-            endpoint="/categorias"
-            @cerrar="cerrarCrearModal"
-            @crear="fetchCategorias"
-        />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" itemName="Categoría" endpoint="/categorias"
+            @cerrar="cerrarCrearModal" @crear="fetchCategorias" />
 
-        <ModalVer
-            v-if="mostrarModalDetalles"
-            :item="itemSeleccionado"
-            itemName="Categoría"
-            :formFields="formFields"
-            :mostrarModalDetalles="mostrarModalDetalles"
-            @close="cerrarDetallesModal"
-        />
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Categoría" :formFields="formFields"
+            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar
-            v-if="mostrarModalEditar"
-            :item="itemSeleccionado"
-            itemName="Categoría"
-            :formFields="formFields"
-            :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/categorias"
-            @cerrar="cerrarEditarModal"
-            @update="fetchCategorias"
-        />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Categoría" :formFields="formFields"
+            :mostrarModalEditar="mostrarModalEditar" endpoint="/categorias" @cerrar="cerrarEditarModal"
+            @update="fetchCategorias" />
 
-        <ModalDesactivar
-            v-if="mostrarModalDesactivar"
-            :item="itemSeleccionado"
-            itemName="Categoría"
-            fieldName="cat_nombre"
-            @cancelar="cerrarDesactivarModal"
-            @confirmar="desactivarItem"
-        />
+        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Categoría"
+            fieldName="cat_nombre" @cancelar="cerrarDesactivarModal" @confirmar="desactivarItem" />
 
-        <ModalActivar
-            v-if="mostrarModalActivar"
-            :item="itemSeleccionado"
-            itemName="Categoría"
-            fieldName="cat_nombre"
-            @cancelar="cerrarActivarModal"
-            @confirmar="activarItem"
-        />
+        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Categoría" fieldName="cat_nombre"
+            @cancelar="cerrarActivarModal" @confirmar="activarItem" />
     </div>
 </template>

@@ -5,7 +5,7 @@ import graphicsDashboard from "@/Components/Dashboard/graphicsDashboard.vue";
 
 <template>
     <AppLayout title="Dashboard">
-        <div class="py-6">
+        <div class="py-2">
             <graphicsDashboard />
         </div>
     </AppLayout>

@@ -38,12 +38,12 @@ Route::middleware([
         Route::delete('/soportes/{soporte}/desactivar', 'desactivarSoporte');
         Route::put('/soportes/{soporte}/activar', 'activarSoporte');
         /** DOCENTE **/
-        Route::get('/docente', 'docente')->name('docente');
-        Route::get('/docentes', 'traerDocente');
-        Route::post('/docentes', 'storeDocente');
-        Route::put('/docentes/{docente}', 'updateDocente');
-        Route::delete('/docentes/{docente}/desactivar', 'desactivarDocente');
-        Route::put('/docentes/{docente}/activar', 'activarDocente');
+        Route::get('/usuario', 'usuario')->name('usuario');
+        Route::get('/usuarios', 'traerUsuario');
+        Route::post('/usuarios', 'storeUsuario');
+        Route::put('/usuarios/{usuario}', 'updateUsuario');
+        Route::delete('/usuarios/{usuario}/desactivar', 'desactivarUsuario');
+        Route::put('/usuarios/{usuario}/activar', 'activarUsuario');
     });
 
     Route::controller(CategoriaController::class)->group(function () {

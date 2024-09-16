@@ -40,12 +40,12 @@ export default {
                     <th
                         v-for="header in headers"
                         :key="header"
-                        class="px-4 py-3 text-[10px] font-bold text-left text-gray-500 uppercase"
+                        class="px-4 py-3 text-[14px] font-bold text-left text-gray-500 uppercase"
                     >
                         {{ header }}
                     </th>
                     <th
-                        class="px-4 py-3 text-[10px] font-bold text-center text-gray-500 uppercase"
+                        class="px-4 py-3 text-[14px] font-bold text-center text-gray-500 uppercase"
                     >
                         Acciones
                     </th>
@@ -57,17 +57,17 @@ export default {
                     :key="item.id"
                     class="transition-colors duration-200 border-b"
                 >
-                    <td class="px-4 py-3 text-[11px] text-gray-400">
+                    <td class="px-4 py-3 text-[14px] text-gray-400">
                         {{ index + 1 }}
                     </td>
                     <td
                         v-for="key in filteredItemKeys(item)"
                         :key="key"
-                        class="px-4 py-3 text-[11px] text-gray-400"
+                        class="px-4 py-3 text-[14px] text-gray-400"
                     >
                         {{ item[key] }}
                     </td>
-                    <td class="px-4 py-3 text-[11px] text-gray-400">
+                    <td class="px-4 py-3 text-[14px] text-gray-400">
                         <span
                             :class="{
                                 'bg-green-100 text-green-800':

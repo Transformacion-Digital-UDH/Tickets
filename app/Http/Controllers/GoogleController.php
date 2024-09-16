@@ -35,7 +35,7 @@ class GoogleController extends Controller
                 $user->email_verified_at = now();
                 $user->save();
                 Auth::login($user);
-                return redirect()->route('dashboard');
+                return redirect()->route('elegirsede');
             } else {
                 if ($se_registro->estado == 2) {
                     return redirect()->redirect('login')->with('status', 'Su cuenta se encuentra suspendido');

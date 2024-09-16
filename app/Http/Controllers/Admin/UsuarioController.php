@@ -29,20 +29,20 @@ class UsuarioController extends Controller
         return response()->json($soportes);
     }
 
-    public function docente()
+    public function usuario()
     {
-        return Inertia::render("Admin/Docente");
+        return Inertia::render("Admin/Usuario");
     }
 
-    public function traerDocente()
+    public function traerUsuario()
     {
-        $docentes = User::with('rol', 'sede')
+        $usuarios = User::with('rol', 'sede')
             ->whereHas('rol', function ($query) {
                 $query->where('rol_nombre', 'Usuario');
             })
             ->get();
 
-        return response()->json($docentes);
+        return response()->json($usuarios);
     }
 
     public function storeSoporte(Request $request)
@@ -73,7 +73,7 @@ class UsuarioController extends Controller
         ], 201);
     }
 
-    public function storeDocente(Request $request)
+    public function storeUsuario(Request $request)
     {
         $validarDatos = $request->validate([
             'name' => 'required|string|max:255',
@@ -84,20 +84,20 @@ class UsuarioController extends Controller
             'activo' => 'boolean',
         ]);
 
-        $docente_rol = Rol::where('rol_nombre', 'Usuario')->first();
+        $usuario_rol = Rol::where('rol_nombre', 'Usuario')->first();
 
-        if (!$docente_rol) {
+        if (!$usuario_rol) {
             return response()->json(['message' => 'Rol Usuario no encontrado'], 404);
         }
 
         $validarDatos['password'] = bcrypt($validarDatos['password']);
-        $validarDatos['rol_id'] = $docente_rol->id;
+        $validarDatos['rol_id'] = $usuario_rol->id;
 
-        $docente = User::create($validarDatos);
+        $usuario = User::create($validarDatos);
 
         return response()->json([
             'message' => 'Usuario creado exitosamente',
-            'docente' => $docente
+            'usuario' => $usuario
         ], 201);
     }
 
@@ -147,7 +147,7 @@ class UsuarioController extends Controller
         }
     }
 
-    public function updateDocente(Request $request, $id)
+    public function updateUsuario(Request $request, $id)
     {
         try {
             $user = User::findOrFail($id);
@@ -188,7 +188,7 @@ class UsuarioController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Error al actualizar al docente: ' . $e->getMessage(),
+                'msg' => 'Error al actualizar al usuario: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -212,12 +212,12 @@ class UsuarioController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ocurrió un error al desactivar el soporte técnico: ' . $e->getMessage(),
+                'msg' => 'Ocurrió un error al desactivar al soporte técnico: ' . $e->getMessage(),
             ], 500);
         }
     }
 
-    public function desactivarDocente($id)
+    public function desactivarUsuario($id)
     {
         try {
             $user = User::findOrFail($id);
@@ -236,7 +236,7 @@ class UsuarioController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ocurrió un error al desactivar el soporte técnico: ' . $e->getMessage(),
+                'msg' => 'Ocurrió un error al desactivar al usuario: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -265,7 +265,7 @@ class UsuarioController extends Controller
         }
     }
 
-    public function activarDocente($id)
+    public function activarUsuario($id)
     {
         try {
             $user = User::findOrFail($id);
@@ -284,7 +284,7 @@ class UsuarioController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ocurrió un error al activar al docente: ' . $e->getMessage(),
+                'msg' => 'Ocurrió un error al activar al usuario: ' . $e->getMessage(),
             ], 500);
         }
     }
