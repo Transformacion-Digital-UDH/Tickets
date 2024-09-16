@@ -35,8 +35,26 @@ class TicketController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validarDatos = $request->validate([
+            'use_id' => 'required|exists:users,id',
+            'cat_id' => 'required|exists:categorias,id',
+            'pri_id' => 'required|exists:prioridads,id',
+            'pab_id' => 'required|exists:pabellons,id',
+            'tic_titulo' => 'required|string|max:255',
+            'tic_descripcion' => 'required|string|max:255',
+            'tic_archivo' => 'required|string|max:255',
+            'tic_estado' => 'required|string|max:255',
+            'tic_activo' => 'boolean',
+        ]);
+
+        $ticket = Ticket::create($validarDatos);
+
+        return response()->json([
+            'message' => 'Ticket creado exitosamente',
+            'ticket' => $ticket
+        ], 201);
     }
+
 
     /**
      * Display the specified resource.

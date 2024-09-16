@@ -18,7 +18,11 @@ export default {
       },
       soporteAsignado: '',
       searchQuery: '', // Barra de búsqueda
-      tickets: [], // Inicialmente vacío
+      tickets: [],
+      usuarios: [],
+      prioridades: [],
+      categorias: [],
+      pabellones: [],
     };
   },
   computed: {
@@ -38,39 +42,75 @@ export default {
   },
   created() {
     this.fetchTickets();
+    this.fetchPrioridades();
+    this.fetchUsuarios();
+    this.fetchCategorias();
+    this.fetchPabellones();
   },
   methods: {
     async fetchTickets() {
       try {
-        const response = await axios.get('/tickets'); // Ajusta la URL según tu ruta API
+        const response = await axios.get('/tickets');
         this.tickets = response.data;
       } catch (error) {
         console.error('Error al traer los tickets:', error);
       }
     },
-    toggleView() {
-      this.isCardView = !this.isCardView;
+    async fetchPrioridades() {
+      try {
+        const response = await axios.get('/prioridades');
+        this.prioridades = response.data;
+      } catch (error) {
+        console.error('Error al traer las prioridades:', error);
+      }
     },
-    showCrearTicketModal() {
-      this.mostrarModalCrearTicket = true;
+    async fetchUsuarios() {
+      try {
+        const response = await axios.get('/usuarios');
+        this.usuarios = response.data;
+      } catch (error) {
+        console.error('Error al traer los usuarios:', error);
+      }
     },
-    cerrarCrearTicketModal() {
-      this.mostrarModalCrearTicket = false;
+    async fetchCategorias() {
+      try {
+        const response = await axios.get('/categorias');
+        this.categorias = response.data;
+      } catch (error) {
+        console.error('Error al traer las categorías:', error);
+      }
+    },
+    async fetchPabellones() {
+      try {
+        const response = await axios.get('/pabellons');
+        this.pabellones = response.data;
+      } catch (error) {
+        console.error('Error al traer los pabellones:', error);
+      }
     },
     async crearTicket() {
       try {
         const response = await axios.post('/tickets', {
           tic_titulo: this.nuevoTicket.titulo,
           tic_descripcion: this.nuevoTicket.descripcion,
+          tic_prioridad: this.nuevoTicket.prioridad,
+          tic_usuario: this.nuevoTicket.usuario,
+          tic_categoria: this.nuevoTicket.categoria,
+          tic_pabellon: this.nuevoTicket.pabellon,
           tic_estado: 'Abierto',
-          tic_activo: true,
-          // Añade los campos adicionales que puedas necesitar, como `tic_archivo`
+          tic_activo: true
         });
         this.tickets.push(response.data);
         this.cerrarCrearTicketModal();
       } catch (error) {
         console.error('Error creating ticket:', error);
       }
+    },
+    showCrearTicketModal() {
+      this.mostrarModalCrearTicket = true;
+    },
+    cerrarCrearTicketModal() {
+      this.mostrarModalCrearTicket = false;
     },
     showDetallesModal(ticket) {
       this.ticketSeleccionado = ticket;
@@ -87,7 +127,6 @@ export default {
       this.mostrarModalAsignarSoporte = false;
     },
     asignarSoporte() {
-      // Implementa la lógica para asignar soporte si es necesario
       alert(`El ticket "${this.ticketSeleccionado.tic_titulo}" ha sido asignado a ${this.soporteAsignado}`);
       this.cerrarAsignarSoporteModal();
     },
@@ -199,14 +238,31 @@ export default {
         <textarea v-model="nuevoTicket.descripcion" class="border p-2 w-full rounded mb-4"></textarea>
         <label class="block mb-2">Prioridad:</label>
         <select v-model="nuevoTicket.prioridad" class="border p-2 w-full rounded mb-4">
-          <option value="Alta">Alta</option>
-          <option value="Media">Media</option>
-          <option value="Baja">Baja</option>
+          <option v-for="prioridad in prioridades" :key="prioridad.id" :value="prioridad.id">
+            {{ prioridad.pri_nombre }}
+          </option>
         </select>
+
         <label class="block mb-2">Usuario:</label>
-        <input type="text" v-model="nuevoTicket.usuario" class="border p-2 w-full rounded mb-4" />
+        <select v-model="nuevoTicket.usuario" class="border p-2 w-full rounded mb-4">
+          <option v-for="usuario in usuarios" :key="usuario.id" :value="usuario.id">
+            {{ usuario.name }}
+          </option>
+        </select>
+
         <label class="block mb-2">Categoría:</label>
-        <input type="text" v-model="nuevoTicket.categoria" class="border p-2 w-full rounded mb-4" />
+        <select v-model="nuevoTicket.categoria" class="border p-2 w-full rounded mb-4">
+          <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.id">
+            {{ categoria.cat_nombre }}
+          </option>
+        </select>
+
+        <label class="block mb-2">Pabellón:</label>
+        <select v-model="nuevoTicket.pabellon" class="border p-2 w-full rounded mb-4">
+          <option v-for="pabellon in pabellones" :key="pabellon.id" :value="pabellon.id">
+            {{ pabellon.pab_nombre }}
+          </option>
+        </select>
         <button @click="crearTicket" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
           Crear
         </button>
