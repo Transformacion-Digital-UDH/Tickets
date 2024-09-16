@@ -9,6 +9,11 @@ use Inertia\Inertia;
 
 class SedeController extends Controller
 {
+    public function elegirsede()
+    {
+        return Inertia::render('ElegirSedes');
+    }
+
     public function index()
     {
         return Inertia::render('Admin/Sedes');

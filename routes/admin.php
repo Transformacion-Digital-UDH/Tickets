@@ -20,6 +20,7 @@ Route::middleware([
 
     Route::controller(SedeController::class)->group(function () {
         Route::get('/sede', 'index')->name('sede');
+        Route::get('/elegirsede', 'elegirsede')->name('elegirsede');
         Route::get('/sedes', 'traer');
         Route::post('/sedes', 'store');
         Route::put('/sedes/{sede}', 'update');
