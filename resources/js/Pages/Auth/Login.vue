@@ -89,14 +89,17 @@ function redirectToGoogle() {
             </button>
         </div>
 
+        <div
+            v-if="status"
+            class="mb-4 text-sm font-medium text-center text-red-600"
+        >
+            {{ status }}
+        </div>
+
         <div class="flex items-center justify-center my-4">
             <hr class="w-full border-t border-gray-300" />
             <span class="px-3 text-gray-500">o</span>
             <hr class="w-full border-t border-gray-300" />
-        </div>
-
-        <div v-if="status" class="mb-4 text-sm font-medium text-center text-red-600">
-            {{ status }}
         </div>
 
         <form @submit.prevent="submit">
