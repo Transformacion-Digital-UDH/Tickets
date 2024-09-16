@@ -17,15 +17,17 @@ return new class extends Migration
             $table->unsignedBigInteger('sed_id')->nullable();
             $table->foreign('rol_id')->references('id')->on('rols');
             $table->foreign('sed_id')->references('id')->on('sedes');
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email');
+            $table->string('name')->nullable();
+            $table->string('apellidos')->nullable();
+            $table->string('foto')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('celular')->nullable();
+            $table->string('password')->nullable();
+            $table->string('celular', 15)->nullable();
+            $table->string('google_id')->nullable();
+            $table->boolean('se_registro')->default(false);
             $table->boolean('activo')->default(true);
             $table->rememberToken();
-            $table->foreignId('current_team_id')->nullable();
-            $table->string('profile_photo_path', 2048)->nullable();
             $table->timestamps();
         });
 

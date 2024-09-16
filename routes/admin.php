@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin\CategoriaController;
 use App\Http\Controllers\Admin\SedeController;
-use App\Http\Controllers\Admin\SubcategoriaController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\AulaController;
 use App\Http\Controllers\Admin\PabellonController;
@@ -53,14 +52,6 @@ Route::middleware([
         Route::put('/categorias/{categoria}', 'update');
         Route::delete('/categorias/{categoria}/desactivar', 'desactivar');
         Route::put('/categorias/{categoria}/activar', 'activar');
-    });
-
-    Route::controller(SubcategoriaController::class)->group(function () {
-        Route::get('/subcategoria', 'index')->name('subcategoria');
-        Route::get('/subcategorias', 'traer');
-        Route::post('/subcategorias', 'store');
-        Route::put('/subcategorias/{subcategoria}', 'update');
-        Route::delete('/subcategorias/{subcategoria}', 'destroy');
     });
 
     Route::controller(TicketController::class)->group(function () {
