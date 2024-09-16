@@ -95,4 +95,3 @@ class PabellonController extends Controller
         }
     }
 }
-

@@ -38,7 +38,7 @@ class UsuarioController extends Controller
     {
         $docentes = User::with('rol', 'sede')
             ->whereHas('rol', function ($query) {
-                $query->where('rol_nombre', 'Docente');
+                $query->where('rol_nombre', 'Usuario');
             })
             ->get();
 
@@ -84,10 +84,10 @@ class UsuarioController extends Controller
             'activo' => 'boolean',
         ]);
 
-        $docente_rol = Rol::where('rol_nombre', 'Docente')->first();
+        $docente_rol = Rol::where('rol_nombre', 'Usuario')->first();
 
         if (!$docente_rol) {
-            return response()->json(['message' => 'Rol Docente no encontrado'], 404);
+            return response()->json(['message' => 'Rol Usuario no encontrado'], 404);
         }
 
         $validarDatos['password'] = bcrypt($validarDatos['password']);
@@ -96,7 +96,7 @@ class UsuarioController extends Controller
         $docente = User::create($validarDatos);
 
         return response()->json([
-            'message' => 'Docente creado exitosamente',
+            'message' => 'Usuario creado exitosamente',
             'docente' => $docente
         ], 201);
     }
@@ -177,13 +177,13 @@ class UsuarioController extends Controller
 
             return response()->json([
                 'status' => true,
-                'msg' => 'Docente actualizado correctamente',
+                'msg' => 'Usuario actualizado correctamente',
                 'user' => $user
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Docente no encontrado'
+                'msg' => 'Usuario no encontrado'
             ], 404);
         } catch (Exception $e) {
             return response()->json([
@@ -226,12 +226,12 @@ class UsuarioController extends Controller
 
             return response()->json([
                 'status' => true,
-                'msg' => 'Docente desactivado exitosamente.',
+                'msg' => 'Usuario desactivado exitosamente.',
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Docente no encontrado.',
+                'msg' => 'Usuario no encontrado.',
             ], 404);
         } catch (Exception $e) {
             return response()->json([
@@ -274,12 +274,12 @@ class UsuarioController extends Controller
 
             return response()->json([
                 'status' => true,
-                'msg' => 'Docente activado exitosamente.',
+                'msg' => 'Usuario activado exitosamente.',
             ]);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Docente no encontrado.',
+                'msg' => 'Usuario no encontrado.',
             ], 404);
         } catch (Exception $e) {
             return response()->json([

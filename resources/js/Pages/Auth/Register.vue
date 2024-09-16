@@ -1,5 +1,4 @@
 <script setup>
-import { ref, onMounted } from "vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import AuthenticationCard from "@/Components/AuthenticationCard.vue";
 import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
@@ -8,39 +7,13 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
-import Select from "@/Components/Select.vue";
-
-const sedes = ref([]);
-
-const isSedeValida = (value) => {
-    return sedes.value.some((sede) => sede.value === value);
-};
-
-const fetchSedes = async () => {
-    try {
-        const response = await fetch("/api/sedes");
-        const data = await response.json();
-        sedes.value = data
-            .filter((sede) => sede.sed_activo === 1)
-            .map((sede) => ({
-                value: sede.id,
-                text: sede.sed_nombre,
-            }));
-    } catch (error) {
-        console.error("Error al cargar las sedes:", error);
-    }
-};
-
-onMounted(() => {
-    fetchSedes();
-});
 
 const form = useForm({
     name: "",
+    apellidos: "",
     email: "",
     password: "",
     password_confirmation: "",
-    sed_id: "",
     terms: false,
 });
 
@@ -72,7 +45,7 @@ const submit = () => {
         </div>
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Nombres y Apellidos" />
+                <InputLabel for="name" value="Nombres" />
                 <TextInput
                     id="name"
                     v-model="form.name"
@@ -83,6 +56,19 @@ const submit = () => {
                     autocomplete="name"
                 />
                 <InputError class="mt-2" :message="form.errors.name" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="apellidos" value="Apellidos" />
+                <TextInput
+                    id="apellidos"
+                    v-model="form.apellidos"
+                    type="text"
+                    class="block w-full mt-1"
+                    required
+                    autocomplete="family-name"
+                />
+                <InputError class="mt-2" :message="form.errors.apellidos" />
             </div>
 
             <div class="mt-4">
@@ -128,21 +114,6 @@ const submit = () => {
                     class="mt-2"
                     :message="form.errors.password_confirmation"
                 />
-            </div>
-
-            <div class="mt-4">
-                <InputLabel for="sed_id" value="Selecciona una Sede" />
-                <Select
-                    id="sed_id"
-                    v-model="form.sed_id"
-                    :options="sedes"
-                    :disabled="sedes.length === 0"
-                    :validate="isSedeValida"
-                    name="sed_id"
-                    placeholder="Por favor seleccione una sede"
-                    required
-                />
-                <InputError class="mt-2" :message="form.errors.sed_id" />
             </div>
 
             <div

@@ -73,7 +73,7 @@ const fetchDocentes = async () => {
             email: docente.email,
             celular: validatePhoneNumber(docente.celular),
             sed_id: docente.sed_id,
-            sed_nombre: docente.sede.sed_nombre,
+            sed_nombre: docente.sede ? docente.sede.sed_nombre : "",
             activo: docente.activo,
         }));
     } catch (error) {
@@ -205,37 +205,84 @@ onMounted(() => {
 
         <div class="flex items-center justify-between mb-4">
             <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <span
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
-                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
+                <input
+                    type="text"
+                    v-model="buscarQuery"
+                    placeholder="Buscar..."
+                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
+                />
             </div>
 
-            <button @click="abrirCrearModal"
-                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]">
+            <button
+                @click="abrirCrearModal"
+                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
+            >
                 <font-awesome-icon icon="plus" class="mr-2 text-lg" />
                 Nuevo
             </button>
         </div>
 
-        <Table :headers="headers" :items="filtrarDocentes" @view="abrirDetallesModal" @edit="abrirEditarModal"
-            @activar="abrirActivarModal" @desactivar="abrirDesactivarModal" />
+        <Table
+            :headers="headers"
+            :items="filtrarDocentes"
+            @view="abrirDetallesModal"
+            @edit="abrirEditarModal"
+            @activar="abrirActivarModal"
+            @desactivar="abrirDesactivarModal"
+        />
 
-        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :sedes="sedes" itemName="Docente"
-            endpoint="/docentes" @cerrar="cerrarCrearModal" @crear="fetchDocentes" />
+        <ModalCrear
+            v-if="mostrarModalCrear"
+            :formFields="formFields"
+            :sedes="sedes"
+            itemName="Docente"
+            endpoint="/docentes"
+            @cerrar="cerrarCrearModal"
+            @crear="fetchDocentes"
+        />
 
-        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Docente" :formFields="formFields"
-            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
+        <ModalVer
+            v-if="mostrarModalDetalles"
+            :item="itemSeleccionado"
+            itemName="Docente"
+            :formFields="formFields"
+            :mostrarModalDetalles="mostrarModalDetalles"
+            @close="cerrarDetallesModal"
+        />
 
-        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Docente" :formFields="formFields"
-            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/docentes" @cerrar="cerrarEditarModal"
-            @update="fetchDocentes" />
+        <ModalEditar
+            v-if="mostrarModalEditar"
+            :item="itemSeleccionado"
+            itemName="Docente"
+            :formFields="formFields"
+            :sedes="sedes"
+            :mostrarModalEditar="mostrarModalEditar"
+            endpoint="/docentes"
+            @cerrar="cerrarEditarModal"
+            @update="fetchDocentes"
+        />
 
-        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Docente" fieldName="name"
-            @cancelar="cerrarDesactivarModal" @confirmar="desactivarItem" />
+        <ModalDesactivar
+            v-if="mostrarModalDesactivar"
+            :item="itemSeleccionado"
+            itemName="Docente"
+            fieldName="name"
+            @cancelar="cerrarDesactivarModal"
+            @confirmar="desactivarItem"
+        />
 
-        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Docente" fieldName="name"
-            @cancelar="cerrarActivarModal" @confirmar="activarItem" />
+        <ModalActivar
+            v-if="mostrarModalActivar"
+            :item="itemSeleccionado"
+            itemName="Docente"
+            fieldName="name"
+            @cancelar="cerrarActivarModal"
+            @confirmar="activarItem"
+        />
     </div>
 </template>
