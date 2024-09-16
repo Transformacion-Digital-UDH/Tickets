@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoriaController;
+use App\Http\Controllers\Admin\PrioridadController;
 use App\Http\Controllers\Admin\SedeController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\AulaController;
@@ -77,5 +78,9 @@ Route::middleware([
         Route::put('/aulas/{aula}', 'update');
         Route::delete('/aulas/{aula}/desactivar', 'desactivar');
         Route::put('/aulas/{aula}/activar', 'activar');
+    });
+
+    Route::controller(PrioridadController::class)->group(function () {
+        Route::get('/prioridades', 'traer');
     });
 });

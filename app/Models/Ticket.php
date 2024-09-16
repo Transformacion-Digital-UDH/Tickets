@@ -21,6 +21,11 @@ class Ticket extends Model
     'tic_activo',
   ];
 
+  public function pabellon()
+  {
+    return $this->belongsTo(Pabellon::class, 'pab_id');
+  }
+
   public function prioridad()
   {
     return $this->belongsTo(Prioridad::class, 'pri_id');
