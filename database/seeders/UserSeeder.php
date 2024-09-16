@@ -17,8 +17,9 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'name' => 'Marvin Campos Deza',
-            'email' => 'marvinhectorcamposdeza@gmail.com',
+            'name' => 'Marvin',
+            'apellidos' => 'Campos Deza',
+            'email' => 'marvinhectorcamposdeza@udh.edu.pe',
             'password' => Hash::make('987654321'),
             'celular' => '987654321',
             'activo' => true,
@@ -27,8 +28,9 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Jean Richard Lino Becerra',
-            'email' => 'jeanlb.14.d@gmail.com',
+            'name' => 'Jean Richard',
+            'apellidos' => 'Lino Becerra',
+            'email' => 'jeanlb.14.d@udh.edu.pe',
             'password' => Hash::make('914210336'),
             'celular' => '914210336',
             'activo' => true,
@@ -38,7 +40,8 @@ class UserSeeder extends Seeder
 
         User::create([
             'name' => 'Cristina',
-            'email' => 'cristina@example.com',
+            'apellidos' => 'Cardenas Abarrote',
+            'email' => 'cristina@udh.edu.pe',
             'password' => Hash::make('password123'),
             'celular' => '987654322',
             'activo' => true,
@@ -48,7 +51,8 @@ class UserSeeder extends Seeder
 
         User::create([
             'name' => 'Rosario',
-            'email' => 'rosario@example.com',
+            'apellidos' => 'Beteta Arteaga',
+            'email' => 'rosario@udh.edu.pe',
             'password' => Hash::make('password123'),
             'celular' => '987654323',
             'activo' => true,
