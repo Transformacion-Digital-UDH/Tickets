@@ -57,7 +57,7 @@ function redirectToGoogle() {
             <button
                 type="button"
                 @click="redirectToGoogle"
-                class="inline-flex items-center justify-center w-full px-4 py-2 text-xs font-semibold tracking-widest text-gray-800 uppercase transition duration-150 ease-in-out bg-white border border-gray-300 hover:bg-gray-100 active:bg-gray-200 focus:outline-none focus:border-gray-300 focus:ring ring-gray-300 disabled:opacity-25"
+                class="inline-flex items-center justify-center w-full px-4 py-2 text-xs font-semibold text-gray-800 uppercase transition duration-150 ease-in-out bg-white border border-gray-300 hover:bg-gray-100 active:bg-gray-200 disabled:opacity-25"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
