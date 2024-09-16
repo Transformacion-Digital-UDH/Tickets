@@ -95,7 +95,7 @@ function redirectToGoogle() {
             <hr class="w-full border-t border-gray-300" />
         </div>
 
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+        <div v-if="status" class="mb-4 text-sm font-medium text-center text-red-600">
             {{ status }}
         </div>
 

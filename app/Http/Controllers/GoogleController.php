@@ -24,7 +24,7 @@ class GoogleController extends Controller
             if (empty($se_registro)) {
                 $isUDHEmail = str_ends_with($user_google->email, '@udh.edu.pe');
                 if (!$isUDHEmail) {
-                    return redirect()->route('login')->with('estado_google', 'Se requiere un correo institucional de la UDH.');
+                    return redirect()->route('login')->with('status', 'Se requiere un correo institucional de la UDH.');
                 }
                 $user = new User();
                 $user->email = $user_google->email;
@@ -38,13 +38,13 @@ class GoogleController extends Controller
                 return redirect()->route('dashboard');
             } else {
                 if ($se_registro->estado == 2) {
-                    return redirect()->redirect('login')->with('estado_google', 'Su cuenta se encuentra suspendido');
+                    return redirect()->redirect('login')->with('status', 'Su cuenta se encuentra suspendido');
                 }
                 Auth::login($se_registro);
                 return redirect()->intended(RouteServiceProvider::HOME);
             }
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('estado_google', 'Ocurrió un error al iniciar sesión.');
+            return redirect()->route('login')->with('status', 'Ocurrió un error al iniciar sesión.');
         }
     }
 }
