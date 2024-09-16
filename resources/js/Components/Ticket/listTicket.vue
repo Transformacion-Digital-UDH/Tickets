@@ -93,10 +93,10 @@ export default {
         const response = await axios.post('/tickets', {
           tic_titulo: this.nuevoTicket.titulo,
           tic_descripcion: this.nuevoTicket.descripcion,
-          tic_prioridad: this.nuevoTicket.prioridad,
-          tic_usuario: this.nuevoTicket.usuario,
-          tic_categoria: this.nuevoTicket.categoria,
-          tic_pabellon: this.nuevoTicket.pabellon,
+          pri_id: this.nuevoTicket.pri_id,
+          use_id: this.nuevoTicket.use_id,
+          cat_id: this.nuevoTicket.cat_id,
+          pab_id: this.nuevoTicket.pab_id,
           tic_estado: 'Abierto',
           tic_activo: true
         });
