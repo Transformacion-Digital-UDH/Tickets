@@ -4,8 +4,7 @@ import Table from "../Table.vue";
 import ModalCrear from "../ModalCrear.vue";
 import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
-import ModalDesactivar from "../ModalDesactivar.vue";
-import ModalActivar from "../ModalActivar.vue";
+import ModalEliminar from "../ModalEliminar.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -20,12 +19,11 @@ const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
-const mostrarModalDesactivar = ref(false);
-const mostrarModalActivar = ref(false);
+const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const passwordGenerada = ref("");
 
-const headers = ["N°", "Nombres", "Correo", "Teléfono", "Sede", "Estado"];
+const headers = ["N°", "Nombres", "Correo", "Estado"];
 
 const generarPassword = () => {
     const caracteres =
@@ -115,30 +113,19 @@ formFields.value = [
         type: "text",
         default: computed(() => passwordGenerada.value),
     },
+    { name: "activo", label: "Estado", type: "boolean" },
 ];
 
-const desactivarItem = async () => {
+const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/soportes/${itemSeleccionado.value.id}/desactivar`
+                `/soportes/${itemSeleccionado.value.id}/eliminar`
             );
             await fetchSoportes();
-            mostrarModalDesactivar.value = false;
+            mostrarModalEliminar.value = false;
         } catch (error) {
-            console.error("Error al desactivar al soporte técnico:", error);
-        }
-    }
-};
-
-const activarItem = async () => {
-    if (itemSeleccionado.value) {
-        try {
-            await axios.put(`/soportes/${itemSeleccionado.value.id}/activar`);
-            await fetchSoportes();
-            mostrarModalActivar.value = false;
-        } catch (error) {
-            console.error("Error al eliminar al soporte técnico:", error);
+            console.error("Error al eliminar al soporte técnico:", error)
         }
     }
 };
@@ -173,22 +160,13 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (soporte) => {
+const abrirEliminarModal = (soporte) => {
     itemSeleccionado.value = soporte;
-    mostrarModalDesactivar.value = true;
+    mostrarModalEliminar.value = true;
 };
 
-const cerrarDesactivarModal = () => {
-    mostrarModalDesactivar.value = false;
-};
-
-const abrirActivarModal = (soporte) => {
-    itemSeleccionado.value = soporte;
-    mostrarModalActivar.value = true;
-};
-
-const cerrarActivarModal = () => {
-    mostrarModalActivar.value = false;
+const cerrarEliminarModal = () => {
+    mostrarModalEliminar.value = false;
 };
 
 onMounted(() => {
@@ -230,10 +208,10 @@ onMounted(() => {
         <Table
             :headers="headers"
             :items="filtrarSoportes"
+            entityType="user"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
-            @activar="abrirActivarModal"
-            @desactivar="abrirDesactivarModal"
+            @eliminar="abrirEliminarModal"
         />
 
         <ModalCrear
@@ -267,22 +245,13 @@ onMounted(() => {
             @update="fetchSoportes"
         />
 
-        <ModalDesactivar
-            v-if="mostrarModalDesactivar"
+        <ModalEliminar
+            v-if="mostrarModalEliminar"
             :item="itemSeleccionado"
             itemName="Soporte"
             fieldName="name"
-            @cancelar="cerrarDesactivarModal"
-            @confirmar="desactivarItem"
-        />
-
-        <ModalActivar
-            v-if="mostrarModalActivar"
-            :item="itemSeleccionado"
-            itemName="Soporte"
-            fieldName="name"
-            @cancelar="cerrarActivarModal"
-            @confirmar="activarItem"
+            @cancelar="cerrarEliminarModal"
+            @confirmar="eliminarItem"
         />
     </div>
 </template>

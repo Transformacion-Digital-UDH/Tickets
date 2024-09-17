@@ -9,8 +9,21 @@ export default {
             type: Array,
             required: true,
         },
+        entityType: {
+            type: String,
+            required: true,
+        },
     },
     computed: {
+        userKeys() {
+            return ["id", "celular", "sed_id", "sed_nombre"];
+        },
+        sedeKeys() {
+            return ["id", "sed_direccion", "sed_telefono"];
+        },
+        pabellonKeys() {
+            return ["pab_id"];
+        },
         getStatusKey() {
             if (this.items.length > 0) {
                 const statusKeys = ["sed_activo", "activo", "cat_activo", "aul_activo", "pab_activo"];
@@ -20,11 +33,33 @@ export default {
             }
             return null;
         },
+        excludedKeys() {
+            let keysToExclude = [];
+
+            switch (this.entityType) {
+                case 'user':
+                    keysToExclude = [...this.userKeys];
+                    break;
+                case 'sede':
+                    keysToExclude = [...this.sedeKeys];
+                    break;
+                case 'pabellon':
+                    keysToExclude = [...this.pabellonKeys];
+                    break;
+                default:
+                    keysToExclude = [];
+            }
+
+            if (this.getStatusKey) {
+                keysToExclude.push(this.getStatusKey);
+            }
+
+            return keysToExclude;
+        },
         filteredItemKeys() {
             return (item) => {
-                const keysToExclude = ["id", "sed_id", "pab_id", this.getStatusKey];
                 return Object.keys(item).filter(
-                    (key) => !keysToExclude.includes(key)
+                    (key) => !this.excludedKeys.includes(key)
                 );
             };
         },
@@ -70,16 +105,12 @@ export default {
                     <td class="px-4 py-3 text-[14px] text-gray-400">
                         <span
                             :class="{
-                                'bg-green-100 text-green-800':
-                                    item[getStatusKey] === 1,
-                                'bg-red-100 text-red-800':
-                                    item[getStatusKey] === 0,
+                                'bg-green-100 text-green-800': item[getStatusKey] === 1,
+                                'bg-red-100 text-red-800': item[getStatusKey] === 0,
                             }"
                             class="px-2 py-1 text-xs font-semibold rounded-full"
                         >
-                            {{
-                                item[getStatusKey] === 1 ? "Activo" : "Inactivo"
-                            }}
+                            {{ item[getStatusKey] === 1 ? "Activo" : "Inactivo" }}
                         </span>
                     </td>
                     <td class="flex items-center justify-center py-3 space-x-3">
@@ -98,20 +129,11 @@ export default {
                             <i class="fas fa-edit"></i>
                         </button>
                         <button
-                            v-if="item[getStatusKey] === 1"
-                            @click="$emit('desactivar', item)"
+                            @click="$emit('eliminar', item)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-red-300 to-red-500 hover:from-red-400 hover:to-red-600"
-                            title="Desactivar"
+                            title="Eliminar"
                         >
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button
-                            v-else
-                            @click="$emit('activar', item)"
-                            class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-green-300 to-green-500 hover:from-green-400 hover:to-green-600"
-                            title="Activar"
-                        >
-                            <i class="fas fa-power-off"></i>
+                            <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>

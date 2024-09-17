@@ -25,8 +25,7 @@ Route::middleware([
         Route::get('/sedes', 'traer');
         Route::post('/sedes', 'store');
         Route::put('/sedes/{sede}', 'update');
-        Route::delete('/sedes/{sede}/desactivar', 'desactivar');
-        Route::put('/sedes/{sede}/activar', 'activar');
+        Route::delete('/sedes/{sede}/eliminar', 'eliminar');
     });
 
 
@@ -36,8 +35,7 @@ Route::middleware([
         Route::get('/soportes', 'traerSoporte');
         Route::post('/soportes', 'storeSoporte');
         Route::put('/soportes/{soporte}', 'updateSoporte');
-        Route::delete('/soportes/{soporte}/desactivar', 'desactivarSoporte');
-        Route::put('/soportes/{soporte}/activar', 'activarSoporte');
+        Route::delete('/soportes/{soporte}/eliminar', 'eliminarSoporte');
         /** DOCENTE **/
         Route::get('/usuario', 'usuario')->name('usuario');
         Route::get('/usuarios', 'traerUsuario');
