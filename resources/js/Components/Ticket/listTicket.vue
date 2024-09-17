@@ -4,6 +4,9 @@ import { ref, reactive, onMounted } from 'vue';
 export default {
   data() {
     return {
+      currentPage: 1,
+      ticketsPerPage: 7,
+
       isCardView: true,
       mostrarModalCrearTicket: false,
       mostrarModalDetalles: false,
@@ -29,6 +32,14 @@ export default {
     };
   },
   computed: {
+    totalPages() {
+      return Math.ceil(this.filteredTickets.length / this.ticketsPerPage);
+    },
+    paginatedTickets() {
+      const start = (this.currentPage - 1) * this.ticketsPerPage;
+      const end = this.currentPage * this.ticketsPerPage;
+      return this.filteredTickets.slice(start, end);
+    },
     filteredTickets() {
       return this.tickets.filter(ticket => {
         const search = this.searchQuery.toLowerCase();
@@ -54,6 +65,12 @@ export default {
 
 
   methods: {
+    changePage(page) {
+      this.currentPage = page;
+    },
+    toggleView() {
+      this.isCardView = !this.isCardView;
+    },
     async fetchTickets() {
       try {
         const response = await axios.get('/tickets');
@@ -110,37 +127,37 @@ export default {
     },
 
     async crearTicket() {
-  try {
-    await axios.post('/tickets', {
-      tic_titulo: this.nuevoTicket.titulo,
-      tic_descripcion: this.nuevoTicket.descripcion,
-      pri_id: this.nuevoTicket.prioridad,
-      use_id: this.nuevoTicket.usuario,
-      cat_id: this.nuevoTicket.categoria,
-      pab_id: this.nuevoTicket.pabellon,
-      tic_estado: 'Abierto',
-      tic_activo: true
-    });
+      try {
+        await axios.post('/tickets', {
+          tic_titulo: this.nuevoTicket.titulo,
+          tic_descripcion: this.nuevoTicket.descripcion,
+          pri_id: this.nuevoTicket.prioridad,
+          use_id: this.nuevoTicket.usuario,
+          cat_id: this.nuevoTicket.categoria,
+          pab_id: this.nuevoTicket.pabellon,
+          tic_estado: 'Abierto',
+          tic_activo: true
+        });
 
-    // Recargar la lista de tickets
-    await this.fetchTickets(); // Vuelve a cargar los tickets desde la API
+        // Recargar la lista de tickets
+        await this.fetchTickets(); // Vuelve a cargar los tickets desde la API
 
-    // Reinicializar el formulario del modal
-    this.nuevoTicket = {
-      titulo: '',
-      descripcion: '',
-      prioridad: '',
-      usuario: '',
-      categoria: '',
-      pabellon: ''
-    };
+        // Reinicializar el formulario del modal
+        this.nuevoTicket = {
+          titulo: '',
+          descripcion: '',
+          prioridad: '',
+          usuario: '',
+          categoria: '',
+          pabellon: ''
+        };
 
-    // Cerrar el modal de creación
-    this.cerrarCrearTicketModal();
-  } catch (error) {
-    console.error('Error al crear el ticket:', error);
-  }
-},
+        // Cerrar el modal de creación
+        this.cerrarCrearTicketModal();
+      } catch (error) {
+        console.error('Error al crear el ticket:', error);
+      }
+    },
     showCrearTicketModal() {
       this.mostrarModalCrearTicket = true;
     },
@@ -167,6 +184,7 @@ export default {
     },
   },
 };
+
 </script>
 
 <template>
@@ -191,77 +209,125 @@ export default {
     </div>
 
     <!-- Vista en tarjetas -->
-    <div v-if="isCardView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-for="ticket in filteredTickets" :key="ticket.id"
-        class="relative bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 min-h-[100px] max-h-[150px] flex flex-col justify-between">
-        <div>
-          <div class="absolute top-2 right-2 px-2 py-1 rounded text-xs" :class="{
-            'bg-orange-700 text-white': ticket.tic_estado === 'Abierto',
-            'bg-blue-700 text-white': ticket.tic_estado === 'En progreso',
-            'bg-green-700 text-white': ticket.tic_estado === 'Finalizado',
-            'bg-red-700 text-white': ticket.tic_estado === 'Cerrado',
-          }">
-            {{ ticket.tic_estado }}
+    <div v-if="isCardView"
+      class="container relative flex flex-col justify-between h-full max-w-9xl px-4 mx-auto xl:px-0 mt-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full">
+        <div v-for="ticket in filteredTickets" :key="ticket.id" class="relative w-full">
+          <!-- Fondo coloreado detrás de la tarjeta -->
+          <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
+            'bg-orange-600': ticket.tic_estado === 'Abierto',
+            'bg-blue-600': ticket.tic_estado === 'En progreso',
+            'bg-green-600': ticket.tic_estado === 'Finalizado',
+            'bg-red-600': ticket.tic_estado === 'Cerrado',
+          }"></span>
+
+          <!-- Contenido de la tarjeta -->
+          <div
+            class="relative bg-white border-2 rounded-lg p-6 h-full transition-transform transform hover:scale-105 hover:shadow-2xl duration-300 ease-in-out"
+            :class="{
+              'border-orange-600': ticket.tic_estado === 'Abierto',
+              'border-blue-600': ticket.tic_estado === 'En progreso',
+              'border-green-600': ticket.tic_estado === 'Finalizado',
+              'border-red-600': ticket.tic_estado === 'Cerrado',
+            }">
+
+            <!-- Estado del ticket como badge -->
+            <div
+              class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold shadow-md transition-colors duration-300"
+              :class="{
+                'bg-orange-600 text-white': ticket.tic_estado === 'Abierto',
+                'bg-blue-600 text-white': ticket.tic_estado === 'En progreso',
+                'bg-green-600 text-white': ticket.tic_estado === 'Finalizado',
+                'bg-red-600 text-white': ticket.tic_estado === 'Cerrado',
+              }">
+              {{ ticket.tic_estado }}
+            </div>
+
+            <!-- Título del ticket -->
+            <div>
+              <h2 class="text-lg font-bold uppercase text-gray-800 truncate">{{ ticket.tic_titulo }}</h2>
+              <hr class="my-2 border-gray-200">
+            </div>
+
+            <!-- Información detallada del ticket -->
+            <div class="flex flex-col space-y-2 text-sm text-gray-600">
+              <span><strong>Prioridad:</strong> {{ ticket.prioridad ? ticket.prioridad.pri_nombre : 'N/A' }}</span>
+              <span><strong>Usuario:</strong> {{ ticket.user ? ticket.user.name : 'N/A' }}</span>
+              <span><strong>Categoría:</strong> {{ ticket.categoria ? ticket.categoria.cat_nombre : 'N/A' }}</span>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex justify-end space-x-3 mt-auto">
+              <button @click="showDetallesModal(ticket)"
+                class="flex items-center text-blue-500 hover:text-blue-700 transition duration-300">
+                <i class="fas fa-eye mr-1"></i> Ver
+              </button>
+              <button @click="showAsignarSoporteModal(ticket)"
+                class="flex items-center text-purple-500 hover:text-purple-700 transition duration-300">
+                <i class="fas fa-user-plus mr-1"></i> Asignar
+              </button>
+            </div>
           </div>
-          <h2 class="text-xl font-semibold uppercase">{{ ticket.tic_titulo }}</h2>
-          <hr>
-          <!-- Prioridad, Usuario y Categoría alineados -->
-          <div class="flex flex-col mt-4">
-            <span class="text-sm text-gray-500">Prioridad: {{ ticket.prioridad ? ticket.prioridad.pri_nombre :
-              '' }}</span>
-            <span class="text-sm text-gray-500">Usuario: {{ ticket.user ? ticket.user.name : '' }}</span>
-            <span class="text-sm text-gray-500">Categoría: {{ ticket.categoria ? ticket.categoria.cat_nombre : ''
-              }}</span>
-          </div>
-        </div>
-        <div class="flex justify-end items-center space-x-2">
-          <button @click="showDetallesModal(ticket)" class="text-blue-500 hover:text-blue-700 transition duration-300">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button @click="showAsignarSoporteModal(ticket)"
-            class="text-purple-500 hover:text-purple-700 transition duration-300">
-            <i class="fas fa-user-plus"></i>
-          </button>
         </div>
       </div>
-
     </div>
 
     <!-- Vista en tabla -->
-    <div v-else>
-      <table class="min-w-full bg-white border">
-        <thead>
-          <tr>
-            <th class="px-4 py-2 border">Título</th>
-            <th class="px-4 py-2 border">Descripción</th>
-            <th class="px-4 py-2 border">Prioridad</th>
-            <th class="px-4 py-2 border">Estado</th>
-            <th class="px-4 py-2 border">Usuario</th>
-            <th class="px-4 py-2 border">Categoría</th>
-            <th class="px-4 py-2 border">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="ticket in filteredTickets" :key="ticket.id" class="border-t">
-            <td class="px-4 py-2 border">{{ ticket.tic_titulo }}</td>
-            <td class="px-4 py-2 border">{{ ticket.tic_descripcion }}</td>
-            <td class="px-4 py-2 border">{{ ticket.prioridad.pri_nombre }}</td>
-            <td class="px-4 py-2 border">{{ ticket.tic_estado }}</td>
-            <td class="px-4 py-2 border">{{ ticket.user.name }}</td>
-            <td class="px-4 py-2 border">{{ ticket.categoria.cat_nombre }}</td>
-            <td class="px-4 py-2 border flex justify-between space-x-2">
-              <button @click="showDetallesModal(ticket)"
-                class="text-blue-500 hover:text-blue-700 transition duration-300">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button @click="showAsignarSoporteModal(ticket)"
-                class="text-purple-500 hover:text-purple-700 transition duration-300">
-                <i class="fas fa-user-plus"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else class="flex flex-col min-h-[603px]"> <!-- Añadí min-h-[500px] para asegurar el espacio mínimo -->
+      <div class="overflow-x-auto flex-grow">
+        <table class="min-w-full bg-white border-collapse rounded-lg shadow-lg">
+          <thead class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+            <tr>
+              <th class="px-6 py-3 border-b">Título</th>
+              <th class="px-6 py-3 border-b">Descripción</th>
+              <th class="px-6 py-3 border-b">Prioridad</th>
+              <th class="px-6 py-3 border-b">Estado</th>
+              <th class="px-6 py-3 border-b">Usuario</th>
+              <th class="px-6 py-3 border-b">Categoría</th>
+              <th class="px-6 py-3 border-b">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-700 text-sm">
+            <tr v-for="ticket in paginatedTickets" :key="ticket.id"
+              class="border-b hover:bg-gray-100 transition duration-300 ease-in-out">
+              <td class="px-6 py-4">{{ ticket.tic_titulo }}</td>
+              <td class="px-6 py-4">{{ ticket.tic_descripcion }}</td>
+              <td class="px-6 py-4">{{ ticket.prioridad ? ticket.prioridad.pri_nombre : 'N/A' }}</td>
+              <td class="px-6 py-4">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="{
+                  'bg-orange-100 text-orange-600': ticket.tic_estado === 'Abierto',
+                  'bg-blue-100 text-blue-600': ticket.tic_estado === 'En progreso',
+                  'bg-green-100 text-green-600': ticket.tic_estado === 'Finalizado',
+                  'bg-red-100 text-red-600': ticket.tic_estado === 'Cerrado',
+                }">
+                  {{ ticket.tic_estado }}
+                </span>
+              </td>
+              <td class="px-6 py-4">{{ ticket.user ? ticket.user.name : 'N/A' }}</td>
+              <td class="px-6 py-4">{{ ticket.categoria ? ticket.categoria.cat_nombre : 'N/A' }}</td>
+              <td class="px-6 py-4 flex justify-center space-x-2">
+                <button @click="showDetallesModal(ticket)"
+                  class="text-white bg-blue-500 hover:bg-blue-700 rounded-full p-2 transition duration-300 ease-in-out">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button @click="showAsignarSoporteModal(ticket)"
+                  class="text-white bg-purple-500 hover:bg-purple-700 rounded-full p-2 transition duration-300 ease-in-out">
+                  <i class="fas fa-user-plus"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación con espacio fijo en la parte inferior -->
+      <div class="flex justify-center space-x-2 mt-4 mb-4"> <!-- Añadí mb-4 para separarlo del final -->
+        <button v-for="page in totalPages" :key="page" @click="changePage(page)"
+          :class="{ 'bg-blue-500 text-white': page === currentPage, 'bg-white text-blue-500 border': page !== currentPage }"
+          class="px-4 py-2 rounded-lg border hover:bg-blue-500 hover:text-white transition duration-300 ease-in-out">
+          {{ page }}
+        </button>
+      </div>
     </div>
 
     <!-- Modal Crear Ticket -->
@@ -270,12 +336,12 @@ export default {
         <h2 class="text-xl font-bold mb-4">Crear Nuevo Ticket</h2>
         <label class="block mb-2">Título:</label>
         <input type="text" v-model="nuevoTicket.titulo" class="border p-2 w-full rounded mb-4" />
-        
+
         <label class="block mb-2">Descripción:</label>
         <textarea v-model="nuevoTicket.descripcion" class="border p-2 w-full rounded mb-4"></textarea>
-        <label cclass="border p-2 w-full rounded mb-4 text-black bg-white" >Prioridad:</label>
+        <label cclass="border p-2 w-full rounded mb-4 text-black bg-white">Prioridad:</label>
         <select v-model="nuevoTicket.prioridad" class="border p-2 w-full rounded mb-4">
-          <option v-for="prioridad in prioridades" :key="prioridad.id " :value="prioridad.id">
+          <option v-for="prioridad in prioridades" :key="prioridad.id" :value="prioridad.id">
             {{ prioridad.nombre }}
           </option>
         </select>
