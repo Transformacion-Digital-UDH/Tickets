@@ -184,7 +184,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <template>
@@ -196,7 +195,7 @@ export default {
       <input v-model="searchQuery" type="text"
         placeholder="Buscar por título, estado, prioridad, usuario o categoría..." class="border p-2 w-full rounded" />
     </div>
-
+    <!--Boton para crear un ticket y vista tabla or card-->
     <div class="mb-4 flex justify-end">
       <button @click="showCrearTicketModal"
         class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300 mr-2">
@@ -331,65 +330,133 @@ export default {
     </div>
 
     <!-- Modal Crear Ticket -->
-    <div v-if="mostrarModalCrearTicket" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-        <h2 class="text-xl font-bold mb-4">Crear Nuevo Ticket</h2>
-        <label class="block mb-2">Título:</label>
-        <input type="text" v-model="nuevoTicket.titulo" class="border p-2 w-full rounded mb-4" />
+    <div v-if="mostrarModalCrearTicket"
+      class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white p-8 rounded-lg shadow-lg max-w-[550px] w-full mx-4">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Crear Nuevo Ticket</h2>
 
-        <label class="block mb-2">Descripción:</label>
-        <textarea v-model="nuevoTicket.descripcion" class="border p-2 w-full rounded mb-4"></textarea>
-        <label cclass="border p-2 w-full rounded mb-4 text-black bg-white">Prioridad:</label>
-        <select v-model="nuevoTicket.prioridad" class="border p-2 w-full rounded mb-4">
-          <option v-for="prioridad in prioridades" :key="prioridad.id" :value="prioridad.id">
-            {{ prioridad.nombre }}
-          </option>
-        </select>
+        <!-- Formulario para crear el ticket -->
+        <form @submit.prevent="crearTicket">
+          <!-- Campo Título -->
+          <div class="mb-5">
+            <label for="titulo" class="mb-3 block text-base font-medium text-gray-700">Título:</label>
+            <input type="text" v-model="nuevoTicket.titulo" id="titulo" placeholder="Título del ticket"
+              class="w-full rounded-md border border-gray-300 bg-white py-3 px-4 text-base font-medium text-gray-700 outline-none focus:border-blue-500 focus:shadow-md" />
+          </div>
 
-        <label class="block mb-2">Usuario:</label>
-        <select v-model="nuevoTicket.usuario" class="border p-2 w-full rounded mb-4">
-          <option v-for="usuario in usuarios" :key="usuario.id" :value="usuario.id">
-            {{ usuario.nombre }}
-          </option>
-        </select>
+          <!-- Campo Descripción -->
+          <div class="mb-5">
+            <label for="descripcion" class="mb-3 block text-base font-medium text-gray-700">Descripción:</label>
+            <textarea v-model="nuevoTicket.descripcion" id="descripcion" placeholder="Descripción del ticket"
+              class="w-full rounded-md border border-gray-300 bg-white py-3 px-4 text-base font-medium text-gray-700 outline-none focus:border-blue-500 focus:shadow-md"></textarea>
+          </div>
 
-        <label class="block mb-2">Categoría:</label>
-        <select v-model="nuevoTicket.categoria" class="border p-2 w-full rounded mb-4">
-          <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.id">
-            {{ categoria.nombre }}
-          </option>
-        </select>
+          <!-- Prioridad -->
+          <div class="mb-5">
+            <label for="prioridad" class="mb-3 block text-base font-medium text-gray-700">Prioridad:</label>
+            <select v-model="nuevoTicket.prioridad" id="prioridad"
+              class="w-full rounded-md border border-gray-300 bg-white py-3 px-4 text-base font-medium text-gray-700 outline-none focus:border-blue-500 focus:shadow-md">
+              <option v-for="prioridad in prioridades" :key="prioridad.id" :value="prioridad.id">{{ prioridad.nombre }}
+              </option>
+            </select>
+          </div>
 
-        <label class="block mb-2">Pabellón:</label>
-        <select v-model="nuevoTicket.pabellon" class="border p-2 w-full rounded mb-4">
-          <option v-for="pabellon in pabellones" :key="pabellon.id" :value="pabellon.id">
-            {{ pabellon.nombre }}
-          </option>
-        </select>
-        <button @click="crearTicket" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-          Crear
-        </button>
-        <button @click="cerrarCrearTicketModal" class="ml-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-          Cancelar
-        </button>
+          <!-- Usuario -->
+          <div class="mb-5">
+            <label for="usuario" class="mb-3 block text-base font-medium text-gray-700">Usuario:</label>
+            <select v-model="nuevoTicket.usuario" id="usuario"
+              class="w-full rounded-md border border-gray-300 bg-white py-3 px-4 text-base font-medium text-gray-700 outline-none focus:border-blue-500 focus:shadow-md">
+              <option v-for="usuario in usuarios" :key="usuario.id" :value="usuario.id">{{ usuario.nombre }}</option>
+            </select>
+          </div>
+
+          <!-- Categoría -->
+          <div class="mb-5">
+            <label for="categoria" class="mb-3 block text-base font-medium text-gray-700">Categoría:</label>
+            <select v-model="nuevoTicket.categoria" id="categoria"
+              class="w-full rounded-md border border-gray-300 bg-white py-3 px-4 text-base font-medium text-gray-700 outline-none focus:border-blue-500 focus:shadow-md">
+              <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.id">{{ categoria.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Pabellón -->
+          <div class="mb-5">
+            <label for="pabellon" class="mb-3 block text-base font-medium text-gray-700">Pabellón:</label>
+            <select v-model="nuevoTicket.pabellon" id="pabellon"
+              class="w-full rounded-md border border-gray-300 bg-white py-3 px-4 text-base font-medium text-gray-700 outline-none focus:border-blue-500 focus:shadow-md">
+              <option v-for="pabellon in pabellones" :key="pabellon.id" :value="pabellon.id">{{ pabellon.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Botones Crear y Cancelar -->
+          <div class="flex justify-end space-x-4">
+            <button type="submit"
+              class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300">
+              Crear
+            </button>
+            <button @click="cerrarCrearTicketModal" type="button"
+              class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
+              Cancelar
+            </button>
+          </div>
+        </form>
       </div>
     </div>
+
 
     <!-- Modal Detalles Ticket -->
-    <div v-if="mostrarModalDetalles" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-        <h2 class="text-xl font-bold mb-4 uppercase">Detalles del Ticket</h2>
-        <p><strong>Título:</strong> {{ ticketSeleccionado.tic_titulo }}</p>
-        <p><strong>Descripción:</strong> {{ ticketSeleccionado.tic_descripcion }}</p>
-        <p><strong>Prioridad:</strong> {{ ticketSeleccionado.prioridad.pri_nombre }}</p>
-        <p><strong>Estado:</strong> {{ ticketSeleccionado.tic_estado }}</p>
-        <p><strong>Usuario:</strong> {{ ticketSeleccionado.user.name }}</p>
-        <p><strong>Categoría:</strong> {{ ticketSeleccionado.categoria.cat_nombre }}</p>
-        <button @click="cerrarDetallesModal" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          Cerrar
-        </button>
+    <div v-if="mostrarModalDetalles" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white max-w-2xl shadow-lg overflow-hidden sm:rounded-lg w-full mx-4">
+        <!-- Estilo general de la tarjeta modal -->
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            Detalles del Ticket
+          </h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">
+            Información detallada del ticket seleccionado.
+          </p>
+        </div>
+        <div class="border-t border-gray-200">
+          <dl>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Título</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ ticketSeleccionado.tic_titulo }}</dd>
+            </div>
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Descripción</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ ticketSeleccionado.tic_descripcion }}</dd>
+            </div>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Prioridad</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ ticketSeleccionado.prioridad.pri_nombre }}
+              </dd>
+            </div>
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Estado</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ ticketSeleccionado.tic_estado }}</dd>
+            </div>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Usuario</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ ticketSeleccionado.user.name }}</dd>
+            </div>
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Categoría</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ ticketSeleccionado.categoria.cat_nombre }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <!-- Botón de cerrar -->
+        <div class="px-4 py-4 sm:px-6 bg-gray-50 flex justify-end">
+          <button @click="cerrarDetallesModal" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+            Cerrar
+          </button>
+        </div>
       </div>
     </div>
+
 
     <!-- Modal Asignar Soporte -->
     <div v-if="mostrarModalAsignarSoporte"
