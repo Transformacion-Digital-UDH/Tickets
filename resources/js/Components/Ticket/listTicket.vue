@@ -12,7 +12,7 @@ export default {
       nuevoTicket: {
         titulo: '',
         descripcion: '',
-        prioridad: 'Media',
+        prioridad: '',
         usuario: '',
         categoria: ''
       },
@@ -31,15 +31,16 @@ export default {
         const search = this.searchQuery.toLowerCase();
         return (
           ticket.tic_titulo.toLowerCase().includes(search) ||
-          ticket.tic_descripcion.toLowerCase().includes(search) ||
-          ticket.tic_estado.toLowerCase().includes(search) ||
-          ticket.prioridad.pri_nombre.toLowerCase().includes(search) ||
-          ticket.user.name.toLowerCase().includes(search) ||
-          ticket.categoria.cat_nombre.toLowerCase().includes(search)
+          (ticket.tic_descripcion && ticket.tic_descripcion.toLowerCase().includes(search)) ||
+          (ticket.tic_estado && ticket.tic_estado.toLowerCase().includes(search)) ||
+          (ticket.prioridad && ticket.prioridad.pri_nombre.toLowerCase().includes(search)) ||
+          (ticket.user && ticket.user.name.toLowerCase().includes(search)) ||
+          (ticket.categoria && ticket.categoria.cat_nombre.toLowerCase().includes(search))
         );
       });
     }
-  },
+  }
+  ,
   created() {
     this.fetchTickets();
     this.fetchPrioridades();
@@ -47,6 +48,8 @@ export default {
     this.fetchCategorias();
     this.fetchPabellones();
   },
+
+
   methods: {
     async fetchTickets() {
       try {
@@ -93,17 +96,17 @@ export default {
         const response = await axios.post('/tickets', {
           tic_titulo: this.nuevoTicket.titulo,
           tic_descripcion: this.nuevoTicket.descripcion,
-          pri_id: this.nuevoTicket.pri_id,
-          use_id: this.nuevoTicket.use_id,
-          cat_id: this.nuevoTicket.cat_id,
-          pab_id: this.nuevoTicket.pab_id,
+          pri_id: this.nuevoTicket.prioridad,  // Se usa el valor del select de prioridad
+          use_id: this.nuevoTicket.usuario,     // Se usa el valor del select de usuario
+          cat_id: this.nuevoTicket.categoria,   // Se usa el valor del select de categoría
+          pab_id: this.nuevoTicket.pabellon,    // Se usa el valor del select de pabellón
           tic_estado: 'Abierto',
           tic_activo: true
         });
         this.tickets.push(response.data);
         this.cerrarCrearTicketModal();
       } catch (error) {
-        console.error('Error creating ticket:', error);
+        console.error('Error al crear ticket:', error);
       }
     },
     showCrearTicketModal() {
@@ -162,7 +165,7 @@ export default {
         class="relative bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 min-h-[100px] max-h-[150px] flex flex-col justify-between">
         <div>
           <div class="absolute top-2 right-2 px-2 py-1 rounded text-xs" :class="{
-            'bg-orange-700 text-white': ticket.tic_estado === 'Pendiente',
+            'bg-orange-700 text-white': ticket.tic_estado === 'Abierto',
             'bg-blue-700 text-white': ticket.tic_estado === 'En progreso',
             'bg-green-700 text-white': ticket.tic_estado === 'Finalizado',
             'bg-red-700 text-white': ticket.tic_estado === 'Cerrado',
@@ -173,9 +176,9 @@ export default {
           <hr>
           <!-- Prioridad, Usuario y Categoría alineados -->
           <div class="flex flex-col mt-4">
-            <span class="text-sm text-gray-500">Prioridad: {{ ticket.prioridad.pri_nombre }}</span>
-            <span class="text-sm text-gray-500">Usuario: {{ ticket.user.name }}</span>
-            <span class="text-sm text-gray-500">Categoría: {{ ticket.categoria.cat_nombre }}</span>
+            <span class="text-sm text-gray-500">Prioridad: {{ ticket.prioridad ? ticket.prioridad.pri_nombre : ''}}</span>
+            <span class="text-sm text-gray-500">Usuario: {{ ticket.user ? ticket.user.name : '' }}</span>
+            <span class="text-sm text-gray-500">Categoría: {{ ticket.categoria ? ticket.categoria.cat_nombre : '' }}</span>
           </div>
         </div>
         <div class="flex justify-end items-center space-x-2">
