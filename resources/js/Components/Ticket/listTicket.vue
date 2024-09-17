@@ -9,13 +9,16 @@ export default {
       mostrarModalDetalles: false,
       mostrarModalAsignarSoporte: false,
       ticketSeleccionado: {},
+
       nuevoTicket: {
         titulo: '',
         descripcion: '',
-        prioridad: '',
+        prioridad: '',  // Aquí se almacena el ID de la prioridad seleccionada
         usuario: '',
-        categoria: ''
+        categoria: '',
+        pabellon: ''
       },
+
       soporteAsignado: '',
       searchQuery: '', // Barra de búsqueda
       tickets: [],
@@ -62,7 +65,10 @@ export default {
     async fetchPrioridades() {
       try {
         const response = await axios.get('/prioridades');
-        this.prioridades = response.data;
+        this.prioridades = response.data.map((prioridad) => ({
+          id: prioridad.id,
+          nombre: prioridad.pri_nombre,
+        }));
       } catch (error) {
         console.error('Error al traer las prioridades:', error);
       }
@@ -70,45 +76,71 @@ export default {
     async fetchUsuarios() {
       try {
         const response = await axios.get('/usuarios');
-        this.usuarios = response.data;
+        this.usuarios = response.data.map((usuario) => ({
+          id: usuario.id,
+          nombre: usuario.name,
+        }));
       } catch (error) {
         console.error('Error al traer los usuarios:', error);
       }
-    },
+    }
+    ,
     async fetchCategorias() {
       try {
         const response = await axios.get('/categorias');
-        this.categorias = response.data;
+        this.categorias = response.data.map((categoria) => ({
+          id: categoria.id,
+          nombre: categoria.cat_nombre,
+        }));
       } catch (error) {
         console.error('Error al traer las categorías:', error);
       }
-    },
+    }
+    ,
     async fetchPabellones() {
       try {
         const response = await axios.get('/pabellons');
-        this.pabellones = response.data;
+        this.pabellones = response.data.map((pabellon) => ({
+          id: pabellon.id,
+          nombre: pabellon.pab_nombre,
+        }));
       } catch (error) {
         console.error('Error al traer los pabellones:', error);
       }
     },
+
     async crearTicket() {
-      try {
-        const response = await axios.post('/tickets', {
-          tic_titulo: this.nuevoTicket.titulo,
-          tic_descripcion: this.nuevoTicket.descripcion,
-          pri_id: this.nuevoTicket.prioridad,  // Se usa el valor del select de prioridad
-          use_id: this.nuevoTicket.usuario,     // Se usa el valor del select de usuario
-          cat_id: this.nuevoTicket.categoria,   // Se usa el valor del select de categoría
-          pab_id: this.nuevoTicket.pabellon,    // Se usa el valor del select de pabellón
-          tic_estado: 'Abierto',
-          tic_activo: true
-        });
-        this.tickets.push(response.data);
-        this.cerrarCrearTicketModal();
-      } catch (error) {
-        console.error('Error al crear ticket:', error);
-      }
-    },
+  try {
+    await axios.post('/tickets', {
+      tic_titulo: this.nuevoTicket.titulo,
+      tic_descripcion: this.nuevoTicket.descripcion,
+      pri_id: this.nuevoTicket.prioridad,
+      use_id: this.nuevoTicket.usuario,
+      cat_id: this.nuevoTicket.categoria,
+      pab_id: this.nuevoTicket.pabellon,
+      tic_estado: 'Abierto',
+      tic_activo: true
+    });
+
+    // Recargar la lista de tickets
+    await this.fetchTickets(); // Vuelve a cargar los tickets desde la API
+
+    // Reinicializar el formulario del modal
+    this.nuevoTicket = {
+      titulo: '',
+      descripcion: '',
+      prioridad: '',
+      usuario: '',
+      categoria: '',
+      pabellon: ''
+    };
+
+    // Cerrar el modal de creación
+    this.cerrarCrearTicketModal();
+  } catch (error) {
+    console.error('Error al crear el ticket:', error);
+  }
+},
     showCrearTicketModal() {
       this.mostrarModalCrearTicket = true;
     },
@@ -135,7 +167,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <template>
@@ -176,9 +207,11 @@ export default {
           <hr>
           <!-- Prioridad, Usuario y Categoría alineados -->
           <div class="flex flex-col mt-4">
-            <span class="text-sm text-gray-500">Prioridad: {{ ticket.prioridad ? ticket.prioridad.pri_nombre : ''}}</span>
+            <span class="text-sm text-gray-500">Prioridad: {{ ticket.prioridad ? ticket.prioridad.pri_nombre :
+              '' }}</span>
             <span class="text-sm text-gray-500">Usuario: {{ ticket.user ? ticket.user.name : '' }}</span>
-            <span class="text-sm text-gray-500">Categoría: {{ ticket.categoria ? ticket.categoria.cat_nombre : '' }}</span>
+            <span class="text-sm text-gray-500">Categoría: {{ ticket.categoria ? ticket.categoria.cat_nombre : ''
+              }}</span>
           </div>
         </div>
         <div class="flex justify-end items-center space-x-2">
@@ -237,33 +270,34 @@ export default {
         <h2 class="text-xl font-bold mb-4">Crear Nuevo Ticket</h2>
         <label class="block mb-2">Título:</label>
         <input type="text" v-model="nuevoTicket.titulo" class="border p-2 w-full rounded mb-4" />
+        
         <label class="block mb-2">Descripción:</label>
         <textarea v-model="nuevoTicket.descripcion" class="border p-2 w-full rounded mb-4"></textarea>
-        <label class="block mb-2">Prioridad:</label>
+        <label cclass="border p-2 w-full rounded mb-4 text-black bg-white" >Prioridad:</label>
         <select v-model="nuevoTicket.prioridad" class="border p-2 w-full rounded mb-4">
-          <option v-for="prioridad in prioridades" :key="prioridad.id" :value="prioridad.id">
-            {{ prioridad.pri_nombre }}
+          <option v-for="prioridad in prioridades" :key="prioridad.id " :value="prioridad.id">
+            {{ prioridad.nombre }}
           </option>
         </select>
 
         <label class="block mb-2">Usuario:</label>
         <select v-model="nuevoTicket.usuario" class="border p-2 w-full rounded mb-4">
           <option v-for="usuario in usuarios" :key="usuario.id" :value="usuario.id">
-            {{ usuario.name }}
+            {{ usuario.nombre }}
           </option>
         </select>
 
         <label class="block mb-2">Categoría:</label>
         <select v-model="nuevoTicket.categoria" class="border p-2 w-full rounded mb-4">
           <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.id">
-            {{ categoria.cat_nombre }}
+            {{ categoria.nombre }}
           </option>
         </select>
 
         <label class="block mb-2">Pabellón:</label>
         <select v-model="nuevoTicket.pabellon" class="border p-2 w-full rounded mb-4">
           <option v-for="pabellon in pabellones" :key="pabellon.id" :value="pabellon.id">
-            {{ pabellon.pab_nombre }}
+            {{ pabellon.nombre }}
           </option>
         </select>
         <button @click="crearTicket" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
