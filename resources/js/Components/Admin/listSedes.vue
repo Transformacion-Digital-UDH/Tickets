@@ -5,12 +5,8 @@ import ModalCrear from "../ModalCrear.vue";
 import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
 import ModalEliminar from "../ModalEliminar.vue";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import ButtonNuevo from "../ButtonNuevo.vue";
 import axios from "axios";
-
-library.add(faPlus);
 
 const sedes = ref([]);
 const buscarQuery = ref("");
@@ -66,22 +62,20 @@ const formFields = [
     { name: "sed_direccion", label: "Dirección", type: "text" },
     { name: "sed_ciudad", label: "Ciudad", type: "text" },
     { name: "sed_telefono", label: "Teléfono", type: "text" },
-    { name: "sed_activo", label: "Estado", type: "boolean" }
+    { name: "sed_activo", label: "Estado", type: "boolean" },
 ];
 
 const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
-            await axios.delete(
-                `/sedes/${itemSeleccionado.value.id}/eliminar`
-            );
+            await axios.delete(`/sedes/${itemSeleccionado.value.id}/eliminar`);
             await fetchSedes();
             mostrarModalEliminar.value = false;
         } catch (error) {
             console.error("Error al eliminar la sede", error);
         }
     }
-}
+};
 
 const abrirCrearModal = () => {
     mostrarModalCrear.value = true;
@@ -112,21 +106,24 @@ const cerrarEditarModal = () => {
 const abrirEliminarModal = (sede) => {
     itemSeleccionado.value = sede;
     mostrarModalEliminar.value = true;
-}
+};
 
 const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
-}
+};
 
 onMounted(() => fetchSedes());
 </script>
 
 <template>
     <div class="p-6">
-        <h1 class="mb-6 text-[20px] font-bold text-gray-500">Lista de Sedes</h1>
-
-        <div class="flex items-center justify-between mb-4">
-            <div class="relative">
+        <h1 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
+            Lista de Sedes
+        </h1>
+        <div
+            class="flex flex-col items-center justify-between mb-4 sm:flex-row"
+        >
+            <div class="relative w-full mb-2 sm:w-auto sm:mb-0">
                 <span
                     class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
                 >
@@ -136,17 +133,10 @@ onMounted(() => fetchSedes());
                     type="text"
                     v-model="buscarQuery"
                     placeholder="Buscar..."
-                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
                 />
             </div>
-
-            <button
-                @click="abrirCrearModal"
-                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
-            >
-                <font-awesome-icon icon="plus" class="mr-2 text-lg" />
-                Nuevo
-            </button>
+            <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
         <Table
