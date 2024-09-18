@@ -4,8 +4,7 @@ import Table from "../Table.vue";
 import ModalCrear from "../ModalCrear.vue";
 import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
-import ModalDesactivar from "../ModalDesactivar.vue";
-import ModalActivar from "../ModalActivar.vue";
+import ModalEliminar from "../ModalEliminar.vue";
 import ButtonNuevo from "../ButtonNuevo.vue";
 import axios from "axios";
 
@@ -14,8 +13,7 @@ const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
-const mostrarModalDesactivar = ref(false);
-const mostrarModalActivar = ref(false);
+const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 
 const headers = ["N°", "Nombre", "Estado"];
@@ -44,30 +42,19 @@ const fetchCategorias = async () => {
 
 const formFields = [
     { name: "cat_nombre", label: "Nombre", type: "text" },
+    { name: "cat_activo", label: "Estado", type: "boolean" },
 ];
 
-const desactivarItem = async () => {
+const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/categorias/${itemSeleccionado.value.id}/desactivar`
+                `/categorias/${itemSeleccionado.value.id}/eliminar`
             );
             await fetchCategorias();
-            mostrarModalDesactivar.value = false;
+            mostrarModalEliminar.value = false;
         } catch (error) {
-            console.error("Error al desactivar la categoría:", error);
-        }
-    }
-};
-
-const activarItem = async () => {
-    if (itemSeleccionado.value) {
-        try {
-            await axios.put(`/categorias/${itemSeleccionado.value.id}/activar`);
-            await fetchCategorias();
-            mostrarModalActivar.value = false;
-        } catch (error) {
-            console.error("Error al activar la categoría:", error);
+            console.error("Error al eliminar la categoría:", error);
         }
     }
 };
@@ -94,22 +81,13 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (categoria) => {
+const abrirEliminarModal = (categoria) => {
     itemSeleccionado.value = categoria;
-    mostrarModalDesactivar.value = true;
+    mostrarModalEliminar.value = true;
 };
 
-const cerrarDesactivarModal = () => {
-    mostrarModalDesactivar.value = false;
-};
-
-const abrirActivarModal = (categoria) => {
-    itemSeleccionado.value = categoria;
-    mostrarModalActivar.value = true;
-};
-
-const cerrarActivarModal = () => {
-    mostrarModalActivar.value = false;
+const cerrarEliminarModal = () => {
+    mostrarModalEliminar.value = false;
 };
 
 onMounted(() => fetchCategorias());
@@ -131,8 +109,8 @@ onMounted(() => fetchCategorias());
             <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
-        <Table :headers="headers" :items="filtrarCategorias" @view="abrirDetallesModal" @edit="abrirEditarModal"
-            @activar="abrirActivarModal" @desactivar="abrirDesactivarModal" />
+        <Table :headers="headers" entityType="categoria" :items="filtrarCategorias" @view="abrirDetallesModal"
+            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
         <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" itemName="Categoría" endpoint="/categorias"
             @cerrar="cerrarCrearModal" @crear="fetchCategorias" />
@@ -144,10 +122,7 @@ onMounted(() => fetchCategorias());
             :mostrarModalEditar="mostrarModalEditar" endpoint="/categorias" @cerrar="cerrarEditarModal"
             @update="fetchCategorias" />
 
-        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Categoría"
-            fieldName="cat_nombre" @cancelar="cerrarDesactivarModal" @confirmar="desactivarItem" />
-
-        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Categoría" fieldName="cat_nombre"
-            @cancelar="cerrarActivarModal" @confirmar="activarItem" />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Categoría" fieldName="cat_nombre"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
     </div>
 </template>

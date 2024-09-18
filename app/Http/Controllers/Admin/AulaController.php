@@ -45,6 +45,7 @@ class AulaController extends Controller
             $validator = Validator::make($request->all(), [
                 'aul_numero' => 'required|string|max:255',
                 'pab_id' => 'required|exists:pabellons,id',
+                'aul_activo' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -77,16 +78,16 @@ class AulaController extends Controller
         }
     }
 
-    public function desactivar($id)
+    public function eliminar($id)
     {
         try {
             $aula = Aula::findOrFail($id);
 
-            $aula->update(['aul_activo' => 0]);
+            $aula->delete();
 
             return response()->json([
                 'status' => true,
-                'msg' => 'Aula desactivada exitosamente.',
+                'msg' => 'Aula elimanada exitosamente.',
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -96,31 +97,7 @@ class AulaController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ocurrió un error al desactivar el aula: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function activar($id)
-    {
-        try {
-            $aula = Aula::findOrFail($id);
-
-            $aula->update(['aul_activo' => 1]);
-
-            return response()->json([
-                'status' => true,
-                'msg' => 'Aula desactivada exitosamente.',
-            ], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'status' => false,
-                'msg' => 'Aula no encontrada.',
-            ], 404);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => false,
-                'msg' => 'Ocurrió un error al desactivar el aula: ' . $e->getMessage(),
+                'msg' => 'Ocurrió un error al eliminar el aula: ' . $e->getMessage(),
             ], 500);
         }
     }

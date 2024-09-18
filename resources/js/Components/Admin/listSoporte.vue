@@ -4,8 +4,7 @@ import Table from "../Table.vue";
 import ModalCrear from "../ModalCrear.vue";
 import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
-import ModalDesactivar from "../ModalDesactivar.vue";
-import ModalActivar from "../ModalActivar.vue";
+import ModalEliminar from "../ModalEliminar.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -20,12 +19,11 @@ const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
-const mostrarModalDesactivar = ref(false);
-const mostrarModalActivar = ref(false);
+const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const passwordGenerada = ref("");
 
-const headers = ["N°", "Nombres", "Correo", "Teléfono", "Sede", "Estado"];
+const headers = ["N°", "Nombres", "Correo", "Estado"];
 
 const generarPassword = () => {
     const caracteres =
@@ -115,30 +113,19 @@ formFields.value = [
         type: "text",
         default: computed(() => passwordGenerada.value),
     },
+    { name: "activo", label: "Estado", type: "boolean" },
 ];
 
-const desactivarItem = async () => {
+const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/soportes/${itemSeleccionado.value.id}/desactivar`
+                `/soportes/${itemSeleccionado.value.id}/eliminar`
             );
             await fetchSoportes();
-            mostrarModalDesactivar.value = false;
+            mostrarModalEliminar.value = false;
         } catch (error) {
-            console.error("Error al desactivar al soporte técnico:", error);
-        }
-    }
-};
-
-const activarItem = async () => {
-    if (itemSeleccionado.value) {
-        try {
-            await axios.put(`/soportes/${itemSeleccionado.value.id}/activar`);
-            await fetchSoportes();
-            mostrarModalActivar.value = false;
-        } catch (error) {
-            console.error("Error al eliminar al soporte técnico:", error);
+            console.error("Error al eliminar al soporte técnico:", error)
         }
     }
 };
@@ -173,22 +160,13 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (soporte) => {
+const abrirEliminarModal = (soporte) => {
     itemSeleccionado.value = soporte;
-    mostrarModalDesactivar.value = true;
+    mostrarModalEliminar.value = true;
 };
 
-const cerrarDesactivarModal = () => {
-    mostrarModalDesactivar.value = false;
-};
-
-const abrirActivarModal = (soporte) => {
-    itemSeleccionado.value = soporte;
-    mostrarModalActivar.value = true;
-};
-
-const cerrarActivarModal = () => {
-    mostrarModalActivar.value = false;
+const cerrarEliminarModal = () => {
+    mostrarModalEliminar.value = false;
 };
 
 onMounted(() => {
@@ -205,84 +183,34 @@ onMounted(() => {
 
         <div class="flex items-center justify-between mb-4">
             <div class="relative">
-                <span
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input
-                    type="text"
-                    v-model="buscarQuery"
-                    placeholder="Buscar..."
-                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-                />
+                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
+                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
             </div>
 
-            <button
-                @click="abrirCrearModal"
-                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
-            >
+            <button @click="abrirCrearModal"
+                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]">
                 <font-awesome-icon icon="plus" class="mr-2 text-lg" />
                 Nuevo
             </button>
         </div>
 
-        <Table
-            :headers="headers"
-            :items="filtrarSoportes"
-            @view="abrirDetallesModal"
-            @edit="abrirEditarModal"
-            @activar="abrirActivarModal"
-            @desactivar="abrirDesactivarModal"
-        />
+        <Table :headers="headers" :items="filtrarSoportes" entityType="user" @view="abrirDetallesModal"
+            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
-        <ModalCrear
-            v-if="mostrarModalCrear"
-            :formFields="formFields"
-            :sedes="sedes"
-            itemName="Soporte"
-            endpoint="/soportes"
-            @cerrar="cerrarCrearModal"
-            @crear="fetchSoportes"
-        />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :sedes="sedes" itemName="Soporte"
+            endpoint="/soportes" @cerrar="cerrarCrearModal" @crear="fetchSoportes" />
 
-        <ModalVer
-            v-if="mostrarModalDetalles"
-            :item="itemSeleccionado"
-            itemName="Soporte"
-            :formFields="formFields"
-            :mostrarModalDetalles="mostrarModalDetalles"
-            @close="cerrarDetallesModal"
-        />
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Soporte" :formFields="formFields"
+            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar
-            v-if="mostrarModalEditar"
-            :item="itemSeleccionado"
-            itemName="Soporte"
-            :formFields="formFields"
-            :sedes="sedes"
-            :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/soportes"
-            @cerrar="cerrarEditarModal"
-            @update="fetchSoportes"
-        />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Soporte" :formFields="formFields"
+            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/soportes" @cerrar="cerrarEditarModal"
+            @update="fetchSoportes" />
 
-        <ModalDesactivar
-            v-if="mostrarModalDesactivar"
-            :item="itemSeleccionado"
-            itemName="Soporte"
-            fieldName="name"
-            @cancelar="cerrarDesactivarModal"
-            @confirmar="desactivarItem"
-        />
-
-        <ModalActivar
-            v-if="mostrarModalActivar"
-            :item="itemSeleccionado"
-            itemName="Soporte"
-            fieldName="name"
-            @cancelar="cerrarActivarModal"
-            @confirmar="activarItem"
-        />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Soporte" fieldName="name"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
     </div>
 </template>

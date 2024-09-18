@@ -39,7 +39,7 @@ class PabellonController extends Controller
         $validarDatos = $request->validate([
             'sed_id' => 'required|exists:sedes,id',
             'pab_nombre' => 'required|string|max:255',
-            'pab_activo' => 'boolean',
+            'pab_activo' => 'nullable|boolean',
         ]);
 
         $pabellon->update($validarDatos);
@@ -47,16 +47,16 @@ class PabellonController extends Controller
         return response()->json(['message' => 'Pabellón actualizado correctamente', 'pabellon' => $pabellon]);
     }
 
-    public function desactivar($id)
+    public function eliminar($id)
     {
         try {
             $pabellon = Pabellon::findOrFail($id);
 
-            $pabellon->update(['pab_activo' => 0]);
+            $pabellon->delete();
 
             return response()->json([
                 'status' => true,
-                'msg' => 'Pabellon desactivado exitosamente.',
+                'msg' => 'Pabellon eliminado exitosamente.',
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -66,31 +66,7 @@ class PabellonController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ocurrió un error al desactivar el pabellon: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function activar($id)
-    {
-        try {
-            $pabellon = Pabellon::findOrFail($id);
-
-            $pabellon->update(['pab_activo' => 1]);
-
-            return response()->json([
-                'status' => true,
-                'msg' => 'Pabellon desactivado exitosamente.',
-            ], 200);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'status' => false,
-                'msg' => 'Pabellon no encontrada.',
-            ], 404);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => false,
-                'msg' => 'Ocurrió un error al desactivar el pabellon: ' . $e->getMessage(),
+                'msg' => 'Ocurrió un error al eliminar el pabellon: ' . $e->getMessage(),
             ], 500);
         }
     }

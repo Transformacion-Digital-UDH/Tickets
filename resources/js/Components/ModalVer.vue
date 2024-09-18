@@ -15,6 +15,10 @@ const props = defineProps({
 
 const formData = ref({});
 
+const visibleFields = computed(() => {
+    return props.formFields.filter(field => field.type !== 'boolean');
+});
+
 watch(
     () => props.item,
     (newItem) => {
@@ -42,7 +46,7 @@ const cerrarDetallesModal = () => {
                 Detalles {{ itemName }}
             </h2>
             <div
-                v-for="(field, index) in formFields"
+                v-for="(field, index) in visibleFields"
                 :key="index"
                 class="mb-2 text-gray-500"
             >

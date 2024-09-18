@@ -46,11 +46,18 @@ class SedeController extends Controller
             'sed_direccion' => 'required|string|max:255',
             'sed_ciudad' => 'required|string|max:255',
             'sed_telefono' => 'required|string|max:20',
+            'sed_activo' => 'nullable|boolean',
         ]);
 
         $sede->update($validarDatos);
 
         return response()->json(['message' => 'Sede actualizada correctamente', 'sede' => $sede]);
+    }
+
+    public function eliminar(Sede $sede)
+    {
+        $sede->delete();
+        return response()->json(['message' => 'Sede eliminada correctamente', 200]);
     }
 
     public function desactivar(Sede $sede)

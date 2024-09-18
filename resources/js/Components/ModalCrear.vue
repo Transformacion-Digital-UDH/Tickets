@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faSave, faTimes, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -34,9 +34,17 @@ const errores = ref([]);
 const loading = ref(false);
 const successMessage = ref("");
 
+const visibleFields = computed(() => {
+    return props.formFields.filter(field => field.type !== 'boolean');
+});
+
 onMounted(() => {
     props.formFields.forEach((field) => {
-        formData.value[field.name] = field.default || "";
+        if (field.type === "boolean") {
+            formData.value[field.name] = true;
+        } else {
+            formData.value[field.name] = field.default || "";
+        }
     });
 });
 
@@ -89,7 +97,11 @@ const submitForm = async () => {
         emit("crear", response.data);
         successMessage.value = "Creación exitosa!";
         props.formFields.forEach((field) => {
-            formData.value[field.name] = field.default || "";
+            if (field.type === "boolean") {
+                formData.value[field.name] = true;
+            } else {
+                formData.value[field.name] = field.default || "";
+            }
         });
         emit("cerrar");
     } catch (error) {
@@ -111,7 +123,7 @@ const cerrarModal = () => emit("cerrar");
         <div class="w-full max-w-lg p-6 transition-transform transform bg-white rounded-lg shadow-lg">
             <h2 class="mb-4 text-xl font-bold text-gray-600">Crear {{ itemName }}</h2>
             <p v-if="successMessage" class="mb-4 text-green-500">{{ successMessage }}</p>
-            <div v-for="(field, index) in formFields" :key="index">
+            <div v-for="(field, index) in visibleFields" :key="index">
                 <label :for="field.name" class="block mb-2 text-gray-500">{{ field.label }}:</label>
                 <template v-if="field.type === 'select'">
                     <select :id="field.name" v-model="formData[field.name]" :class="{

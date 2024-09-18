@@ -84,15 +84,16 @@ const cerrarModal = () => emit("cerrar");
                 {{ successMessage }}
             </p>
             <div v-for="(field, index) in formFields" :key="index" class="mb-4">
-                <label :for="field.name" class="block mb-2 text-gray-500">
+                <label :for="`form-${field.name}`" class="block mb-2 text-gray-500">
                     {{ field.label }}:
                 </label>
                 <template v-if="field.type === 'select'">
                     <template v-if="field.name === 'sed_id'">
-                        <select :id="field.name" v-model="formData[field.name]" :class="{
+                        <select :id="`form-${field.name}`" v-model="formData[field.name]" :class="{
                             'text-gray-400': formData[field.name] === '',
                             'text-gray-900': formData[field.name] !== '',
-                        }" class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
+                        }"
+                            class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
                             <option value="" disabled selected>
                                 Seleccione una sede
                             </option>
@@ -103,10 +104,11 @@ const cerrarModal = () => emit("cerrar");
                         </select>
                     </template>
                     <template v-if="field.name === 'pab_id'">
-                        <select :id="field.name" v-model="formData[field.name]" :class="{
+                        <select :id="`form-${field.name}`" v-model="formData[field.name]" :class="{
                             'text-gray-400': formData[field.name] === '',
                             'text-gray-900': formData[field.name] !== '',
-                        }" class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
+                        }"
+                            class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
 
                             <option value="" disabled selected>
                                 Seleccione un pabellón
@@ -118,10 +120,26 @@ const cerrarModal = () => emit("cerrar");
                         </select>
                     </template>
                 </template>
-                <template v-else>
-                    <input :id="field.name" :type="field.type" v-model="formData[field.name]"
+                <template v-else-if="field.type === 'text' || field.type === 'email'">
+                    <input :id="`form-${field.name}`" :type="field.type" v-model="formData[field.name]"
                         :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                         class="w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50" />
+                </template>
+                <template v-if="field.type === 'boolean'">
+                    <div class="flex items-center mb-4">
+                        <input type="checkbox" :id="`form-${field.name}`" v-model="formData[field.name]"
+                            class="hidden peer" />
+                        <label :for="`form-${field.name}`"
+                            class="flex items-center justify-center w-10 h-5 bg-gray-300 rounded-full cursor-pointer transition-colors duration-300"
+                            :class="{ 'bg-green-400': formData[field.name], 'bg-red-400': !formData[field.name] }">
+                            <span
+                                class="w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300"
+                                :class="{ 'translate-x-[10px]': formData[field.name], '-translate-x-[10px]': !formData[field.name] }"></span>
+                        </label>
+                        <span class="ml-2 text-sm font-medium text-gray-700">
+                            {{ formData[field.name] ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </div>
                 </template>
                 <p v-if="errores[field.name]" class="text-sm text-red-500">
                     {{ errores[field.name][0] }}
