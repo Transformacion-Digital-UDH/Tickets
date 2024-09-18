@@ -1,27 +1,33 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
-import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import { ref } from "vue";
+import { Head, useForm } from "@inertiajs/vue3";
+import AuthenticationCard from "@/Components/AuthenticationCard.vue";
+import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
 
-defineProps({
-    status: String,
-});
-
+const message = ref("");
 const form = useForm({
-    email: '',
+    email: "",
 });
 
 const submit = () => {
-    form.post(route('password.email'));
+    form.post(route("password.email"), {
+        onSuccess: () => {
+            message.value =
+                "Se ha enviado un enlace de restablecimiento de contraseña a su correo electrónico.";
+        },
+        onError: () => {
+            message.value = "No se pudo enviar el enlace de restablecimiento.";
+        },
+    });
 };
 </script>
 
 <template>
-    <Head title="Forgot Password" />
+    <Head title="Olvidaste tu Contraseña" />
 
     <AuthenticationCard>
         <template #logo>
@@ -29,21 +35,24 @@ const submit = () => {
         </template>
 
         <div class="mb-4 text-sm text-gray-600">
-            Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.
+            ¿Olvidaste tu contraseña? No hay problema. Sólo déjanos saber tu
+            correo electrónico dirección y le enviaremos a su mismo correo
+            electrónico un enlace para restablecer la contraseña que le
+            permitirá a usted poder elegir uno nuevo.
         </div>
 
-        <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
-            {{ status }}
+        <div v-if="message" class="mb-4 text-sm font-medium text-green-600">
+            {{ message }}
         </div>
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="Correo Electrónico" />
                 <TextInput
                     id="email"
                     v-model="form.email"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="block w-full mt-1"
                     required
                     autofocus
                     autocomplete="username"
@@ -52,8 +61,11 @@ const submit = () => {
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Email Password Reset Link
+                <PrimaryButton
+                    :class="{ 'opacity-25': form.processing }"
+                    :disabled="form.processing"
+                >
+                    Restablecer Contraseña
                 </PrimaryButton>
             </div>
         </form>

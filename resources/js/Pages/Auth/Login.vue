@@ -34,7 +34,7 @@ function redirectToGoogle() {
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Inicio de sesión" />
 
     <AuthenticationCard>
         <template #logo>
@@ -139,7 +139,13 @@ function redirectToGoogle() {
                 </label>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
+            <div class="flex items-center justify-between mt-4">
+                <Link
+                    :href="route('password.request')"
+                    class="text-sm font-semibold text-gray-800 hover:text-gray-600 hover:underline"
+                >
+                    He olvidado mí contraseña
+                </Link>
                 <PrimaryButton
                     class="ms-4"
                     :class="{ 'opacity-25': form.processing }"
