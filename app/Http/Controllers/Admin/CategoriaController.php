@@ -34,6 +34,7 @@ class CategoriaController extends Controller
     {
         $validarDatos = $request->validate([
             'cat_nombre' => 'required|string|max:255',
+            'cat_activo' => 'nullable|boolean',
         ]);
 
         $categoria->update($validarDatos);
@@ -41,15 +42,9 @@ class CategoriaController extends Controller
         return response()->json(['message' => 'Categoría actualizada correctamente', 'categoria' => $categoria]);
     }
 
-    public function desactivar(Categoria $categoria)
+    public function eliminar(Categoria $categoria)
     {
-        $categoria->update(['cat_activo' => 0]);
+        $categoria->delete();
         return response()->json(['message' => 'Categoría desactivada correctamente'], 200);
-    }
-
-    public function activar(Categoria $categoria)
-    {
-        $categoria->update(['cat_activo' => 1]);
-        return response()->json(['message' => 'Categoría activada correctamente'], 200);
     }
 }

@@ -4,8 +4,7 @@ import Table from "../Table.vue";
 import ModalCrear from "../ModalCrear.vue";
 import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
-import ModalDesactivar from "../ModalDesactivar.vue";
-import ModalActivar from "../ModalActivar.vue";
+import ModalEliminar from "../ModalEliminar.vue";
 import ButtonNuevo from "../ButtonNuevo.vue";
 import axios from "axios";
 
@@ -16,8 +15,7 @@ const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
-const mostrarModalDesactivar = ref(false);
-const mostrarModalActivar = ref(false);
+const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 
 const headers = ["N°", "Pabellones", "Sede", "Estado"];
@@ -33,7 +31,7 @@ const filtrarPabellones = computed(() => {
 
 const fetchPabellones = async () => {
     try {
-        const response = await axios.get("/pabellons");
+        const response = await axios.get("/pabellones");
         pabellons.value = response.data.map((pabellon) => ({
             id: pabellon.id,
             pab_nombre: pabellon.pab_nombre,
@@ -75,28 +73,17 @@ formFields.value = [
         type: "select",
         options: sedes.value,
     },
+    { name: "pab_activo", label: "Estado", type: "boolean" },
 ];
 
-const desactivarItem = async () => {
+const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/pabellons/${itemSeleccionado.value.id}/desactivar`
+                `/pabellones/${itemSeleccionado.value.id}/eliminar`
             );
             await fetchPabellones();
-            mostrarModalDesactivar.value = false;
-        } catch (error) {
-            console.error("Error al desactivar el pabellon:", error);
-        }
-    }
-};
-
-const activarItem = async () => {
-    if (itemSeleccionado.value) {
-        try {
-            await axios.put(`/pabellons/${itemSeleccionado.value.id}/activar`);
-            await fetchPabellones();
-            mostrarModalActivar.value = false;
+            mostrarModalEliminar.value = false;
         } catch (error) {
             console.error("Error al eliminar el pabellon:", error);
         }
@@ -125,22 +112,13 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (pabellon) => {
+const abrirEliminarModal = (pabellon) => {
     itemSeleccionado.value = pabellon;
-    mostrarModalDesactivar.value = true;
+    mostrarModalEliminar.value = true;
 };
 
-const cerrarDesactivarModal = () => {
-    mostrarModalDesactivar.value = false;
-};
-
-const abrirActivarModal = (pabellon) => {
-    itemSeleccionado.value = pabellon;
-    mostrarModalActivar.value = true;
-};
-
-const cerrarActivarModal = () => {
-    mostrarModalActivar.value = false;
+const cerrarEliminarModal = () => {
+    mostrarModalEliminar.value = false;
 };
 
 onMounted(() => {
@@ -166,23 +144,20 @@ onMounted(() => {
             <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
-        <Table :headers="headers" :items="filtrarPabellones" @view="abrirDetallesModal" @edit="abrirEditarModal"
-            @activar="abrirActivarModal" @desactivar="abrirDesactivarModal" />
+        <Table :headers="headers" entityType="pabellon" :items="filtrarPabellones" @view="abrirDetallesModal"
+            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
         <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :sedes="sedes" itemName="Pabellon"
-            endpoint="/pabellons" @cerrar="cerrarCrearModal" @crear="fetchPabellones" />
+            endpoint="/pabellones" @cerrar="cerrarCrearModal" @crear="fetchPabellones" />
 
         <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Pabellon" :formFields="formFields"
             :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
         <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Pabellon" :formFields="formFields"
-            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/pabellons" @cerrar="cerrarEditarModal"
+            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/pabellones" @cerrar="cerrarEditarModal"
             @update="fetchPabellones" />
 
-        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Pabellon" fieldName="name"
-            @cancelar="cerrarDesactivarModal" @confirmar="desactivarItem" />
-
-        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Pabellon" fieldName="name"
-            @cancelar="cerrarActivarModal" @confirmar="activarItem" />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Pabellon" fieldName="name"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
     </div>
 </template>

@@ -15,14 +15,20 @@ export default {
         },
     },
     computed: {
-        userKeys() {
-            return ["id", "celular", "sed_id", "sed_nombre"];
-        },
         sedeKeys() {
             return ["id", "sed_direccion", "sed_telefono"];
         },
+        userKeys() {
+            return ["id", "celular", "sed_id", "sed_nombre"];
+        },
+        categoriaKeys() {
+            return ["id"];
+        },
         pabellonKeys() {
-            return ["pab_id"];
+            return ["id", "sed_id"];
+        },
+        aulaKeys() {
+            return ["id", "pab_id"];
         },
         getStatusKey() {
             if (this.items.length > 0) {
@@ -37,14 +43,20 @@ export default {
             let keysToExclude = [];
 
             switch (this.entityType) {
-                case 'user':
-                    keysToExclude = [...this.userKeys];
-                    break;
                 case 'sede':
                     keysToExclude = [...this.sedeKeys];
                     break;
+                case 'user':
+                    keysToExclude = [...this.userKeys];
+                    break;
+                case 'categoria':
+                    keysToExclude = [...this.categoriaKeys];
+                    break;
                 case 'pabellon':
                     keysToExclude = [...this.pabellonKeys];
+                    break;
+                case 'aula':
+                    keysToExclude = [...this.aulaKeys];
                     break;
                 default:
                     keysToExclude = [];

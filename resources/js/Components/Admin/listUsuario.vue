@@ -4,8 +4,7 @@ import Table from "../Table.vue";
 import ModalCrear from "../ModalCrear.vue";
 import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
-import ModalDesactivar from "../ModalDesactivar.vue";
-import ModalActivar from "../ModalActivar.vue";
+import ModalEliminar from "../ModalEliminar.vue";
 import ButtonNuevo from "../ButtonNuevo.vue";
 import axios from "axios";
 
@@ -16,12 +15,11 @@ const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
-const mostrarModalDesactivar = ref(false);
-const mostrarModalActivar = ref(false);
+const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const passwordGenerada = ref("");
 
-const headers = ["N°", "Nombres", "Correo", "Teléfono", "Sede", "Estado"];
+const headers = ["N°", "Nombres", "Correo", "Estado"];
 
 const generarPassword = () => {
     const caracteres =
@@ -114,28 +112,17 @@ formFields.value = [
         type: "text",
         default: computed(() => passwordGenerada.value),
     },
+    { name: "activo", label: "Estado", type: "boolean" },
 ];
 
-const desactivarItem = async () => {
+const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/usuarios/${itemSeleccionado.value.id}/desactivar`
+                `/usuarios/${itemSeleccionado.value.id}/eliminar`
             );
             await fetchUsuarios();
-            mostrarModalDesactivar.value = false;
-        } catch (error) {
-            console.error("Error al desactivar al usuario:", error);
-        }
-    }
-};
-
-const activarItem = async () => {
-    if (itemSeleccionado.value) {
-        try {
-            await axios.put(`/usuarios/${itemSeleccionado.value.id}/activar`);
-            await fetchUsuarios();
-            mostrarModalActivar.value = false;
+            mostrarModalEliminar.value = false;
         } catch (error) {
             console.error("Error al eliminar al usuario:", error);
         }
@@ -164,22 +151,13 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (usuario) => {
+const abrirEliminarModal = (usuario) => {
     itemSeleccionado.value = usuario;
-    mostrarModalDesactivar.value = true;
+    mostrarModalEliminar.value = true;
 };
 
-const cerrarDesactivarModal = () => {
-    mostrarModalDesactivar.value = false;
-};
-
-const abrirActivarModal = (usuario) => {
-    itemSeleccionado.value = usuario;
-    mostrarModalActivar.value = true;
-};
-
-const cerrarActivarModal = () => {
-    mostrarModalActivar.value = false;
+const cerrarEliminarModal = () => {
+    mostrarModalEliminar.value = false;
 };
 
 onMounted(() => {
@@ -196,77 +174,29 @@ onMounted(() => {
 
         <div class="flex items-center justify-between mb-4">
             <div class="relative">
-                <span
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input
-                    type="text"
-                    v-model="buscarQuery"
-                    placeholder="Buscar..."
-                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-                />
+                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
+                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
             </div>
             <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
-        <Table
-            :headers="headers"
-            :items="filtrarUsuarios"
-            @view="abrirDetallesModal"
-            @edit="abrirEditarModal"
-            @activar="abrirActivarModal"
-            @desactivar="abrirDesactivarModal"
-        />
+        <Table :headers="headers" :items="filtrarUsuarios" entityType="user" @view="abrirDetallesModal"
+            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
-        <ModalCrear
-            v-if="mostrarModalCrear"
-            :formFields="formFields"
-            :sedes="sedes"
-            itemName="Usuario"
-            endpoint="/usuarios"
-            @cerrar="cerrarCrearModal"
-            @crear="fetchUsuarios"
-        />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :sedes="sedes" itemName="Usuario"
+            endpoint="/usuarios" @cerrar="cerrarCrearModal" @crear="fetchUsuarios" />
 
-        <ModalVer
-            v-if="mostrarModalDetalles"
-            :item="itemSeleccionado"
-            itemName="Usuario"
-            :formFields="formFields"
-            :mostrarModalDetalles="mostrarModalDetalles"
-            @close="cerrarDetallesModal"
-        />
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Usuario" :formFields="formFields"
+            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar
-            v-if="mostrarModalEditar"
-            :item="itemSeleccionado"
-            itemName="Usuario"
-            :formFields="formFields"
-            :sedes="sedes"
-            :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/usuarios"
-            @cerrar="cerrarEditarModal"
-            @update="fetchUsuarios"
-        />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Usuario" :formFields="formFields"
+            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/usuarios" @cerrar="cerrarEditarModal"
+            @update="fetchUsuarios" />
 
-        <ModalDesactivar
-            v-if="mostrarModalDesactivar"
-            :item="itemSeleccionado"
-            itemName="Usuario"
-            fieldName="name"
-            @cancelar="cerrarDesactivarModal"
-            @confirmar="desactivarItem"
-        />
-
-        <ModalActivar
-            v-if="mostrarModalActivar"
-            :item="itemSeleccionado"
-            itemName="Usuario"
-            fieldName="name"
-            @cancelar="cerrarActivarModal"
-            @confirmar="activarItem"
-        />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Usuario" fieldName="name"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
     </div>
 </template>

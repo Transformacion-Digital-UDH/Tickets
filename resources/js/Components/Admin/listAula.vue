@@ -4,8 +4,7 @@ import Table from "../Table.vue";
 import ModalCrear from "../ModalCrear.vue";
 import ModalVer from "../ModalVer.vue";
 import ModalEditar from "../ModalEditar.vue";
-import ModalDesactivar from "../ModalDesactivar.vue";
-import ModalActivar from "../ModalActivar.vue";
+import ModalEliminar from "../ModalEliminar.vue";
 import ButtonNuevo from "../ButtonNuevo.vue";
 import axios from "axios";
 
@@ -16,8 +15,7 @@ const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
-const mostrarModalDesactivar = ref(false);
-const mostrarModalActivar = ref(false);
+const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 
 const headers = ["N°", "Aula", "Pabellon", "Estado"];
@@ -48,7 +46,7 @@ const fetchAulas = async () => {
 
 const fetchPabellones = async () => {
     try {
-        const response = await axios.get("/pabellons");
+        const response = await axios.get("/pabellones");
         pabellons.value = response.data.map((pabellon) => ({
             value: pabellon.id,
             text: pabellon.pab_nombre,
@@ -75,28 +73,17 @@ formFields.value = [
         type: "select",
         options: pabellons.value,
     },
+    { name: "aul_activo", label: "Estado", type: "boolean" },
 ];
 
-const desactivarItem = async () => {
+const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
             await axios.delete(
-                `/aulas/${itemSeleccionado.value.id}/desactivar`
+                `/aulas/${itemSeleccionado.value.id}/eliminar`
             );
             await fetchAulas();
-            mostrarModalDesactivar.value = false;
-        } catch (error) {
-            console.error("Error al desactivar el aula:", error);
-        }
-    }
-};
-
-const activarItem = async () => {
-    if (itemSeleccionado.value) {
-        try {
-            await axios.put(`/aulas/${itemSeleccionado.value.id}/activar`);
-            await fetchAulas();
-            mostrarModalActivar.value = false;
+            mostrarModalEliminar.value = false;
         } catch (error) {
             console.error("Error al eliminar el aula:", error);
         }
@@ -125,22 +112,13 @@ const cerrarEditarModal = () => {
     mostrarModalEditar.value = false;
 };
 
-const abrirDesactivarModal = (aula) => {
+const abrirEliminarModal = (aula) => {
     itemSeleccionado.value = aula;
-    mostrarModalDesactivar.value = true;
+    mostrarModalEliminar.value = true;
 };
 
-const cerrarDesactivarModal = () => {
-    mostrarModalDesactivar.value = false;
-};
-
-const abrirActivarModal = (aula) => {
-    itemSeleccionado.value = aula;
-    mostrarModalActivar.value = true;
-};
-
-const cerrarActivarModal = () => {
-    mostrarModalActivar.value = false;
+const cerrarEliminarModal = () => {
+    mostrarModalEliminar.value = false;
 };
 
 onMounted(() => {
@@ -167,8 +145,8 @@ onMounted(() => {
             <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
-        <Table :headers="headers" :items="filtrarAulas" @view="abrirDetallesModal" @edit="abrirEditarModal"
-            @activar="abrirActivarModal" @desactivar="abrirDesactivarModal" />
+        <Table :headers="headers" entityType="aula" :items="filtrarAulas" @view="abrirDetallesModal"
+            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
         <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :pabellons="pabellons" itemName="Aula"
             endpoint="/aulas" @cerrar="cerrarCrearModal" @crear="fetchAulas" />
@@ -177,13 +155,10 @@ onMounted(() => {
             :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
         <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Aula" :formFields="formFields"
-            :pabellons="pabellons" :mostrarModalEditar="mostrarModalEditar" endpoint="/aulas" @cerrar="cerrarEditarModal"
-            @update="fetchAulas" />
+            :pabellons="pabellons" :mostrarModalEditar="mostrarModalEditar" endpoint="/aulas"
+            @cerrar="cerrarEditarModal" @update="fetchAulas" />
 
-        <ModalDesactivar v-if="mostrarModalDesactivar" :item="itemSeleccionado" itemName="Aula" fieldName="name"
-            @cancelar="cerrarDesactivarModal" @confirmar="desactivarItem" />
-
-        <ModalActivar v-if="mostrarModalActivar" :item="itemSeleccionado" itemName="Aula" fieldName="name"
-            @cancelar="cerrarActivarModal" @confirmar="activarItem" />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Aula" fieldName="name"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
     </div>
 </template>

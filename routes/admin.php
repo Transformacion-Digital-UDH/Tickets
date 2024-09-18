@@ -41,8 +41,7 @@ Route::middleware([
         Route::get('/usuarios', 'traerUsuario');
         Route::post('/usuarios', 'storeUsuario');
         Route::put('/usuarios/{usuario}', 'updateUsuario');
-        Route::delete('/usuarios/{usuario}/desactivar', 'desactivarUsuario');
-        Route::put('/usuarios/{usuario}/activar', 'activarUsuario');
+        Route::delete('/usuarios/{usuario}/eliminar', 'eliminarUsuario');
     });
 
     Route::controller(CategoriaController::class)->group(function () {
@@ -50,23 +49,15 @@ Route::middleware([
         Route::get('/categorias', 'traer');
         Route::post('/categorias', 'store');
         Route::put('/categorias/{categoria}', 'update');
-        Route::delete('/categorias/{categoria}/desactivar', 'desactivar');
-        Route::put('/categorias/{categoria}/activar', 'activar');
-    });
-
-    Route::controller(TicketController::class)->group(function () {
-        Route::get('/ticket', 'index')->name('ticket');
-        Route::get('/tickets', 'traer');
-        Route::post('/tickets', 'store');
+        Route::delete('/categorias/{categoria}/eliminar', 'eliminar');
     });
 
     Route::controller(PabellonController::class)->group(function () {
         Route::get('/pabellon', 'index')->name('pabellon');
-        Route::get('/pabellons', 'traer');
-        Route::post('/pabellons', 'store');
-        Route::put('/pabellons/{pabellon}', 'update');
-        Route::delete('/pabellons/{pabellon}/desactivar', 'desactivar');
-        Route::put('/pabellons/{pabellon}/activar', 'activar');
+        Route::get('/pabellones', 'traer');
+        Route::post('/pabellones', 'store');
+        Route::put('/pabellones/{pabellon}', 'update');
+        Route::delete('/pabellones/{pabellon}/eliminar', 'eliminar');
     });
 
     Route::controller(AulaController::class)->group(function () {
@@ -74,8 +65,13 @@ Route::middleware([
         Route::get('/aulas', 'traer');
         Route::post('/aulas', 'store');
         Route::put('/aulas/{aula}', 'update');
-        Route::delete('/aulas/{aula}/desactivar', 'desactivar');
-        Route::put('/aulas/{aula}/activar', 'activar');
+        Route::delete('/aulas/{aula}/eliminar', 'eliminar');
+    });
+
+    Route::controller(TicketController::class)->group(function () {
+        Route::get('/ticket', 'index')->name('ticket');
+        Route::get('/tickets', 'traer');
+        Route::post('/tickets', 'store');
     });
 
     Route::controller(PrioridadController::class)->group(function () {

@@ -183,75 +183,34 @@ onMounted(() => {
 
         <div class="flex items-center justify-between mb-4">
             <div class="relative">
-                <span
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input
-                    type="text"
-                    v-model="buscarQuery"
-                    placeholder="Buscar..."
-                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-                />
+                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
+                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
             </div>
 
-            <button
-                @click="abrirCrearModal"
-                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]"
-            >
+            <button @click="abrirCrearModal"
+                class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-200 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1]">
                 <font-awesome-icon icon="plus" class="mr-2 text-lg" />
                 Nuevo
             </button>
         </div>
 
-        <Table
-            :headers="headers"
-            :items="filtrarSoportes"
-            entityType="user"
-            @view="abrirDetallesModal"
-            @edit="abrirEditarModal"
-            @eliminar="abrirEliminarModal"
-        />
+        <Table :headers="headers" :items="filtrarSoportes" entityType="user" @view="abrirDetallesModal"
+            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
-        <ModalCrear
-            v-if="mostrarModalCrear"
-            :formFields="formFields"
-            :sedes="sedes"
-            itemName="Soporte"
-            endpoint="/soportes"
-            @cerrar="cerrarCrearModal"
-            @crear="fetchSoportes"
-        />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :sedes="sedes" itemName="Soporte"
+            endpoint="/soportes" @cerrar="cerrarCrearModal" @crear="fetchSoportes" />
 
-        <ModalVer
-            v-if="mostrarModalDetalles"
-            :item="itemSeleccionado"
-            itemName="Soporte"
-            :formFields="formFields"
-            :mostrarModalDetalles="mostrarModalDetalles"
-            @close="cerrarDetallesModal"
-        />
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Soporte" :formFields="formFields"
+            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar
-            v-if="mostrarModalEditar"
-            :item="itemSeleccionado"
-            itemName="Soporte"
-            :formFields="formFields"
-            :sedes="sedes"
-            :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/soportes"
-            @cerrar="cerrarEditarModal"
-            @update="fetchSoportes"
-        />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Soporte" :formFields="formFields"
+            :sedes="sedes" :mostrarModalEditar="mostrarModalEditar" endpoint="/soportes" @cerrar="cerrarEditarModal"
+            @update="fetchSoportes" />
 
-        <ModalEliminar
-            v-if="mostrarModalEliminar"
-            :item="itemSeleccionado"
-            itemName="Soporte"
-            fieldName="name"
-            @cancelar="cerrarEliminarModal"
-            @confirmar="eliminarItem"
-        />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Soporte" fieldName="name"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
     </div>
 </template>

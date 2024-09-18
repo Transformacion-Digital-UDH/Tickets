@@ -159,6 +159,7 @@ class UsuarioController extends Controller
                 'celular' => 'required|string|max:30',
                 'sed_id' => 'required|exists:sedes,id',
                 'password' => 'nullable|string|min:8',
+                'activo' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -169,7 +170,7 @@ class UsuarioController extends Controller
                 ], 422);
             }
 
-            $data = $request->only(['name', 'email', 'celular', 'sed_id']);
+            $data = $request->only(['name', 'email', 'celular', 'sed_id', 'activo']);
             if ($request->filled('password')) {
                 $data['password'] = bcrypt($request->password);
             }
@@ -218,16 +219,16 @@ class UsuarioController extends Controller
         }
     }
 
-    public function desactivarUsuario($id)
+    public function eliminarUsuario($id)
     {
         try {
             $user = User::findOrFail($id);
 
-            $user->update(['activo' => 0]);
+            $user->delete();
 
             return response()->json([
                 'status' => true,
-                'msg' => 'Usuario desactivado exitosamente.',
+                'msg' => 'Usuario eliminado exitosamente.',
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -237,7 +238,7 @@ class UsuarioController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ocurrió un error al desactivar al usuario: ' . $e->getMessage(),
+                'msg' => 'Ocurrió un error al eliminar al usuario: ' . $e->getMessage(),
             ], 500);
         }
     }
