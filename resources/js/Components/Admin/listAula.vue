@@ -21,11 +21,8 @@ const itemSeleccionado = ref(null);
 const headers = ["N°", "Aula", "Pabellon", "Estado"];
 
 const filtrarAulas = computed(() => {
-    return aulas.value.filter(
-        (aula) =>
-            aula.aul_numero
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase())
+    return aulas.value.filter((aula) =>
+        aula.aul_numero.toLowerCase().includes(buscarQuery.value.toLowerCase())
     );
 });
 
@@ -79,9 +76,7 @@ formFields.value = [
 const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
-            await axios.delete(
-                `/aulas/${itemSeleccionado.value.id}/eliminar`
-            );
+            await axios.delete(`/aulas/${itemSeleccionado.value.id}/eliminar`);
             await fetchAulas();
             mostrarModalEliminar.value = false;
         } catch (error) {
@@ -129,36 +124,75 @@ onMounted(() => {
 
 <template>
     <div class="p-6">
-        <h1 class="mb-6 text-[20px] font-bold text-gray-500">
+        <h1 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
             Lista de Aulas
         </h1>
-
-        <div class="flex items-center justify-between mb-4">
-            <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div
+            class="flex flex-col items-center justify-between mb-4 sm:flex-row"
+        >
+            <div class="relative w-full mb-2 sm:w-auto sm:mb-0">
+                <span
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
-                    class="flex-grow px-12 pl-10 placeholder-gray-400 border border-gray-300 rounded-md focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
+                <input
+                    type="text"
+                    v-model="buscarQuery"
+                    placeholder="Buscar..."
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
+                />
             </div>
-
             <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
-        <Table :headers="headers" entityType="aula" :items="filtrarAulas" @view="abrirDetallesModal"
-            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
+        <Table
+            :headers="headers"
+            entityType="aula"
+            :items="filtrarAulas"
+            @view="abrirDetallesModal"
+            @edit="abrirEditarModal"
+            @eliminar="abrirEliminarModal"
+        />
 
-        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :pabellons="pabellons" itemName="Aula"
-            endpoint="/aulas" @cerrar="cerrarCrearModal" @crear="fetchAulas" />
+        <ModalCrear
+            v-if="mostrarModalCrear"
+            :formFields="formFields"
+            :pabellons="pabellons"
+            itemName="Aula"
+            endpoint="/aulas"
+            @cerrar="cerrarCrearModal"
+            @crear="fetchAulas"
+        />
 
-        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Aula" :formFields="formFields"
-            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
+        <ModalVer
+            v-if="mostrarModalDetalles"
+            :item="itemSeleccionado"
+            itemName="Aula"
+            :formFields="formFields"
+            :mostrarModalDetalles="mostrarModalDetalles"
+            @close="cerrarDetallesModal"
+        />
 
-        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Aula" :formFields="formFields"
-            :pabellons="pabellons" :mostrarModalEditar="mostrarModalEditar" endpoint="/aulas"
-            @cerrar="cerrarEditarModal" @update="fetchAulas" />
+        <ModalEditar
+            v-if="mostrarModalEditar"
+            :item="itemSeleccionado"
+            itemName="Aula"
+            :formFields="formFields"
+            :pabellons="pabellons"
+            :mostrarModalEditar="mostrarModalEditar"
+            endpoint="/aulas"
+            @cerrar="cerrarEditarModal"
+            @update="fetchAulas"
+        />
 
-        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Aula" fieldName="name"
-            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
+        <ModalEliminar
+            v-if="mostrarModalEliminar"
+            :item="itemSeleccionado"
+            itemName="Aula"
+            fieldName="name"
+            @cancelar="cerrarEliminarModal"
+            @confirmar="eliminarItem"
+        />
     </div>
 </template>
