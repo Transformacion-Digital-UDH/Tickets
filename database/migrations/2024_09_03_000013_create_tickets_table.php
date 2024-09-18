@@ -17,10 +17,10 @@ return new class extends Migration
             $table->foreignId('cat_id')->constrained('categorias');
             $table->foreignId('pri_id')->constrained('prioridads');
             $table->foreignId('pab_id')->constrained('pabellons');
-            $table->string('tic_titulo');
-            $table->text('tic_descripcion');
-            $table->string('tic_archivo');
-            $table->string('tic_estado');
+            $table->string('tic_titulo')->nullable();
+            $table->text('tic_descripcion')->nullable();
+            $table->string('tic_archivo')->nullable();
+            $table->string('tic_estado')->nullable();
             $table->boolean('tic_activo')->default(true);
             $table->timestamps();
         });
