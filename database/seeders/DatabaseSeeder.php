@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
         $this->call(SedeSeeder::class);
         $this->call(RolSeeder::class);
         $this->call(UserSeeder::class);
+        $this->call(CategoriaSeeder::class);
+        $this->call(PrioridadSeeder::class);
         $this->call(PabellonSeeder::class);
+        $this->call(AulaSeeder::class);
+        $this->call(TicketSeeder::class);
     }
 }
