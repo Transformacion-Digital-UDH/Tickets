@@ -11,6 +11,7 @@ import axios from "axios";
 const usuarios = ref([]);
 const sedes = ref([]);
 const formFields = ref([]);
+const formFieldsVer = ref([]);
 const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
@@ -91,6 +92,15 @@ const fetchSedes = async () => {
             }
             return field;
         });
+        formFieldsVer.value = formFieldsVer.value.map((field) => {
+            if (field.name === "sed_id") {
+                return {
+                    ...field,
+                    options: sedes.value,
+                };
+            }
+            return field;
+        });
     } catch (error) {
         console.error("Error al cargar las sedes:", error);
     }
@@ -113,6 +123,13 @@ formFields.value = [
         default: computed(() => passwordGenerada.value),
     },
     { name: "activo", label: "Estado", type: "boolean" },
+];
+
+formFieldsVer.value = [
+    { name: "name", label: "Nombre", type: "text" },
+    { name: "sed_nombre", label: "Sede", type: "text" },
+    { name: "email", label: "Correo", type: "email" },
+    { name: "celular", label: "Teléfono", type: "text" },
 ];
 
 const eliminarItem = async () => {
@@ -213,7 +230,7 @@ onMounted(() => {
             v-if="mostrarModalDetalles"
             :item="itemSeleccionado"
             itemName="Usuario"
-            :formFields="formFields"
+            :formFieldsVer="formFieldsVer"
             :mostrarModalDetalles="mostrarModalDetalles"
             @close="cerrarDetallesModal"
         />

@@ -47,7 +47,7 @@ function redirectToGoogle() {
             ¿Aun no tienes una cuenta?
             <Link
                 :href="route('register')"
-                class="font-semibold text-gray-800 hover:text-gray-600 hover:underline"
+                class="font-semibold text-gray-800 hover:text-[#2EBAA1] hover:underline"
             >
                 Registrate aquí
             </Link>
@@ -91,17 +91,17 @@ function redirectToGoogle() {
 
         <div
             v-if="status"
-            class="mb-4 text-sm font-medium text-center text-red-600"
+            class="mb-4 text-sm font-medium text-center text-yellow-600"
         >
             {{ status }}
         </div>
-
+        
         <div class="flex items-center justify-center my-4">
             <hr class="w-full border-t border-gray-300" />
             <span class="px-3 text-gray-500">o</span>
             <hr class="w-full border-t border-gray-300" />
         </div>
-
+        
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Correo Electrónico" />
@@ -142,7 +142,7 @@ function redirectToGoogle() {
             <div class="flex items-center justify-between mt-4">
                 <Link
                     :href="route('password.request')"
-                    class="text-sm font-semibold text-gray-800 hover:text-gray-600 hover:underline"
+                    class="text-sm font-semibold text-gray-800 hover:text-[#2EBAA1] hover:underline"
                 >
                     He olvidado mí contraseña
                 </Link>

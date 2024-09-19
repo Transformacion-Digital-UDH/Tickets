@@ -44,6 +44,10 @@ const formFields = [
     { name: "cat_activo", label: "Estado", type: "boolean" },
 ];
 
+const formFieldsVer = [
+    { name: "cat_nombre", label: "Categoría", type: "text" }
+];
+
 const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
@@ -138,7 +142,7 @@ onMounted(() => fetchCategorias());
             v-if="mostrarModalDetalles"
             :item="itemSeleccionado"
             itemName="Categoría"
-            :formFields="formFields"
+            :formFieldsVer="formFieldsVer"
             :mostrarModalDetalles="mostrarModalDetalles"
             @close="cerrarDetallesModal"
         />
