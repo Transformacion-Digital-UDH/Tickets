@@ -56,6 +56,28 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password123'),
             'celular' => '987654323',
             'activo' => true,
+            'rol_id' => 2,
+            'sed_id' => 2,
+        ]);
+
+        User::create([
+            'name' => 'Marcelina',
+            'apellidos' => 'Cartil Martel',
+            'email' => 'marcelina@udh.edu.pe',
+            'password' => Hash::make('password123'),
+            'celular' => '987654323',
+            'activo' => true,
+            'rol_id' => 3,
+            'sed_id' => 3,
+        ]);
+
+        User::create([
+            'name' => 'Xiomara',
+            'apellidos' => 'Calderon Deza',
+            'email' => 'xiomara@udh.edu.pe',
+            'password' => Hash::make('password123'),
+            'celular' => '987654323',
+            'activo' => true,
             'rol_id' => 3,
             'sed_id' => 3,
         ]);

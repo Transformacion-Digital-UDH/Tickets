@@ -14,20 +14,38 @@ class PabellonSeeder extends Seeder
     public function run(): void
     {
         Pabellon::create([
-            'sed_id'=> 1,
+            'sed_id' => 1,
             'pab_nombre' => 'Pabellon 1',
             'pab_activo' => true,
         ]);
 
         Pabellon::create([
-            'sed_id'=> 2,
+            'sed_id' => 2,
             'pab_nombre' => 'Pabellon 2',
             'pab_activo' => true,
         ]);
 
         Pabellon::create([
-            'sed_id'=> 3,
+            'sed_id' => 3,
             'pab_nombre' => 'Pabellon 3',
+            'pab_activo' => true,
+        ]);
+
+        Pabellon::create([
+            'sed_id' => 2,
+            'pab_nombre' => 'Pabellon 4',
+            'pab_activo' => true,
+        ]);
+
+        Pabellon::create([
+            'sed_id' => 3,
+            'pab_nombre' => 'Pabellon 5',
+            'pab_activo' => true,
+        ]);
+
+        Pabellon::create([
+            'sed_id' => 1,
+            'pab_nombre' => 'Pabellon 6',
             'pab_activo' => true,
         ]);
     }
