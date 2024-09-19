@@ -181,7 +181,7 @@ export default {
                         >
                             <button
                                 @click="$emit('view', item)"
-                                class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-blue-300 to-blue-500 hover:from-blue-400 hover:to-blue-600"
+                                class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
                                 title="Ver detalles"
                             >
                                 <i class="fas fa-eye"></i>

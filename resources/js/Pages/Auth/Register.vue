@@ -38,7 +38,7 @@ const submit = () => {
             ¿Ya tienes una cuenta?
             <Link
                 :href="route('login')"
-                class="font-semibold text-gray-800 hover:text-gray-600 hover:underline"
+                class="font-semibold text-gray-800 hover:text-[#2EBAA1] hover:underline"
             >
                 Inicia sesión aquí
             </Link>
@@ -134,14 +134,14 @@ const submit = () => {
                             <a
                                 target="_blank"
                                 :href="route('terms.show')"
-                                class="text-xs text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                class="text-xs text-gray-600 underline rounded-md hover:text-[#2EBAA1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >Términos de servicio</a
                             >
                             y
                             <a
                                 target="_blank"
                                 :href="route('policy.show')"
-                                class="text-xs text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                class="text-xs text-gray-600 underline rounded-md hover:text-[#2EBAA1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >Política de privacidad</a
                             >
                         </div>

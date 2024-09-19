@@ -11,6 +11,7 @@ import axios from "axios";
 const aulas = ref([]);
 const pabellons = ref([]);
 const formFields = ref([]);
+const formFieldsVer = ref([]);
 const buscarQuery = ref("");
 const mostrarModalCrear = ref(false);
 const mostrarModalDetalles = ref(false);
@@ -57,6 +58,15 @@ const fetchPabellones = async () => {
             }
             return field;
         });
+        formFieldsVer.value = formFieldsVer.value.map((field) => {
+            if (field.name === "pab_id") {
+                return {
+                    ...field,
+                    options: pabellons.value,
+                };
+            }
+            return field;
+        });
     } catch (error) {
         console.error("Error al cargar los pabellones:", error);
     }
@@ -71,6 +81,11 @@ formFields.value = [
         options: pabellons.value,
     },
     { name: "aul_activo", label: "Estado", type: "boolean" },
+];
+
+formFieldsVer.value = [
+    { name: "aul_numero", label: "Aula", type: "text" },
+    { name: "pab_nombre", label: "Pabellon", type: "text" },
 ];
 
 const eliminarItem = async () => {
@@ -169,7 +184,7 @@ onMounted(() => {
             v-if="mostrarModalDetalles"
             :item="itemSeleccionado"
             itemName="Aula"
-            :formFields="formFields"
+            :formFieldsVer="formFieldsVer"
             :mostrarModalDetalles="mostrarModalDetalles"
             @close="cerrarDetallesModal"
         />

@@ -65,6 +65,13 @@ const formFields = [
     { name: "sed_activo", label: "Estado", type: "boolean" },
 ];
 
+const formFieldsVer = [
+    { name: "sed_nombre", label: "Sede", type: "text" },
+    { name: "sed_direccion", label: "Dirección", type: "text" },
+    { name: "sed_ciudad", label: "Ciudad", type: "text" },
+    { name: "sed_telefono", label: "Teléfono", type: "text" },
+];
+
 const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
@@ -161,7 +168,7 @@ onMounted(() => fetchSedes());
             v-if="mostrarModalDetalles"
             :item="itemSeleccionado"
             itemName="Sede"
-            :formFields="formFields"
+            :formFieldsVer="formFieldsVer"
             :mostrarModalDetalles="mostrarModalDetalles"
             @close="cerrarDetallesModal"
         />
