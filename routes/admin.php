@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AsignadoController;
 use App\Http\Controllers\Admin\CategoriaController;
 use App\Http\Controllers\Admin\PrioridadController;
 use App\Http\Controllers\Admin\SedeController;
@@ -78,5 +79,9 @@ Route::middleware([
 
     Route::controller(PrioridadController::class)->group(function () {
         Route::get('/prioridades', 'traer');
+    });
+
+    Route::controller(AsignadoController::class)->group(function () {
+        Route::post('/asignar/{ticket}', 'store');
     });
 });
