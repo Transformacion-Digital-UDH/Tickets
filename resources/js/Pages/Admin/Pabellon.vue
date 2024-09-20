@@ -1,6 +1,6 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import listPabellon from '@/Components/Admin/listPabellon.vue';
+import AppLayout from "@/Layouts/AppLayout.vue";
+import listPabellon from "@/Components/Admin/listPabellon.vue";
 </script>
 
 <template>

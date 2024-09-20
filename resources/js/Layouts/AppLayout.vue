@@ -155,10 +155,7 @@ defineProps({ title: String });
                             :active="route().current('categoria')"
                             :class="linkClasses(route().current('categoria'))"
                         >
-                            <font-awesome-icon
-                                icon="tags"
-                                class="text-lg"
-                            />
+                            <font-awesome-icon icon="tags" class="text-lg" />
                             <span v-if="abrirSidebar" class="ml-2"
                                 >Categoria</span
                             >

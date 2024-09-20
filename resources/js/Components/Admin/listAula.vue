@@ -1,11 +1,11 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import Table from "../Table.vue";
-import ModalCrear from "../ModalCrear.vue";
-import ModalVer from "../ModalVer.vue";
-import ModalEditar from "../ModalEditar.vue";
-import ModalEliminar from "../ModalEliminar.vue";
-import ButtonNuevo from "../ButtonNuevo.vue";
+import Table from "@/Components/Table.vue";
+import ModalCrear from "@/Components/ModalCrear.vue";
+import ModalVer from "@/Components/ModalVer.vue";
+import ModalEditar from "@/Components/ModalEditar.vue";
+import ModalEliminar from "@/Components/ModalEliminar.vue";
+import ButtonNuevo from "@/Components/ButtonNuevo.vue";
 import axios from "axios";
 
 const aulas = ref([]);
