@@ -8,7 +8,19 @@ const props = defineProps({
     item: Object,
     itemName: String,
     formFields: Array,
+    prioridads: {
+        type: Array,
+        default: () => [],
+    },
+    usuarios: {
+        type: Array,
+        default: () => [],
+    },
     sedes: {
+        type: Array,
+        default: () => [],
+    },
+    categorias: {
         type: Array,
         default: () => [],
     },
@@ -27,11 +39,55 @@ const errores = ref([]);
 const loading = ref(false);
 const successMessage = ref("");
 
+const initializeFormData = (item) => {
+    formData.value = {};
+    props.formFields.forEach((field) => {
+        formData.value[field.name] = item?.[field.name] || "";
+    });
+};
+
+const updateSelectOptions = (fieldName, options) => {
+    const field = props.formFields.find((f) => f.name === fieldName);
+    if (field) {
+        field.options = options;
+    }
+};
+
+watch(
+    () => props.prioridads,
+    (newOptions) => updateSelectOptions("pri_id", newOptions),
+    { immediate: true }
+);
+
+watch(
+    () => props.usuarios,
+    (newOptions) => updateSelectOptions("use_id", newOptions),
+    { immediate: true }
+);
+
+watch(
+    () => props.sedes,
+    (newOptions) => updateSelectOptions("sed_id", newOptions),
+    { immediate: true }
+);
+
+watch(
+    () => props.categorias,
+    (newOptions) => updateSelectOptions("cat_id", newOptions),
+    { immediate: true }
+);
+
+watch(
+    () => props.pabellons,
+    (newOptions) => updateSelectOptions("pab_id", newOptions),
+    { immediate: true }
+);
+
 watch(
     () => props.item,
     (newItem) => {
         if (newItem) {
-            formData.value = { ...newItem };
+            initializeFormData(newItem);
         }
     },
     { immediate: true }
@@ -98,25 +154,13 @@ const cerrarModal = () => emit("cerrar");
                             <select
                                 :id="`form-${field.name}`"
                                 v-model="formData[field.name]"
-                                :class="{
-                                    'text-[#2EBAA1]':
-                                        formData[field.name] === '',
-                                    'text-gray-900':
-                                        formData[field.name] !== '',
-                                }"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                             >
-                                <option value="" disabled selected>
-                                    {{
-                                        field.name === "sed_id"
-                                            ? "Seleccione una sede"
-                                            : "Seleccione un pabellón"
-                                    }}
+                                <option value="" disabled>
+                                    Seleccione su {{ field.label }}
                                 </option>
                                 <option
-                                    v-for="option in field.name === 'sed_id'
-                                        ? props.sedes
-                                        : props.pabellons"
+                                    v-for="option in field.options"
                                     :key="option.value"
                                     :value="option.value"
                                 >
@@ -136,6 +180,14 @@ const cerrarModal = () => emit("cerrar");
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                             />
+                        </template>
+                        <template v-else-if="field.type === 'textarea'">
+                            <textarea
+                                :id="`form-${field.name}`"
+                                v-model="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            ></textarea>
                         </template>
                         <template v-if="field.type === 'boolean'">
                             <div class="flex items-center mb-4">
