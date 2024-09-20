@@ -33,6 +33,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    aulas: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(["cerrar", "crear"]);
@@ -133,6 +137,23 @@ watch(
                     field.options = newPabellones.map((pabellon) => ({
                         value: pabellon.value,
                         label: pabellon.text,
+                    }));
+                }
+            });
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.aulas,
+    (newAulas) => {
+        if (newAulas && newAulas.length > 0) {
+            props.formFields.forEach((field) => {
+                if (field.name === "aul_id") {
+                    field.options = newAulas.map((aula) => ({
+                        value: aula.value,
+                        label: aula.text,
                     }));
                 }
             });
