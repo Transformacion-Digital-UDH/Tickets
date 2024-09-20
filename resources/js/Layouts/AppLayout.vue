@@ -191,7 +191,7 @@ defineProps({ title: String });
             </nav>
 
             <div class="flex flex-col flex-1">
-                <nav class="bg-[#6775f5] border-b border-[#757877]">
+                <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
                     <div
                         class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
                     >

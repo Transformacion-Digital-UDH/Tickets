@@ -2,6 +2,7 @@
 import { ref, onMounted, computed, createApp } from "vue";
 import CardTickets from "@/Components/CardTickets.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
+import ModalAsignar from "@/Components/ModalAsignar.vue";
 import ModalVer from "@/Components/ModalVer.vue";
 import ModalEditar from "@/Components/ModalEditar.vue";
 import ModalEliminar from "@/Components/ModalEliminar.vue";
@@ -15,15 +16,18 @@ library.add(faThLarge, faTable);
 
 const tickets = ref([]);
 const prioridades = ref([]);
+const soportes = ref([]);
 const usuarios = ref([]);
 const categorias = ref([]);
 const pabellones = ref([]);
 const aulas = ref([]);
 const formFields = ref([]);
+const formFieldsAsignar = ref([]);
 const formFieldsVer = ref([]);
 const buscarQuery = ref("");
 const isCardView = ref(true);
 const mostrarModalCrear = ref(false);
+const mostrarModalAsignar = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
@@ -114,6 +118,27 @@ const fetchPrioridades = async () => {
         });
     } catch (error) {
         console.error("Error al cargar las prioridades:", error);
+    }
+};
+
+const fetchSoportes = async () => {
+    try {
+        const response = await axios.get("/soportes");
+        soportes.value = response.data.map((soporte) => ({
+            value: soporte.id,
+            text: soporte.name,
+        }));
+        formFieldsAsignar.value = formFieldsAsignar.value.map((field) => {
+            if (field.name == "use_id") {
+                return {
+                    ...field,
+                    options: soportes.value,
+                };
+            }
+            return field;
+        });
+    } catch (error) {
+        console.error("Error al cargar los soportes técnicos:", error);
     }
 };
 
@@ -268,6 +293,15 @@ formFields.value = [
     { name: "tic_activo", label: "Activo", type: "boolean" },
 ];
 
+formFieldsAsignar.value = [
+    {
+        name: "use_id",
+        label: "Soporte",
+        type: "select",
+        options: soportes.value,
+    },
+];
+
 formFieldsVer.value = [
     { name: "tic_titulo", label: "Título", type: "text" },
     { name: "pri_nombre", label: "Prioridad", type: "text" },
@@ -278,6 +312,20 @@ formFieldsVer.value = [
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_estado", label: "Estado", type: "text" },
 ];
+
+const asignarSoporte = async () => {
+    if (itemSeleccionado.value) {
+        try {
+            await axios.put(
+                `/tickets/${itemSeleccionado.value.id}`
+            );
+            await fetchTickets();
+            mostrarModalAsignar.value = false;
+        } catch (error) {
+            console.error("Error al asignar un soporte técnico:", error);
+        }
+    }
+}
 
 const eliminarItem = async () => {
     if (itemSeleccionado.value) {
@@ -295,6 +343,15 @@ const eliminarItem = async () => {
 
 const cerrarCrearModal = () => {
     mostrarModalCrear.value = false;
+};
+
+const abrirAsignarModal = (ticket) => {
+    itemSeleccionado.value = ticket;
+    mostrarModalAsignar.value = true;
+};
+
+const cerrarAsignarModal = () => {
+    mostrarModalAsignar.value = false;
 };
 
 const abrirDetallesModal = (ticket) => {
@@ -327,6 +384,7 @@ const cerrarEliminarModal = () => {
 onMounted(() => {
     fetchTickets();
     fetchPrioridades();
+    fetchSoportes();
     fetchUsuarios();
     fetchCategorias();
     fetchPabellones();
@@ -358,19 +416,22 @@ onMounted(() => {
             </div>
         </div>
 
-        <CardTickets :isCardView="isCardView" :headers="headers" :tickets="filtrarTickets" @view="abrirDetallesModal"
-            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
+        <CardTickets :isCardView="isCardView" :headers="headers" :tickets="filtrarTickets" @asign="abrirAsignarModal"
+            @view="abrirDetallesModal" @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
         <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :prioridads="prioridades" :usuarios="usuarios"
             :categorias="categorias" :pabellons="pabellones" :aulas="aulas" itemName="Ticket" endpoint="/tickets"
             @cerrar="cerrarCrearModal" @crear="fetchTickets" />
 
+        <ModalAsignar v-if="mostrarModalAsignar" :formFieldsAsignar="formFieldsAsignar" :soportes="soportes"
+            itemName="Soporte Técnico" endpoint="/tickets" @cerrar="cerrarAsignarModal" @crear="fetchTickets" />
+
         <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Ticket" :formFieldsVer="formFieldsVer"
             :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
         <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Ticket" :formFields="formFields"
-            :prioridads="prioridades" :usuarios="usuarios" :categorias="categorias" :pabellons="pabellones" :aulas="aulas"
-            :mostrarModalEditar="mostrarModalEditar" endpoint="/tickets" @cerrar="cerrarEditarModal"
+            :prioridads="prioridades" :usuarios="usuarios" :categorias="categorias" :pabellons="pabellones"
+            :aulas="aulas" :mostrarModalEditar="mostrarModalEditar" endpoint="/tickets" @cerrar="cerrarEditarModal"
             @update="fetchTickets" />
 
         <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Ticket" fieldName="tic_titulo"
