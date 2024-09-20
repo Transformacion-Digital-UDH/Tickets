@@ -14,6 +14,7 @@ class Ticket extends Model
     'cat_id',
     'pri_id',
     'pab_id',
+    'aul_id',
     'tic_titulo',
     'tic_descripcion',
     'tic_archivo',
@@ -39,6 +40,11 @@ class Ticket extends Model
   public function categoria()
   {
     return $this->belongsTo(Categoria::class, 'cat_id');
+  }
+
+  public function aula()
+  {
+    return $this->belongsTo(Aula::class, foreignKey: 'aul_id');
   }
 
 }

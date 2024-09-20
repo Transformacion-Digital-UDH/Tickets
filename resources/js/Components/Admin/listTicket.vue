@@ -18,6 +18,7 @@ const prioridades = ref([]);
 const usuarios = ref([]);
 const categorias = ref([]);
 const pabellones = ref([]);
+const aulas = ref([]);
 const formFields = ref([]);
 const formFieldsVer = ref([]);
 const buscarQuery = ref("");
@@ -76,6 +77,8 @@ const fetchTickets = async () => {
             cat_nombre: ticket.categoria ? ticket.categoria.cat_nombre : "",
             pab_id: ticket.pab_id,
             pab_nombre: ticket.pabellon ? ticket.pabellon.pab_nombre : "",
+            aul_id: ticket.aul_id,
+            aul_numero: ticket.aula ? ticket.aula.aul_numero : "",
             tic_estado: ticket.tic_estado,
             tic_activo: ticket.tic_activo,
         }));
@@ -204,6 +207,36 @@ const fetchPabellones = async () => {
     }
 };
 
+const fetchAulas = async () => {
+    try {
+        const response = await axios.get("/aulas");
+        aulas.value = response.data.map((aula) => ({
+            value: aula.id,
+            text: aula.aul_numero,
+        }));
+        formFields.value = formFields.value.map((field) => {
+            if (field.name === "aul_id") {
+                return {
+                    ...field,
+                    options: aulas.value,
+                };
+            }
+            return field;
+        });
+        formFieldsVer.value = formFieldsVer.value.map((field) => {
+            if (field.name === "aul_id") {
+                return {
+                    ...field,
+                    options: aulas.value,
+                };
+            }
+            return field;
+        });
+    } catch (error) {
+        console.error("Error al cargar las aulas:", error);
+    }
+};
+
 formFields.value = [
     { name: "tic_titulo", label: "Título", type: "text" },
     {
@@ -230,6 +263,7 @@ formFields.value = [
         type: "select",
         options: pabellones.value,
     },
+    { name: "aul_id", label: "Aula", type: "select", options: aulas.value },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_activo", label: "Activo", type: "boolean" },
 ];
@@ -240,6 +274,7 @@ formFieldsVer.value = [
     { name: "name", label: "Usuario", type: "text" },
     { name: "cat_nombre", label: "Categoría", type: "text" },
     { name: "pab_nombre", label: "Pabellón", type: "text" },
+    { name: "aul_numero", label: "Aula", type: "text" },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_estado", label: "Estado", type: "text" },
 ];
@@ -295,6 +330,7 @@ onMounted(() => {
     fetchUsuarios();
     fetchCategorias();
     fetchPabellones();
+    fetchAulas();
 });
 </script>
 
@@ -305,88 +341,39 @@ onMounted(() => {
         </h1>
         <div class="flex items-center justify-between mb-4">
             <div class="relative w-full sm:w-auto">
-                <span
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input
-                    type="text"
-                    v-model="buscarQuery"
-                    placeholder="Buscar..."
-                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-                />
+                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
             </div>
             <div class="flex items-center space-x-1">
-                <font-awesome-icon
-                    @click="isCardView = true"
-                    :class="{ 'bg-gray-200': isCardView }"
+                <font-awesome-icon @click="isCardView = true" :class="{ 'bg-gray-200': isCardView }"
                     class="flex items-center px-4 py-2 text-sm font-semibold bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100"
-                    icon="th-large"
-                />
-                <font-awesome-icon
-                    @click="isCardView = false"
-                    :class="{ 'bg-gray-200': !isCardView }"
+                    icon="th-large" />
+                <font-awesome-icon @click="isCardView = false" :class="{ 'bg-gray-200': !isCardView }"
                     class="flex items-center px-4 py-2 text-sm font-semibold bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100"
-                    icon="table"
-                />
+                    icon="table" />
                 <ButtonNuevo @click="mostrarModalCrear = true" />
             </div>
         </div>
 
-        <CardTickets
-            :isCardView="isCardView"
-            :headers="headers"
-            :tickets="filtrarTickets"
-            @view="abrirDetallesModal"
-            @edit="abrirEditarModal"
-            @eliminar="abrirEliminarModal"
-        />
+        <CardTickets :isCardView="isCardView" :headers="headers" :tickets="filtrarTickets" @view="abrirDetallesModal"
+            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
-        <ModalCrear
-            v-if="mostrarModalCrear"
-            :formFields="formFields"
-            :prioridads="prioridades"
-            :usuarios="usuarios"
-            :categorias="categorias"
-            :pabellons="pabellones"
-            itemName="Ticket"
-            endpoint="/tickets"
-            @cerrar="cerrarCrearModal"
-            @crear="fetchTickets"
-        />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :prioridads="prioridades" :usuarios="usuarios"
+            :categorias="categorias" :pabellons="pabellones" :aulas="aulas" itemName="Ticket" endpoint="/tickets"
+            @cerrar="cerrarCrearModal" @crear="fetchTickets" />
 
-        <ModalVer
-            v-if="mostrarModalDetalles"
-            :item="itemSeleccionado"
-            itemName="Ticket"
-            :formFieldsVer="formFieldsVer"
-            :mostrarModalDetalles="mostrarModalDetalles"
-            @close="cerrarDetallesModal"
-        />
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Ticket" :formFieldsVer="formFieldsVer"
+            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar
-            v-if="mostrarModalEditar"
-            :item="itemSeleccionado"
-            itemName="Ticket"
-            :formFields="formFields"
-            :prioridads="prioridades"
-            :usuarios="usuarios"
-            :categorias="categorias"
-            :pabellons="pabellones"
-            :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/tickets"
-            @cerrar="cerrarEditarModal"
-            @update="fetchTickets"
-        />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Ticket" :formFields="formFields"
+            :prioridads="prioridades" :usuarios="usuarios" :categorias="categorias" :pabellons="pabellones" :aulas="aulas"
+            :mostrarModalEditar="mostrarModalEditar" endpoint="/tickets" @cerrar="cerrarEditarModal"
+            @update="fetchTickets" />
 
-        <ModalEliminar
-            v-if="mostrarModalEliminar"
-            :item="itemSeleccionado"
-            itemName="Ticket"
-            fieldName="tic_titulo"
-            @cancelar="cerrarEliminarModal"
-            @confirmar="eliminarItem"
-        />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Ticket" fieldName="tic_titulo"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
     </div>
 </template>

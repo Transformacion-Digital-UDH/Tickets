@@ -32,6 +32,7 @@ class TicketController extends Controller
             'use_id' => 'required|exists:users,id',
             'cat_id' => 'required|exists:categorias,id',
             'pab_id' => 'required|exists:pabellons,id',
+            'aul_id' => 'required|exists:aulas,id',
         ]);
 
         $ticket = Ticket::create([
@@ -41,6 +42,7 @@ class TicketController extends Controller
             'use_id' => $validatedData['use_id'],
             'cat_id' => $validatedData['cat_id'],
             'pab_id' => $validatedData['pab_id'],
+            'aul_id' => $validatedData['aul_id'],
             'tic_estado' => 'Abierto',
             'tic_activo' => true,
         ]);
@@ -60,6 +62,7 @@ class TicketController extends Controller
                 'cat_id' => 'required|exists:categorias,id',
                 'pri_id' => 'required|exists:prioridads,id',
                 'pab_id' => 'required|exists:pabellons,id',
+                'aul_id' => 'required|exists:aulas,id',
                 'tic_activo' => 'nullable|boolean',
             ]);
 
@@ -71,7 +74,7 @@ class TicketController extends Controller
                 ], 422);
             }
 
-            $data = $request->only(['tic_titulo', 'tic_descripcion', 'use_id', 'cat_id', 'pri_id', 'pab_id', 'tic_activo']);
+            $data = $request->only(['tic_titulo', 'tic_descripcion', 'use_id', 'cat_id', 'pri_id', 'pab_id', 'aul_id', 'tic_activo']);
 
             $ticket->update($data);
 

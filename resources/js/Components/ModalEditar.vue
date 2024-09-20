@@ -28,6 +28,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    aulas: {
+        type: Array,
+        default: () => [],
+    },
     mostrarModalEditar: Boolean,
     endpoint: String,
 });
@@ -80,6 +84,12 @@ watch(
 watch(
     () => props.pabellons,
     (newOptions) => updateSelectOptions("pab_id", newOptions),
+    { immediate: true }
+);
+
+watch(
+    () => props.aulas,
+    (newOptions) => updateSelectOptions("aul_id", newOptions),
     { immediate: true }
 );
 
