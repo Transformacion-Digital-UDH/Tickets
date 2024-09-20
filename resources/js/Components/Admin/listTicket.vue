@@ -1,12 +1,17 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import TableforTickets from "@/Components/TableforTickets.vue";
+import { ref, onMounted, computed, createApp } from "vue";
+import CardTickets from "@/Components/CardTickets.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalVer from "@/Components/ModalVer.vue";
 import ModalEditar from "@/Components/ModalEditar.vue";
 import ModalEliminar from "@/Components/ModalEliminar.vue";
 import ButtonNuevo from "@/Components/ButtonNuevo.vue";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faThLarge, faTable } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+
+library.add(faThLarge, faTable);
 
 const tickets = ref([]);
 const prioridades = ref([]);
@@ -23,7 +28,14 @@ const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 
-const headers = ["N°", "Título", "Descripción", "Estado"];
+const headers = [
+    "Título",
+    "Descripción",
+    "Prioridad",
+    "Estado",
+    "Usuario",
+    "Categoría",
+];
 
 const filtrarTickets = computed(() => {
     return tickets.value.filter(
@@ -31,26 +43,21 @@ const filtrarTickets = computed(() => {
             ticket.tic_titulo
                 .toLowerCase()
                 .includes(buscarQuery.value.toLowerCase()) ||
-            (ticket.tic_descripcion &&
-                ticket.tic_descripcion
-                    .toLowerCase()
-                    .includes(buscarQuery.value.toLowerCase())) ||
-            (ticket.tic_estado &&
-                ticket.tic_estado
-                    .toLowerCase()
-                    .includes(buscarQuery.value.toLowerCase())) ||
-            (ticket.prioridad &&
-                ticket.prioridad.pri_nombre
-                    .toLowerCase()
-                    .includes(buscarQuery.value.toLowerCase())) ||
-            (ticket.name &&
-                ticket.name
-                    .toLowerCase()
-                    .includes(buscarQuery.value.toLowerCase())) ||
-            (ticket.cat_nombre &&
-                ticket.cat_nombre
-                    .toLowerCase()
-                    .includes(buscarQuery.value.toLowerCase()))
+            ticket.tic_descripcion
+                .toLowerCase()
+                .includes(buscarQuery.value.toLowerCase()) ||
+            ticket.tic_estado
+                .toLowerCase()
+                .includes(buscarQuery.value.toLowerCase()) ||
+            ticket.pri_nombre
+                .toLowerCase()
+                .includes(buscarQuery.value.toLowerCase()) ||
+            ticket.name
+                .toLowerCase()
+                .includes(buscarQuery.value.toLowerCase()) ||
+            ticket.cat_nombre
+                .toLowerCase()
+                .includes(buscarQuery.value.toLowerCase())
     );
 });
 
@@ -64,11 +71,12 @@ const fetchTickets = async () => {
             pri_id: ticket.pri_id,
             pri_nombre: ticket.prioridad ? ticket.prioridad.pri_nombre : "",
             use_id: ticket.use_id,
-            name: ticket.usuario ? ticket.usuario.name : "",
+            name: ticket.user ? ticket.user.name : "",
             cat_id: ticket.cat_id,
             cat_nombre: ticket.categoria ? ticket.categoria.cat_nombre : "",
             pab_id: ticket.pab_id,
             pab_nombre: ticket.pabellon ? ticket.pabellon.pab_nombre : "",
+            tic_estado: ticket.tic_estado,
             tic_activo: ticket.tic_activo,
         }));
     } catch (error) {
@@ -208,26 +216,30 @@ formFields.value = [
         name: "use_id",
         label: "Usuario",
         type: "select",
+        options: usuarios.value,
     },
     {
         name: "cat_id",
         label: "Categoría",
         type: "select",
+        options: categorias.value,
     },
     {
         name: "pab_id",
         label: "Pabellón",
         type: "select",
+        options: pabellones.value,
     },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
+    { name: "tic_activo", label: "Activo", type: "boolean" },
 ];
 
 formFieldsVer.value = [
     { name: "tic_titulo", label: "Título", type: "text" },
-    { name: "prioridad.pri_nombre", label: "Prioridad", type: "text" },
-    { name: "user.name", label: "Usuario", type: "text" },
-    { name: "categoria.cat_nombre", label: "Categoría", type: "text" },
-    { name: "pabellon.pab_nombre", label: "Pabellón", type: "text" },
+    { name: "pri_nombre", label: "Prioridad", type: "text" },
+    { name: "name", label: "Usuario", type: "text" },
+    { name: "cat_nombre", label: "Categoría", type: "text" },
+    { name: "pab_nombre", label: "Pabellón", type: "text" },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_estado", label: "Estado", type: "text" },
 ];
@@ -291,10 +303,8 @@ onMounted(() => {
         <h1 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
             Lista de Tickets
         </h1>
-        <div
-            class="flex flex-col items-center justify-between mb-4 sm:flex-row"
-        >
-            <div class="relative w-full mb-2 sm:w-auto sm:mb-0">
+        <div class="flex items-center justify-between mb-4">
+            <div class="relative w-full sm:w-auto">
                 <span
                     class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
                 >
@@ -303,14 +313,28 @@ onMounted(() => {
                 <input
                     type="text"
                     v-model="buscarQuery"
-                    placeholder="Buscar por título, estado, prioridad, usuario o categoría..."
+                    placeholder="Buscar..."
                     class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
                 />
             </div>
-            <ButtonNuevo @click="mostrarModalCrear = true" />
+            <div class="flex items-center space-x-1">
+                <font-awesome-icon
+                    @click="isCardView = true"
+                    :class="{ 'bg-gray-200': isCardView }"
+                    class="flex items-center px-4 py-2 text-sm font-semibold bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100"
+                    icon="th-large"
+                />
+                <font-awesome-icon
+                    @click="isCardView = false"
+                    :class="{ 'bg-gray-200': !isCardView }"
+                    class="flex items-center px-4 py-2 text-sm font-semibold bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100"
+                    icon="table"
+                />
+                <ButtonNuevo @click="mostrarModalCrear = true" />
+            </div>
         </div>
 
-        <TableforTickets
+        <CardTickets
             :isCardView="isCardView"
             :headers="headers"
             :tickets="filtrarTickets"
@@ -360,7 +384,7 @@ onMounted(() => {
             v-if="mostrarModalEliminar"
             :item="itemSeleccionado"
             itemName="Ticket"
-            fieldName="name"
+            fieldName="tic_titulo"
             @cancelar="cerrarEliminarModal"
             @confirmar="eliminarItem"
         />

@@ -49,6 +49,6 @@ class RegisteredUserController extends Controller
             $se_registro->save();
             Auth::login($se_registro);
         }
-        return redirect()->route('elegirsede');
+        return redirect()->route('dashboard');
     }
 }
