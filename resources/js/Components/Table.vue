@@ -1,5 +1,5 @@
 <script>
-import CardMobile from "./CardMobile.vue";
+import CardMobile from "@/Components/CardMobile.vue";
 
 export default {
     components: {

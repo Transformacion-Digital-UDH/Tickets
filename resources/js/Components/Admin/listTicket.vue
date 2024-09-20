@@ -1,0 +1,368 @@
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import TableforTickets from "@/Components/TableforTickets.vue";
+import ModalCrear from "@/Components/ModalCrear.vue";
+import ModalVer from "@/Components/ModalVer.vue";
+import ModalEditar from "@/Components/ModalEditar.vue";
+import ModalEliminar from "@/Components/ModalEliminar.vue";
+import ButtonNuevo from "@/Components/ButtonNuevo.vue";
+import axios from "axios";
+
+const tickets = ref([]);
+const prioridades = ref([]);
+const usuarios = ref([]);
+const categorias = ref([]);
+const pabellones = ref([]);
+const formFields = ref([]);
+const formFieldsVer = ref([]);
+const buscarQuery = ref("");
+const isCardView = ref(true);
+const mostrarModalCrear = ref(false);
+const mostrarModalDetalles = ref(false);
+const mostrarModalEditar = ref(false);
+const mostrarModalEliminar = ref(false);
+const itemSeleccionado = ref(null);
+
+const headers = ["N°", "Título", "Descripción", "Estado"];
+
+const filtrarTickets = computed(() => {
+    return tickets.value.filter(
+        (ticket) =>
+            ticket.tic_titulo
+                .toLowerCase()
+                .includes(buscarQuery.value.toLowerCase()) ||
+            (ticket.tic_descripcion &&
+                ticket.tic_descripcion
+                    .toLowerCase()
+                    .includes(buscarQuery.value.toLowerCase())) ||
+            (ticket.tic_estado &&
+                ticket.tic_estado
+                    .toLowerCase()
+                    .includes(buscarQuery.value.toLowerCase())) ||
+            (ticket.prioridad &&
+                ticket.prioridad.pri_nombre
+                    .toLowerCase()
+                    .includes(buscarQuery.value.toLowerCase())) ||
+            (ticket.name &&
+                ticket.name
+                    .toLowerCase()
+                    .includes(buscarQuery.value.toLowerCase())) ||
+            (ticket.cat_nombre &&
+                ticket.cat_nombre
+                    .toLowerCase()
+                    .includes(buscarQuery.value.toLowerCase()))
+    );
+});
+
+const fetchTickets = async () => {
+    try {
+        const response = await axios.get("/tickets");
+        tickets.value = response.data.map((ticket) => ({
+            id: ticket.id,
+            tic_titulo: ticket.tic_titulo,
+            tic_descripcion: ticket.tic_descripcion,
+            pri_id: ticket.pri_id,
+            pri_nombre: ticket.prioridad ? ticket.prioridad.pri_nombre : "",
+            use_id: ticket.use_id,
+            name: ticket.usuario ? ticket.usuario.name : "",
+            cat_id: ticket.cat_id,
+            cat_nombre: ticket.categoria ? ticket.categoria.cat_nombre : "",
+            pab_id: ticket.pab_id,
+            pab_nombre: ticket.pabellon ? ticket.pabellon.pab_nombre : "",
+            tic_activo: ticket.tic_activo,
+        }));
+    } catch (error) {
+        console.error("Error al cargar los tickets:", error);
+    }
+};
+
+const fetchPrioridades = async () => {
+    try {
+        const response = await axios.get("/prioridades");
+        prioridades.value = response.data.map((prioridad) => ({
+            value: prioridad.id,
+            text: prioridad.pri_nombre,
+        }));
+        formFields.value = formFields.value.map((field) => {
+            if (field.name === "pri_id") {
+                return {
+                    ...field,
+                    options: prioridades.value,
+                };
+            }
+            return field;
+        });
+        formFieldsVer.value = formFieldsVer.value.map((field) => {
+            if (field.name === "pri_id") {
+                return {
+                    ...field,
+                    options: prioridades.value,
+                };
+            }
+            return field;
+        });
+    } catch (error) {
+        console.error("Error al cargar las prioridades:", error);
+    }
+};
+
+const fetchUsuarios = async () => {
+    try {
+        const response = await axios.get("/usuarios");
+        usuarios.value = response.data.map((usuario) => ({
+            value: usuario.id,
+            text: usuario.name,
+        }));
+        formFields.value = formFields.value.map((field) => {
+            if (field.name === "use_id") {
+                return {
+                    ...field,
+                    options: usuarios.value,
+                };
+            }
+            return field;
+        });
+        formFieldsVer.value = formFieldsVer.value.map((field) => {
+            if (field.name === "use_id") {
+                return {
+                    ...field,
+                    options: usuarios.value,
+                };
+            }
+            return field;
+        });
+    } catch (error) {
+        console.error("Error al cargar los usuarios:", error);
+    }
+};
+
+const fetchCategorias = async () => {
+    try {
+        const response = await axios.get("/categorias");
+        categorias.value = response.data.map((categoria) => ({
+            value: categoria.id,
+            text: categoria.cat_nombre,
+        }));
+        formFields.value = formFields.value.map((field) => {
+            if (field.name === "cat_id") {
+                return {
+                    ...field,
+                    options: categorias.value,
+                };
+            }
+            return field;
+        });
+        formFieldsVer.value = formFieldsVer.value.map((field) => {
+            if (field.name === "cat_id") {
+                return {
+                    ...field,
+                    options: categorias.value,
+                };
+            }
+            return field;
+        });
+    } catch (error) {
+        console.error("Error al cargar las categorías:", error);
+    }
+};
+
+const fetchPabellones = async () => {
+    try {
+        const response = await axios.get("/pabellones");
+        pabellones.value = response.data.map((pabellon) => ({
+            value: pabellon.id,
+            text: pabellon.pab_nombre,
+        }));
+        formFields.value = formFields.value.map((field) => {
+            if (field.name === "pab_id") {
+                return {
+                    ...field,
+                    options: pabellones.value,
+                };
+            }
+            return field;
+        });
+        formFieldsVer.value = formFieldsVer.value.map((field) => {
+            if (field.name === "pab_id") {
+                return {
+                    ...field,
+                    options: pabellones.value,
+                };
+            }
+            return field;
+        });
+    } catch (error) {
+        console.error("Error al cargar los pabellones:", error);
+    }
+};
+
+formFields.value = [
+    { name: "tic_titulo", label: "Título", type: "text" },
+    {
+        name: "pri_id",
+        label: "Prioridad",
+        type: "select",
+        options: prioridades.value,
+    },
+    {
+        name: "use_id",
+        label: "Usuario",
+        type: "select",
+    },
+    {
+        name: "cat_id",
+        label: "Categoría",
+        type: "select",
+    },
+    {
+        name: "pab_id",
+        label: "Pabellón",
+        type: "select",
+    },
+    { name: "tic_descripcion", label: "Descripción", type: "textarea" },
+];
+
+formFieldsVer.value = [
+    { name: "tic_titulo", label: "Título", type: "text" },
+    { name: "prioridad.pri_nombre", label: "Prioridad", type: "text" },
+    { name: "user.name", label: "Usuario", type: "text" },
+    { name: "categoria.cat_nombre", label: "Categoría", type: "text" },
+    { name: "pabellon.pab_nombre", label: "Pabellón", type: "text" },
+    { name: "tic_descripcion", label: "Descripción", type: "textarea" },
+    { name: "tic_estado", label: "Estado", type: "text" },
+];
+
+const eliminarItem = async () => {
+    if (itemSeleccionado.value) {
+        try {
+            await axios.delete(
+                `/tickets/${itemSeleccionado.value.id}/eliminar`
+            );
+            await fetchTickets();
+            mostrarModalEliminar.value = false;
+        } catch (error) {
+            console.error("Error al eliminar al ticket:", error);
+        }
+    }
+};
+
+const cerrarCrearModal = () => {
+    mostrarModalCrear.value = false;
+};
+
+const abrirDetallesModal = (ticket) => {
+    itemSeleccionado.value = ticket;
+    mostrarModalDetalles.value = true;
+};
+
+const cerrarDetallesModal = () => {
+    mostrarModalDetalles.value = false;
+};
+
+const abrirEditarModal = (ticket) => {
+    itemSeleccionado.value = ticket;
+    mostrarModalEditar.value = true;
+};
+
+const cerrarEditarModal = () => {
+    mostrarModalEditar.value = false;
+};
+
+const abrirEliminarModal = (ticket) => {
+    itemSeleccionado.value = ticket;
+    mostrarModalEliminar.value = true;
+};
+
+const cerrarEliminarModal = () => {
+    mostrarModalEliminar.value = false;
+};
+
+onMounted(() => {
+    fetchTickets();
+    fetchPrioridades();
+    fetchUsuarios();
+    fetchCategorias();
+    fetchPabellones();
+});
+</script>
+
+<template>
+    <div class="p-6">
+        <h1 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
+            Lista de Tickets
+        </h1>
+        <div
+            class="flex flex-col items-center justify-between mb-4 sm:flex-row"
+        >
+            <div class="relative w-full mb-2 sm:w-auto sm:mb-0">
+                <span
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
+                    <i class="text-gray-400 fas fa-search"></i>
+                </span>
+                <input
+                    type="text"
+                    v-model="buscarQuery"
+                    placeholder="Buscar por título, estado, prioridad, usuario o categoría..."
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
+                />
+            </div>
+            <ButtonNuevo @click="mostrarModalCrear = true" />
+        </div>
+
+        <TableforTickets
+            :isCardView="isCardView"
+            :headers="headers"
+            :tickets="filtrarTickets"
+            @view="abrirDetallesModal"
+            @edit="abrirEditarModal"
+            @eliminar="abrirEliminarModal"
+        />
+
+        <ModalCrear
+            v-if="mostrarModalCrear"
+            :formFields="formFields"
+            :prioridads="prioridades"
+            :usuarios="usuarios"
+            :categorias="categorias"
+            :pabellons="pabellones"
+            itemName="Ticket"
+            endpoint="/tickets"
+            @cerrar="cerrarCrearModal"
+            @crear="fetchTickets"
+        />
+
+        <ModalVer
+            v-if="mostrarModalDetalles"
+            :item="itemSeleccionado"
+            itemName="Ticket"
+            :formFieldsVer="formFieldsVer"
+            :mostrarModalDetalles="mostrarModalDetalles"
+            @close="cerrarDetallesModal"
+        />
+
+        <ModalEditar
+            v-if="mostrarModalEditar"
+            :item="itemSeleccionado"
+            itemName="Ticket"
+            :formFields="formFields"
+            :prioridads="prioridades"
+            :usuarios="usuarios"
+            :categorias="categorias"
+            :pabellons="pabellones"
+            :mostrarModalEditar="mostrarModalEditar"
+            endpoint="/tickets"
+            @cerrar="cerrarEditarModal"
+            @update="fetchTickets"
+        />
+
+        <ModalEliminar
+            v-if="mostrarModalEliminar"
+            :item="itemSeleccionado"
+            itemName="Ticket"
+            fieldName="name"
+            @cancelar="cerrarEliminarModal"
+            @confirmar="eliminarItem"
+        />
+    </div>
+</template>

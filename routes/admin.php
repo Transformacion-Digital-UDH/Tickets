@@ -72,6 +72,8 @@ Route::middleware([
         Route::get('/ticket', 'index')->name('ticket');
         Route::get('/tickets', 'traer');
         Route::post('/tickets', 'store');
+        Route::put('/tickets/{ticket}', 'update');
+        Route::delete('/tickets/{ticket}/eliminar', 'eliminar');
     });
 
     Route::controller(PrioridadController::class)->group(function () {

@@ -201,37 +201,56 @@ export default {
 
         <!-- Barra de búsqueda -->
         <div class="mb-4">
-            <input v-model="searchQuery" type="text"
+            <input
+                v-model="searchQuery"
+                type="text"
                 placeholder="Buscar por título, estado, prioridad, usuario o categoría..."
-                class="w-full p-2 border rounded" />
+                class="w-full p-2 border rounded"
+            />
         </div>
         <!--Boton para crear un ticket y vista tabla or card-->
         <div class="flex justify-end mb-4">
-            <button @click="showCrearTicketModal"
-                class="px-4 py-2 mr-2 text-white transition duration-300 bg-green-500 rounded hover:bg-green-600">
+            <button
+                @click="showCrearTicketModal"
+                class="px-4 py-2 mr-2 text-white transition duration-300 bg-green-500 rounded hover:bg-green-600"
+            >
                 Crear Ticket
             </button>
-            <button @click="toggleView"
-                class="px-4 py-2 text-white transition duration-300 bg-blue-500 rounded hover:bg-blue-600">
+            <button
+                @click="toggleView"
+                class="px-4 py-2 text-white transition duration-300 bg-blue-500 rounded hover:bg-blue-600"
+            >
                 <i :class="isCardView ? 'fas fa-list' : 'fas fa-table'"></i>
             </button>
         </div>
 
         <!-- Vista en tarjetas -->
-        <div v-if="isCardView"
-            class="container relative flex flex-col justify-between h-full px-4 mx-auto mt-5 max-w-9xl xl:px-0">
-            <div class="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                <div v-for="ticket in filteredTickets" :key="ticket.id" class="relative w-full">
+        <div
+            v-if="isCardView"
+            class="container relative flex flex-col justify-between h-full px-4 mx-auto mt-5 max-w-9xl xl:px-0"
+        >
+            <div
+                class="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            >
+                <div
+                    v-for="ticket in filteredTickets"
+                    :key="ticket.id"
+                    class="relative w-full"
+                >
                     <!-- Fondo coloreado detrás de la tarjeta -->
-                    <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
-                        'bg-orange-600': ticket.tic_estado === 'Abierto',
-                        'bg-blue-600': ticket.tic_estado === 'En progreso',
-                        'bg-green-600': ticket.tic_estado === 'Finalizado',
-                        'bg-red-600': ticket.tic_estado === 'Cerrado',
-                    }"></span>
+                    <span
+                        class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg"
+                        :class="{
+                            'bg-orange-600': ticket.tic_estado === 'Abierto',
+                            'bg-blue-600': ticket.tic_estado === 'En progreso',
+                            'bg-green-600': ticket.tic_estado === 'Finalizado',
+                            'bg-red-600': ticket.tic_estado === 'Cerrado',
+                        }"
+                    ></span>
 
                     <!-- Contenido de la tarjeta -->
-                    <div class="relative h-full p-6 transition-transform duration-300 ease-in-out transform bg-white border-2 rounded-lg hover:scale-105 hover:shadow-2xl"
+                    <div
+                        class="relative h-full p-6 transition-transform duration-300 ease-in-out transform bg-white border-2 rounded-lg hover:scale-105 hover:shadow-2xl"
                         :class="{
                             'border-orange-600':
                                 ticket.tic_estado === 'Abierto',
@@ -240,9 +259,11 @@ export default {
                             'border-green-600':
                                 ticket.tic_estado === 'Finalizado',
                             'border-red-600': ticket.tic_estado === 'Cerrado',
-                        }">
+                        }"
+                    >
                         <!-- Estado del ticket como badge -->
-                        <div class="absolute px-3 py-1 text-xs font-semibold transition-colors duration-300 rounded-full shadow-md top-3 right-3"
+                        <div
+                            class="absolute px-3 py-1 text-xs font-semibold transition-colors duration-300 rounded-full shadow-md top-3 right-3"
                             :class="{
                                 'bg-orange-600 text-white':
                                     ticket.tic_estado === 'Abierto',
@@ -252,46 +273,61 @@ export default {
                                     ticket.tic_estado === 'Finalizado',
                                 'bg-red-600 text-white':
                                     ticket.tic_estado === 'Cerrado',
-                            }">
+                            }"
+                        >
                             {{ ticket.tic_estado }}
                         </div>
 
                         <!-- Título del ticket -->
                         <div>
-                            <h2 class="text-lg font-bold text-gray-800 uppercase truncate">
+                            <h2
+                                class="text-lg font-bold text-gray-800 uppercase truncate"
+                            >
                                 {{ ticket.tic_titulo }}
                             </h2>
                             <hr class="my-2 border-gray-200" />
                         </div>
 
                         <!-- Información detallada del ticket -->
-                        <div class="flex flex-col space-y-2 text-sm text-gray-600">
-                            <span><strong>Prioridad:</strong>
+                        <div
+                            class="flex flex-col space-y-2 text-sm text-gray-600"
+                        >
+                            <span
+                                ><strong>Prioridad:</strong>
                                 {{
                                     ticket.prioridad
                                         ? ticket.prioridad.pri_nombre
                                         : "N/A"
-                                }}</span>
-                            <span><strong>Usuario:</strong>
+                                }}</span
+                            >
+                            <span
+                                ><strong>Usuario:</strong>
                                 {{
                                     ticket.user ? ticket.user.name : "N/A"
-                                }}</span>
-                            <span><strong>Categoría:</strong>
+                                }}</span
+                            >
+                            <span
+                                ><strong>Categoría:</strong>
                                 {{
                                     ticket.categoria
                                         ? ticket.categoria.cat_nombre
                                         : "N/A"
-                                }}</span>
+                                }}</span
+                            >
                         </div>
 
                         <!-- Botones de acción -->
                         <div class="flex justify-end mt-auto space-x-3">
-                            <button @click="showDetallesModal(ticket)"
-                                class="flex items-center text-blue-500 transition duration-300 hover:text-blue-700">
+                            <button
+                                @click="showDetallesModal(ticket)"
+                                class="flex items-center text-blue-500 transition duration-300 hover:text-blue-700"
+                            >
                                 <i class="mr-1 fas fa-eye"></i> Ver
                             </button>
-                            <button @click="showAsignarSoporteModal(ticket)"
-                                class="flex items-center text-purple-500 transition duration-300 hover:text-purple-700">
+                            <button
+                                @click="showAsignarSoporteModal(ticket)"
+                                class="flex items-center text-purple-500 transition duration-300 hover:text-purple-700"
+                            >
                                 <i class="mr-1 fas fa-user-plus"></i> Asignar
                             </button>
                         </div>
@@ -304,8 +340,12 @@ export default {
         <div v-else class="flex flex-col min-h-[603px]">
             <!-- Añadí min-h-[500px] para asegurar el espacio mínimo -->
             <div class="flex-grow overflow-x-auto">
-                <table class="min-w-full bg-white border-collapse rounded-lg shadow-lg">
-                    <thead class="text-sm leading-normal text-gray-600 uppercase bg-gray-200">
+                <table
+                    class="min-w-full bg-white border-collapse rounded-lg shadow-lg"
+                >
+                    <thead
+                        class="text-sm leading-normal text-gray-600 uppercase bg-gray-200"
+                    >
                         <tr>
                             <th class="px-6 py-3 border-b">Título</th>
                             <th class="px-6 py-3 border-b">Descripción</th>
@@ -317,8 +357,11 @@ export default {
                         </tr>
                     </thead>
                     <tbody class="text-sm text-gray-700">
-                        <tr v-for="ticket in paginatedTickets" :key="ticket.id"
-                            class="transition duration-300 ease-in-out border-b hover:bg-gray-100">
+                        <tr
+                            v-for="ticket in paginatedTickets"
+                            :key="ticket.id"
+                            class="transition duration-300 ease-in-out border-b hover:bg-gray-100"
+                        >
                             <td class="px-6 py-4">{{ ticket.tic_titulo }}</td>
                             <td class="px-6 py-4">
                                 {{ ticket.tic_descripcion }}
@@ -331,16 +374,19 @@ export default {
                                 }}
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full" :class="{
-                                    'bg-orange-100 text-orange-600':
-                                        ticket.tic_estado === 'Abierto',
-                                    'bg-blue-100 text-blue-600':
-                                        ticket.tic_estado === 'En progreso',
-                                    'bg-green-100 text-green-600':
-                                        ticket.tic_estado === 'Finalizado',
-                                    'bg-red-100 text-red-600':
-                                        ticket.tic_estado === 'Cerrado',
-                                }">
+                                <span
+                                    class="px-3 py-1 text-xs font-semibold rounded-full"
+                                    :class="{
+                                        'bg-orange-100 text-orange-600':
+                                            ticket.tic_estado === 'Abierto',
+                                        'bg-blue-100 text-blue-600':
+                                            ticket.tic_estado === 'En progreso',
+                                        'bg-green-100 text-green-600':
+                                            ticket.tic_estado === 'Finalizado',
+                                        'bg-red-100 text-red-600':
+                                            ticket.tic_estado === 'Cerrado',
+                                    }"
+                                >
                                     {{ ticket.tic_estado }}
                                 </span>
                             </td>
@@ -355,12 +401,16 @@ export default {
                                 }}
                             </td>
                             <td class="flex justify-center px-6 py-4 space-x-2">
-                                <button @click="showDetallesModal(ticket)"
-                                    class="p-2 text-white transition duration-300 ease-in-out bg-blue-500 rounded-full hover:bg-blue-700">
+                                <button
+                                    @click="showDetallesModal(ticket)"
+                                    class="p-2 text-white transition duration-300 ease-in-out bg-blue-500 rounded-full hover:bg-blue-700"
+                                >
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button @click="showAsignarSoporteModal(ticket)"
-                                    class="p-2 text-white transition duration-300 ease-in-out bg-purple-500 rounded-full hover:bg-purple-700">
+                                <button
+                                    @click="showAsignarSoporteModal(ticket)"
+                                    class="p-2 text-white transition duration-300 ease-in-out bg-purple-500 rounded-full hover:bg-purple-700"
+                                >
                                     <i class="fas fa-user-plus"></i>
                                 </button>
                             </td>
@@ -372,50 +422,83 @@ export default {
             <!-- Paginación con espacio fijo en la parte inferior -->
             <div class="flex justify-center mt-4 mb-4 space-x-2">
                 <!-- Añadí mb-4 para separarlo del final -->
-                <button v-for="page in totalPages" :key="page" @click="changePage(page)" :class="{
-                    'bg-blue-500 text-white': page === currentPage,
-                    'bg-white text-blue-500 border': page !== currentPage,
-                }"
-                    class="px-4 py-2 transition duration-300 ease-in-out border rounded-lg hover:bg-blue-500 hover:text-white">
+                <button
+                    v-for="page in totalPages"
+                    :key="page"
+                    @click="changePage(page)"
+                    :class="{
+                        'bg-blue-500 text-white': page === currentPage,
+                        'bg-white text-blue-500 border': page !== currentPage,
+                    }"
+                    class="px-4 py-2 transition duration-300 ease-in-out border rounded-lg hover:bg-blue-500 hover:text-white"
+                >
                     {{ page }}
                 </button>
             </div>
         </div>
 
         <!-- Modal Crear Ticket -->
-        <div v-if="mostrarModalCrearTicket"
-            class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50">
+        <div
+            v-if="mostrarModalCrearTicket"
+            class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50"
+        >
             <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg">
                 <div class="border-2 border-[#2EBAA1] p-4 rounded-lg">
-                    <h2 class="mb-4 text-xl font-bold text-[#2EBAA1]">Crear Nuevo Ticket</h2>
+                    <h2 class="mb-4 text-xl font-bold text-[#2EBAA1]">
+                        Crear Nuevo Ticket
+                    </h2>
 
                     <!-- Formulario para crear el ticket -->
                     <form @submit.prevent="crearTicket">
                         <!-- Campo Título -->
                         <div class="mb-4">
-                            <label for="titulo" class="block mb-2 text-gray-500">Título:</label>
-                            <input type="text" v-model="nuevoTicket.titulo" id="titulo"
+                            <label for="titulo" class="block mb-2 text-gray-500"
+                                >Título:</label
+                            >
+                            <input
+                                type="text"
+                                v-model="nuevoTicket.titulo"
+                                id="titulo"
                                 placeholder="Ingrese título del ticket"
-                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50" />
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            />
                         </div>
 
                         <!-- Campo Descripción -->
                         <div class="mb-4">
-                            <label for="descripcion" class="block mb-2 text-gray-500">Descripción:</label>
-                            <textarea v-model="nuevoTicket.descripcion" id="descripcion"
+                            <label
+                                for="descripcion"
+                                class="block mb-2 text-gray-500"
+                                >Descripción:</label
+                            >
+                            <textarea
+                                v-model="nuevoTicket.descripcion"
+                                id="descripcion"
                                 placeholder="Ingrese descripción del ticket"
-                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"></textarea>
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            ></textarea>
                         </div>
 
                         <!-- Prioridad -->
                         <div class="mb-4">
-                            <label for="prioridad" class="block mb-2 text-gray-500">Prioridad:</label>
-                            <select v-model="nuevoTicket.prioridad" id="prioridad"
-                                class="w-full p-2 mb-1 text-gray-900 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
+                            <label
+                                for="prioridad"
+                                class="block mb-2 text-gray-500"
+                                >Prioridad:</label
+                            >
+                            <select
+                                v-model="nuevoTicket.prioridad"
+                                id="prioridad"
+                                class="w-full p-2 mb-1 text-gray-900 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            >
                                 <option value="" disabled selected>
                                     Seleccione Prioridad
                                 </option>
-                                <option v-for="prioridad in prioridades" :key="prioridad.id" :value="prioridad.id">
+                                <option
+                                    v-for="prioridad in prioridades"
+                                    :key="prioridad.id"
+                                    :value="prioridad.id"
+                                >
                                     {{ prioridad.nombre }}
                                 </option>
                             </select>
@@ -423,13 +506,24 @@ export default {
 
                         <!-- Usuario -->
                         <div class="mb-4">
-                            <label for="usuario" class="block mb-2 text-gray-500">Usuario:</label>
-                            <select v-model="nuevoTicket.usuario" id="usuario"
-                                class="w-full p-2 mb-1 text-gray-900 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
+                            <label
+                                for="usuario"
+                                class="block mb-2 text-gray-500"
+                                >Usuario:</label
+                            >
+                            <select
+                                v-model="nuevoTicket.usuario"
+                                id="usuario"
+                                class="w-full p-2 mb-1 text-gray-900 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            >
                                 <option value="" disabled selected>
                                     Seleccione Usuario
                                 </option>
-                                <option v-for="usuario in usuarios" :key="usuario.id" :value="usuario.id">
+                                <option
+                                    v-for="usuario in usuarios"
+                                    :key="usuario.id"
+                                    :value="usuario.id"
+                                >
                                     {{ usuario.nombre }}
                                 </option>
                             </select>
@@ -437,13 +531,24 @@ export default {
 
                         <!-- Categoría -->
                         <div class="mb-4">
-                            <label for="categoria" class="block mb-2 text-gray-500">Categoría:</label>
-                            <select v-model="nuevoTicket.categoria" id="categoria"
-                                class="w-full p-2 mb-1 text-gray-900 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
+                            <label
+                                for="categoria"
+                                class="block mb-2 text-gray-500"
+                                >Categoría:</label
+                            >
+                            <select
+                                v-model="nuevoTicket.categoria"
+                                id="categoria"
+                                class="w-full p-2 mb-1 text-gray-900 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            >
                                 <option value="" disabled selected>
                                     Seleccione Categoría
                                 </option>
-                                <option v-for="categoria in categorias" :key="categoria.id" :value="categoria.id">
+                                <option
+                                    v-for="categoria in categorias"
+                                    :key="categoria.id"
+                                    :value="categoria.id"
+                                >
                                     {{ categoria.nombre }}
                                 </option>
                             </select>
@@ -451,13 +556,24 @@ export default {
 
                         <!-- Pabellón -->
                         <div class="mb-4">
-                            <label for="pabellon" class="block mb-2 text-gray-500">Pabellón:</label>
-                            <select v-model="nuevoTicket.pabellon" id="pabellon"
-                                class="w-full p-2 mb-1 text-gray-900 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
+                            <label
+                                for="pabellon"
+                                class="block mb-2 text-gray-500"
+                                >Pabellón:</label
+                            >
+                            <select
+                                v-model="nuevoTicket.pabellon"
+                                id="pabellon"
+                                class="w-full p-2 mb-1 text-gray-900 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            >
                                 <option value="" disabled selected>
                                     Seleccione Pabellón
                                 </option>
-                                <option v-for="pabellon in pabellones" :key="pabellon.id" :value="pabellon.id">
+                                <option
+                                    v-for="pabellon in pabellones"
+                                    :key="pabellon.id"
+                                    :value="pabellon.id"
+                                >
                                     {{ pabellon.nombre }}
                                 </option>
                             </select>
@@ -465,12 +581,17 @@ export default {
 
                         <!-- Botones Crear y Cancelar -->
                         <div class="flex justify-end mt-6 space-x-4">
-                            <button type="submit"
-                                class="px-4 py-2 bg-[#2EBAA1] text-white rounded-md hover:bg-opacity-90">
+                            <button
+                                type="submit"
+                                class="px-4 py-2 bg-[#2EBAA1] text-white rounded-md hover:bg-opacity-90"
+                            >
                                 Crear
                             </button>
-                            <button @click="cerrarCrearTicketModal" type="button"
-                                class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                            <button
+                                @click="cerrarCrearTicketModal"
+                                type="button"
+                                class="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600"
+                            >
                                 Cancelar
                             </button>
                         </div>
@@ -480,9 +601,13 @@ export default {
         </div>
 
         <!-- Modal Detalles Ticket -->
-        <div v-if="mostrarModalDetalles"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="w-full max-w-2xl mx-4 overflow-hidden bg-white shadow-lg sm:rounded-lg">
+        <div
+            v-if="mostrarModalDetalles"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+        >
+            <div
+                class="w-full max-w-2xl mx-4 overflow-hidden bg-white shadow-lg sm:rounded-lg"
+            >
                 <!-- Estilo general de la tarjeta modal -->
                 <div class="px-4 py-5 sm:px-6">
                     <h3 class="text-lg font-medium leading-6 text-gray-900">
@@ -494,51 +619,75 @@ export default {
                 </div>
                 <div class="border-t border-gray-200">
                     <dl>
-                        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div
+                            class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                        >
                             <dt class="text-sm font-medium text-gray-500">
                                 Título
                             </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <dd
+                                class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                            >
                                 {{ ticketSeleccionado.tic_titulo }}
                             </dd>
                         </div>
-                        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div
+                            class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                        >
                             <dt class="text-sm font-medium text-gray-500">
                                 Descripción
                             </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <dd
+                                class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                            >
                                 {{ ticketSeleccionado.tic_descripcion }}
                             </dd>
                         </div>
-                        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div
+                            class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                        >
                             <dt class="text-sm font-medium text-gray-500">
                                 Prioridad
                             </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <dd
+                                class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                            >
                                 {{ ticketSeleccionado.prioridad.pri_nombre }}
                             </dd>
                         </div>
-                        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div
+                            class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                        >
                             <dt class="text-sm font-medium text-gray-500">
                                 Estado
                             </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <dd
+                                class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                            >
                                 {{ ticketSeleccionado.tic_estado }}
                             </dd>
                         </div>
-                        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div
+                            class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                        >
                             <dt class="text-sm font-medium text-gray-500">
                                 Usuario
                             </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <dd
+                                class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                            >
                                 {{ ticketSeleccionado.user.name }}
                             </dd>
                         </div>
-                        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div
+                            class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                        >
                             <dt class="text-sm font-medium text-gray-500">
                                 Categoría
                             </dt>
-                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <dd
+                                class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                            >
                                 {{ ticketSeleccionado.categoria.cat_nombre }}
                             </dd>
                         </div>
@@ -546,8 +695,10 @@ export default {
                 </div>
                 <!-- Botón de cerrar -->
                 <div class="flex justify-end px-4 py-4 sm:px-6 bg-gray-50">
-                    <button @click="cerrarDetallesModal"
-                        class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+                    <button
+                        @click="cerrarDetallesModal"
+                        class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+                    >
                         Cerrar
                     </button>
                 </div>
@@ -555,20 +706,31 @@ export default {
         </div>
 
         <!-- Modal Asignar Soporte -->
-        <div v-if="mostrarModalAsignarSoporte"
-            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div
+            v-if="mostrarModalAsignarSoporte"
+            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+        >
             <div class="w-full max-w-lg p-6 bg-white rounded-lg shadow-lg">
                 <h2 class="mb-4 text-xl font-bold">Asignar a Soporte</h2>
                 <p>
                     <strong>Título:</strong> {{ ticketSeleccionado.tic_titulo }}
                 </p>
                 <label class="block mb-2">Asignar a:</label>
-                <input type="text" v-model="soporteAsignado" class="w-full p-2 mb-4 border rounded" />
-                <button @click="asignarSoporte" class="px-4 py-2 text-white bg-purple-500 rounded hover:bg-purple-600">
+                <input
+                    type="text"
+                    v-model="soporteAsignado"
+                    class="w-full p-2 mb-4 border rounded"
+                />
+                <button
+                    @click="asignarSoporte"
+                    class="px-4 py-2 text-white bg-purple-500 rounded hover:bg-purple-600"
+                >
                     Asignar
                 </button>
-                <button @click="cerrarAsignarSoporteModal"
-                    class="px-4 py-2 ml-4 text-white bg-red-500 rounded hover:bg-red-600">
+                <button
+                    @click="cerrarAsignarSoporteModal"
+                    class="px-4 py-2 ml-4 text-white bg-red-500 rounded hover:bg-red-600"
+                >
                     Cancelar
                 </button>
             </div>

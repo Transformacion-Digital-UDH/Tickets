@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+
 class TicketController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return Inertia::render('Admin/Ticket');
@@ -22,17 +23,6 @@ class TicketController extends Controller
         return response()->json($tickets);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -58,36 +48,72 @@ class TicketController extends Controller
         return response()->json($ticket, 201);
     }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Ticket $ticket)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            $ticket = Ticket::findOrFail($id);
+
+            $validator = Validator::make($request->all(), [
+                'tic_titulo' => 'required|string|max:255',
+                'tic_descripcion' => 'required|string|max:400',
+                'use_id' => 'required|exists:users,id',
+                'cat_id' => 'required|exists:categorias,id',
+                'pri_id' => 'required|exists:prioridads,id',
+                'pab_id' => 'required|exists:pabellons,id',
+                'tic_activo' => 'nullable|boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'Hubo errores en la validación',
+                    'errors' => $validator->errors()->toArray(),
+                ], 422);
+            }
+
+            $data = $request->only(['tic_titulo', 'tic_descripcion', 'use_id', 'cat_id', 'pri_id', 'pab_id', 'tic_activo']);
+
+            $ticket->update($data);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Ticket actualizado correctamente',
+                'ticket' => $ticket
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Ticket no encontrado'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Error al actualizar al ticket: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Ticket $ticket)
+    public function eliminar($id)
     {
-        //
-    }
+        try {
+            $ticket = Ticket::findOrFail($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Ticket $ticket)
-    {
-        //
-    }
+            $ticket->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Ticket $ticket)
-    {
-        //
+            return response()->json([
+                'status' => true,
+                'msg' => 'Ticket eliminado exitosamente.',
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Ticket no encontrado.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Ocurrió un error al eliminar al ticket: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }
