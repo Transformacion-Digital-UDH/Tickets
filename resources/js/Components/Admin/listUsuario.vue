@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import Table from "@/Components/Table.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalVer from "@/Components/ModalVer.vue";
@@ -72,14 +74,21 @@ const fetchUsuarios = async () => {
             activo: usuario.activo,
         }));
     } catch (error) {
-        console.error("Error al cargar los usuarios:", error);
+        toast.error("Error al cargar los usuarios", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
 const fetchSedes = async () => {
     try {
         const response = await axios.get("/sedes");
-        sedes.value = response.data.map((sede) => ({
+        sedes.value = response.data.filter((sede) => sede.sed_activo).map((sede) => ({
             value: sede.id,
             text: sede.sed_nombre,
         }));
@@ -102,7 +111,14 @@ const fetchSedes = async () => {
             return field;
         });
     } catch (error) {
-        console.error("Error al cargar las sedes:", error);
+        toast.error("Error al cargar las sedes", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
@@ -140,8 +156,16 @@ const eliminarItem = async () => {
             );
             await fetchUsuarios();
             mostrarModalEliminar.value = false;
+            alertaEliminar();
         } catch (error) {
-            console.error("Error al eliminar al usuario:", error);
+            toast.error("No puedes eliminar a este soporte técnico, por el momento solo desactivelo", {
+                autoClose: 5000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         }
     }
 };
@@ -176,6 +200,42 @@ const abrirEliminarModal = (usuario) => {
 const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
+
+const alertaCreacion = () => {
+    fetchUsuarios();
+    toast.success("Usuario creado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEditar = () => {
+    fetchUsuarios();
+    toast.success("Usuario actualizado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEliminar = () => {
+    fetchUsuarios();
+    toast.success("Usuario eliminado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
 
 onMounted(() => {
     fetchUsuarios();
@@ -223,7 +283,7 @@ onMounted(() => {
             itemName="Usuario"
             endpoint="/usuarios"
             @cerrar="cerrarCrearModal"
-            @crear="fetchUsuarios"
+            @crear="alertaCreacion"
         />
 
         <ModalVer
@@ -244,7 +304,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/usuarios"
             @cerrar="cerrarEditarModal"
-            @update="fetchUsuarios"
+            @update="alertaEditar"
         />
 
         <ModalEliminar

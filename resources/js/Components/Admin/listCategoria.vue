@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import Table from "@/Components/Table.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalVer from "@/Components/ModalVer.vue";
@@ -35,7 +37,14 @@ const fetchCategorias = async () => {
             cat_activo: categoria.cat_activo,
         }));
     } catch (error) {
-        console.error("Error al cargar las categorias:", error);
+        toast.error("Error al cargar los categorías", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
@@ -56,8 +65,16 @@ const eliminarItem = async () => {
             );
             await fetchCategorias();
             mostrarModalEliminar.value = false;
+            alertaEliminar();
         } catch (error) {
-            console.error("Error al eliminar la categoría:", error);
+            toast.error("No puedes eliminar esta categoría, por el momento solo desactivelo", {
+                autoClose: 5000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         }
     }
 };
@@ -92,6 +109,42 @@ const abrirEliminarModal = (categoria) => {
 const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
+
+const alertaCreacion = () => {
+    fetchCategorias();
+    toast.success("Categoria creado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEditar = () => {
+    fetchCategorias();
+    toast.success("Categoria actualizado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEliminar = () => {
+    fetchCategorias();
+    toast.success("Categoria eliminado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
 
 onMounted(() => fetchCategorias());
 </script>
@@ -135,7 +188,7 @@ onMounted(() => fetchCategorias());
             itemName="Categoría"
             endpoint="/categorias"
             @cerrar="cerrarCrearModal"
-            @crear="fetchCategorias"
+            @crear="alertaCreacion"
         />
 
         <ModalVer
@@ -155,7 +208,7 @@ onMounted(() => fetchCategorias());
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/categorias"
             @cerrar="cerrarEditarModal"
-            @update="fetchCategorias"
+            @update="alertaEditar"
         />
 
         <ModalEliminar

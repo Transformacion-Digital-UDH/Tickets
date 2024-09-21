@@ -94,7 +94,7 @@ const fetchTickets = async () => {
 const fetchPrioridades = async () => {
     try {
         const response = await axios.get("/prioridades");
-        prioridades.value = response.data.map((prioridad) => ({
+        prioridades.value = response.data.filter((prioridad) => prioridad.pri_activo).map((prioridad) => ({
             value: prioridad.id,
             text: prioridad.pri_nombre,
         }));
@@ -124,7 +124,7 @@ const fetchPrioridades = async () => {
 const fetchSoportes = async () => {
     try {
         const response = await axios.get("/soportes");
-        soportes.value = response.data.map((soporte) => ({
+        soportes.value = response.data.filter((soporte) => soporte.activo).map((soporte) => ({
             value: soporte.id,
             text: soporte.name,
         }));
@@ -145,7 +145,7 @@ const fetchSoportes = async () => {
 const fetchUsuarios = async () => {
     try {
         const response = await axios.get("/usuarios");
-        usuarios.value = response.data.map((usuario) => ({
+        usuarios.value = response.data.filter((usuario) => usuario.activo).map((usuario) => ({
             value: usuario.id,
             text: usuario.name,
         }));
@@ -175,7 +175,7 @@ const fetchUsuarios = async () => {
 const fetchCategorias = async () => {
     try {
         const response = await axios.get("/categorias");
-        categorias.value = response.data.map((categoria) => ({
+        categorias.value = response.data.filter((categoria) => categoria.cat_activo).map((categoria) => ({
             value: categoria.id,
             text: categoria.cat_nombre,
         }));
@@ -205,7 +205,7 @@ const fetchCategorias = async () => {
 const fetchPabellones = async () => {
     try {
         const response = await axios.get("/pabellones");
-        pabellones.value = response.data.map((pabellon) => ({
+        pabellones.value = response.data.filter((pabellon) => pabellon.pab_activo).map((pabellon) => ({
             value: pabellon.id,
             text: pabellon.pab_nombre,
         }));
@@ -235,7 +235,7 @@ const fetchPabellones = async () => {
 const fetchAulas = async () => {
     try {
         const response = await axios.get("/aulas");
-        aulas.value = response.data.map((aula) => ({
+        aulas.value = response.data.filter((aula) => aula.aul_activo).map((aula) => ({
             value: aula.id,
             text: aula.aul_numero,
         }));

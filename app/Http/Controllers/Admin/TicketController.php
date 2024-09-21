@@ -19,7 +19,7 @@ class TicketController extends Controller
 
     public function traer()
     {
-        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon')->get();
+        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula')->get();
         return response()->json($tickets);
     }
 

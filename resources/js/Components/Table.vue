@@ -21,7 +21,7 @@ export default {
     },
     data() {
         return {
-            isMobile: true,
+            isMobile: false,
         };
     },
     mounted() {

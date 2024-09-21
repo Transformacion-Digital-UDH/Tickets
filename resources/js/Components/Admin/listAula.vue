@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import Table from "@/Components/Table.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalVer from "@/Components/ModalVer.vue";
@@ -38,14 +40,21 @@ const fetchAulas = async () => {
             aul_activo: aula.aul_activo,
         }));
     } catch (error) {
-        console.error("Error al cargar las aulas:", error);
+        toast.error("Error al cargar las aulas", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
 const fetchPabellones = async () => {
     try {
         const response = await axios.get("/pabellones");
-        pabellons.value = response.data.map((pabellon) => ({
+        pabellons.value = response.data.filter((pabellon) => pabellon.pab_activo).map((pabellon) => ({
             value: pabellon.id,
             text: pabellon.pab_nombre,
         }));
@@ -68,7 +77,14 @@ const fetchPabellones = async () => {
             return field;
         });
     } catch (error) {
-        console.error("Error al cargar los pabellones:", error);
+        toast.error("Error al cargar los pabellones", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
@@ -94,8 +110,16 @@ const eliminarItem = async () => {
             await axios.delete(`/aulas/${itemSeleccionado.value.id}/eliminar`);
             await fetchAulas();
             mostrarModalEliminar.value = false;
+            alertaEliminar();
         } catch (error) {
-            console.error("Error al eliminar el aula:", error);
+            toast.error("No puedes eliminar esta aula, por el momento solo desactivelo", {
+                autoClose: 5000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         }
     }
 };
@@ -130,6 +154,42 @@ const abrirEliminarModal = (aula) => {
 const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
+
+const alertaCreacion = () => {
+    fetchAulas();
+    toast.success("Aula creado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEditar = () => {
+    fetchAulas();
+    toast.success("Aula actualizado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEliminar = () => {
+    fetchAulas();
+    toast.success("Aula eliminado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
 
 onMounted(() => {
     fetchAulas();
@@ -177,7 +237,7 @@ onMounted(() => {
             itemName="Aula"
             endpoint="/aulas"
             @cerrar="cerrarCrearModal"
-            @crear="fetchAulas"
+            @crear="alertaCreacion"
         />
 
         <ModalVer
@@ -198,7 +258,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/aulas"
             @cerrar="cerrarEditarModal"
-            @update="fetchAulas"
+            @update="alertaEditar"
         />
 
         <ModalEliminar

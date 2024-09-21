@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import Table from "@/Components/Table.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalVer from "@/Components/ModalVer.vue";
@@ -69,14 +71,21 @@ const fetchSoportes = async () => {
             activo: soporte.activo,
         }));
     } catch (error) {
-        console.error("Error al cargar los soportes técnicos:", error);
+        toast.error("Error al cargar los soportes técnicos", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
 const fetchSedes = async () => {
     try {
         const response = await axios.get("/sedes");
-        sedes.value = response.data.map((sede) => ({
+        sedes.value = response.data.filter((sede) => sede.sed_activo).map((sede) => ({
             value: sede.id,
             text: sede.sed_nombre,
         }));
@@ -99,7 +108,14 @@ const fetchSedes = async () => {
             return field;
         });
     } catch (error) {
-        console.error("Error al cargar las sedes:", error);
+        toast.error("Error al cargar las sedes", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
@@ -137,15 +153,18 @@ const eliminarItem = async () => {
             );
             await fetchSoportes();
             mostrarModalEliminar.value = false;
+            alertaEliminar();
         } catch (error) {
-            console.error("Error al eliminar al soporte técnico:", error);
+            toast.error("No puedes eliminar a este soporte técnico, por el momento solo desactivelo", {
+                autoClose: 5000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         }
     }
-};
-
-const abrirCrearModal = () => {
-    passwordGenerada.value = generarPassword();
-    mostrarModalCrear.value = true;
 };
 
 const cerrarCrearModal = () => {
@@ -181,6 +200,42 @@ const abrirEliminarModal = (soporte) => {
 const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
+
+const alertaCreacion = () => {
+    fetchSoportes();
+    toast.success("Soporte técnico creado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEditar = () => {
+    fetchSoportes();
+    toast.success("Soporte técnico actualizado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEliminar = () => {
+    fetchSoportes();
+    toast.success("Soporte técnico eliminado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
 
 onMounted(() => {
     fetchSoportes();
@@ -228,7 +283,7 @@ onMounted(() => {
             itemName="Soporte"
             endpoint="/soportes"
             @cerrar="cerrarCrearModal"
-            @crear="fetchSoportes"
+            @crear="alertaCreacion"
         />
 
         <ModalVer
@@ -249,7 +304,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/soportes"
             @cerrar="cerrarEditarModal"
-            @update="fetchSoportes"
+            @update="alertaEditar"
         />
 
         <ModalEliminar

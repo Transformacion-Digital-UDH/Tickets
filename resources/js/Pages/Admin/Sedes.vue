@@ -4,9 +4,9 @@ import listSedes from "@/Components/Admin/listSedes.vue";
 </script>
 
 <template>
-    <AppLayout title="Sedes">
-        <div class="py-2">
-            <listSedes />
-        </div>
-    </AppLayout>
+<AppLayout title="Sedes">
+    <div class="py-2">
+        <listSedes />
+    </div>
+</AppLayout>
 </template>
