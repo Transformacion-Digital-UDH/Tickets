@@ -16,6 +16,7 @@ class AuthenticatedSessionController extends Controller
     {
         return Inertia::render('Auth/Login', [
             'status' => session('status'),
+            'error' => session('error'),
         ]);
     }
 
@@ -25,7 +26,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'Ha iniciado sesión correctamente ');
     }
 
     public function destroy(Request $request): RedirectResponse

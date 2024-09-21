@@ -1,5 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import AuthenticationCard from "@/Components/AuthenticationCard.vue";
 import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
 import Checkbox from "@/Components/Checkbox.vue";
@@ -8,9 +10,10 @@ import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 
-defineProps({
+const props = defineProps({
     canResetPassword: Boolean,
     status: String,
+    error: String,
 });
 
 const form = useForm({
@@ -18,6 +21,28 @@ const form = useForm({
     password: "",
     remember: false,
 });
+
+if (props.status) {
+    toast.success(props.status, {
+        autoClose: 4000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+if (props.error) {
+    toast.error(props.error, {
+        autoClose: 4000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-red-500 p-4",
+    });
+}
 
 const submit = () => {
     form.transform((data) => ({
@@ -89,19 +114,12 @@ function redirectToGoogle() {
             </button>
         </div>
 
-        <div
-            v-if="status"
-            class="mb-4 text-sm font-medium text-center text-yellow-600"
-        >
-            {{ status }}
-        </div>
-        
         <div class="flex items-center justify-center my-4">
             <hr class="w-full border-t border-gray-300" />
             <span class="px-3 text-gray-500">o</span>
             <hr class="w-full border-t border-gray-300" />
         </div>
-        
+
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Correo Electrónico" />
