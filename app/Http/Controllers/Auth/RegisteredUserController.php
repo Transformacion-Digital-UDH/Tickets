@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Inertia\Inertia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,6 +50,6 @@ class RegisteredUserController extends Controller
             $se_registro->save();
             Auth::login($se_registro);
         }
-        return redirect()->route('dashboard');
+        return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'Ha iniciado sesión correctamente ');
     }
 }
