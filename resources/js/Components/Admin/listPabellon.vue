@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import Table from "@/Components/Table.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalVer from "@/Components/ModalVer.vue";
@@ -40,14 +42,21 @@ const fetchPabellones = async () => {
             pab_activo: pabellon.pab_activo,
         }));
     } catch (error) {
-        console.error("Error al cargar los pabellones:", error);
+        toast.error("Error al cargar los pabellones", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
 const fetchSedes = async () => {
     try {
         const response = await axios.get("/sedes");
-        sedes.value = response.data.map((sede) => ({
+        sedes.value = response.data.filter((sede) => sede.sed_activo).map((sede) => ({
             value: sede.id,
             text: sede.sed_nombre,
         }));
@@ -70,7 +79,14 @@ const fetchSedes = async () => {
             return field;
         });
     } catch (error) {
-        console.error("Error al cargar las sedes:", error);
+        toast.error("Error al cargar las sedes", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
@@ -98,8 +114,16 @@ const eliminarItem = async () => {
             );
             await fetchPabellones();
             mostrarModalEliminar.value = false;
+            alertaEliminar();
         } catch (error) {
-            console.error("Error al eliminar el pabellon:", error);
+            toast.error("No puedes eliminar este pabellon, por el momento solo desactivelo", {
+                autoClose: 5000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         }
     }
 };
@@ -134,6 +158,42 @@ const abrirEliminarModal = (pabellon) => {
 const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
+
+const alertaCreacion = () => {
+    fetchPabellones();
+    toast.success("Pabellon creado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEditar = () => {
+    fetchPabellones();
+    toast.success("Pabellon actualizado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEliminar = () => {
+    fetchPabellones();
+    toast.success("Pabellon eliminado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
 
 onMounted(() => {
     fetchPabellones();
@@ -181,7 +241,7 @@ onMounted(() => {
             itemName="Pabellon"
             endpoint="/pabellones"
             @cerrar="cerrarCrearModal"
-            @crear="fetchPabellones"
+            @crear="alertaCreacion"
         />
 
         <ModalVer
@@ -202,7 +262,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/pabellones"
             @cerrar="cerrarEditarModal"
-            @update="fetchPabellones"
+            @update="alertaEditar"
         />
 
         <ModalEliminar

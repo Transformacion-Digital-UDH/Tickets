@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import Table from "@/Components/Table.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalVer from "@/Components/ModalVer.vue";
@@ -53,7 +55,14 @@ const fetchSedes = async () => {
             sed_activo: sede.sed_activo,
         }));
     } catch (error) {
-        console.error("Error al cargar las sedes:", error);
+        toast.error("Error al cargar las sedes", {
+            autoClose: 5000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-4",
+        });
     }
 };
 
@@ -78,14 +87,18 @@ const eliminarItem = async () => {
             await axios.delete(`/sedes/${itemSeleccionado.value.id}/eliminar`);
             await fetchSedes();
             mostrarModalEliminar.value = false;
+            alertaEliminar();
         } catch (error) {
-            console.error("Error al eliminar la sede", error);
+            toast.error("No puedes eliminar esta sede, por el momento solo desactivelo", {
+                autoClose: 5000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         }
     }
-};
-
-const abrirCrearModal = () => {
-    mostrarModalCrear.value = true;
 };
 
 const cerrarCrearModal = () => {
@@ -119,6 +132,42 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
+const alertaCreacion = () => {
+    fetchSedes();
+    toast.success("Sede creada correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEditar = () => {
+    fetchSedes();
+    toast.success("Sede actualizada correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
+const alertaEliminar = () => {
+    fetchSedes();
+    toast.success("Sede eliminada correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
+}
+
 onMounted(() => fetchSedes());
 </script>
 
@@ -127,70 +176,31 @@ onMounted(() => fetchSedes());
         <h1 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
             Lista de Sedes
         </h1>
-        <div
-            class="flex flex-col items-center justify-between mb-4 sm:flex-row"
-        >
+        <div class="flex flex-col items-center justify-between mb-4 sm:flex-row">
             <div class="relative w-full mb-2 sm:w-auto sm:mb-0">
-                <span
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input
-                    type="text"
-                    v-model="buscarQuery"
-                    placeholder="Buscar..."
-                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-                />
+                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
             </div>
             <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
-        <Table
-            :headers="headers"
-            :items="filtrarSedes"
-            entityType="sede"
-            @view="abrirDetallesModal"
-            @edit="abrirEditarModal"
-            @eliminar="abrirEliminarModal"
-        />
+        <Table :headers="headers" :items="filtrarSedes" entityType="sede" @view="abrirDetallesModal"
+            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
-        <ModalCrear
-            v-if="mostrarModalCrear"
-            :formFields="formFields"
-            itemName="Sede"
-            endpoint="/sedes"
-            @cerrar="cerrarCrearModal"
-            @crear="fetchSedes"
-        />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" itemName="Sede" endpoint="/sedes"
+            @cerrar="cerrarCrearModal" @crear="alertaCreacion" />
 
-        <ModalVer
-            v-if="mostrarModalDetalles"
-            :item="itemSeleccionado"
-            itemName="Sede"
-            :formFieldsVer="formFieldsVer"
-            :mostrarModalDetalles="mostrarModalDetalles"
-            @close="cerrarDetallesModal"
-        />
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Sede" :formFieldsVer="formFieldsVer"
+            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar
-            v-if="mostrarModalEditar"
-            :item="itemSeleccionado"
-            itemName="Sede"
-            :formFields="formFields"
-            :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/sedes"
-            @cerrar="cerrarEditarModal"
-            @update="fetchSedes"
-        />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Sede" :formFields="formFields"
+            :mostrarModalEditar="mostrarModalEditar" endpoint="/sedes" @cerrar="cerrarEditarModal"
+            @update="alertaEditar" />
 
-        <ModalEliminar
-            v-if="mostrarModalEliminar"
-            :item="itemSeleccionado"
-            itemName="Sede"
-            fieldName="sed_nombre"
-            @cancelar="cerrarEliminarModal"
-            @confirmar="eliminarItem"
-        />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Sede" fieldName="sed_nombre"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
     </div>
 </template>
