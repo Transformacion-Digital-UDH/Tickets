@@ -10,13 +10,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PabellonController;
 use App\Http\Controllers\Admin\TicketController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::controller(SedeController::class)->group(function () {
