@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ButtonCerrar from "@/Components/ButtonCerrar.vue";
 import axios from "axios";
@@ -42,12 +42,14 @@ const formData = ref({});
 const errores = ref([]);
 const loading = ref(false);
 const successMessage = ref("");
+const clickInicial = ref(false);
 
 const initializeFormData = (item) => {
     formData.value = {};
     props.formFields.forEach((field) => {
         formData.value[field.name] = item?.[field.name] || "";
     });
+    clickInicial.value = true;
 };
 
 const updateSelectOptions = (fieldName, options) => {
@@ -102,6 +104,16 @@ watch(
     },
     { immediate: true }
 );
+
+onMounted(() => {
+    props.formFields.forEach((field) => {
+        if (field.type === "boolean" && clickInicial.value) {
+            formData.value[field.name] = !formData.value[field.name];
+            formData.value[field.name] = !formData.value[field.name];
+        }
+    });
+    clickInicial.value = false;
+});
 
 const editarItem = async () => {
     loading.value = true;

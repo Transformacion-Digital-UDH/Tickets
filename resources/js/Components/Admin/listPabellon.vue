@@ -24,10 +24,14 @@ const itemSeleccionado = ref(null);
 const headers = ["N°", "Pabellon", "Sede", "Estado"];
 
 const filtrarPabellones = computed(() => {
-    return pabellons.value.filter((pabellon) =>
-        pabellon.pab_nombre
-            .toLowerCase()
-            .includes(buscarQuery.value.toLowerCase())
+    return pabellons.value.filter(
+        (pabellon) =>
+            pabellon.pab_nombre
+                .toLowerCase()
+                .includes(buscarQuery.value.toLowerCase()) ||
+            pabellon.sed_nombre
+                .toLowerCase()
+                .includes(buscarQuery.value.toLowerCase())
     );
 });
 
@@ -56,10 +60,12 @@ const fetchPabellones = async () => {
 const fetchSedes = async () => {
     try {
         const response = await axios.get("/sedes");
-        sedes.value = response.data.filter((sede) => sede.sed_activo).map((sede) => ({
-            value: sede.id,
-            text: sede.sed_nombre,
-        }));
+        sedes.value = response.data
+            .filter((sede) => sede.sed_activo)
+            .map((sede) => ({
+                value: sede.id,
+                text: sede.sed_nombre,
+            }));
         formFields.value = formFields.value.map((field) => {
             if (field.name === "sed_id") {
                 return {
@@ -116,14 +122,17 @@ const eliminarItem = async () => {
             mostrarModalEliminar.value = false;
             alertaEliminar();
         } catch (error) {
-            toast.error("No puedes eliminar este pabellon, por el momento solo desactivelo", {
-                autoClose: 5000,
-                position: "bottom-right",
-                style: {
-                    width: "400px",
-                },
-                className: "border-l-4 border-red-500 p-4",
-            });
+            toast.error(
+                "No puedes eliminar este pabellon, por el momento solo desactivelo",
+                {
+                    autoClose: 5000,
+                    position: "bottom-right",
+                    style: {
+                        width: "400px",
+                    },
+                    className: "border-l-4 border-red-500 p-4",
+                }
+            );
         }
     }
 };
@@ -169,7 +178,7 @@ const alertaCreacion = () => {
         },
         className: "border-l-4 border-green-500 p-4",
     });
-}
+};
 
 const alertaEditar = () => {
     fetchPabellones();
@@ -181,7 +190,7 @@ const alertaEditar = () => {
         },
         className: "border-l-4 border-green-500 p-4",
     });
-}
+};
 
 const alertaEliminar = () => {
     fetchPabellones();
@@ -193,7 +202,7 @@ const alertaEliminar = () => {
         },
         className: "border-l-4 border-green-500 p-4",
     });
-}
+};
 
 onMounted(() => {
     fetchPabellones();
