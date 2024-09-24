@@ -28,7 +28,7 @@ if (props.success) {
 </script>
 
 <template>
-    <AppLayout title="Dashboard">
+    <AppLayout v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Admin'" title="Dashboard">
         <div class="py-2">
             <listDashboard />
         </div>

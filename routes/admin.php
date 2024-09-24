@@ -7,12 +7,14 @@ use App\Http\Controllers\Admin\SedeController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\AulaController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Usuario\UsuarioDashboardController;
 use App\Http\Controllers\Admin\PabellonController;
 use App\Http\Controllers\Admin\TicketController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/user-dashboard', [UsuarioDashboardController::class, 'index'])->name('user-dashboard');
 
     Route::controller(SedeController::class)->group(function () {
         Route::get('/sede', 'index')->name('sede');
