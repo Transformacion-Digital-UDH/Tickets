@@ -4,7 +4,7 @@ import listTicket from "@/Components/Admin/listTicket.vue";
 </script>
 
 <template>
-    <AppLayout title="Tickets">
+    <AppLayout v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Admin'" title="Tickets">
         <div class="py-2">
             <listTicket />
         </div>

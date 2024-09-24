@@ -3,7 +3,7 @@ import { h } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import listDashboard from "@/Components/Usuario/listDashboard.vue";
+import listDashboard from "@/Components/Admin/listDashboard.vue";
 import StarMessage from "@/Components/StarMessage.vue";
 
 const props = defineProps({
@@ -28,7 +28,7 @@ if (props.success) {
 </script>
 
 <template>
-    <AppLayout title="Dashboard">
+    <AppLayout v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Usuario'" title="Dashboard">
         <div class="py-2">
             <listDashboard />
         </div>

@@ -55,8 +55,8 @@ const linkClasses = (isActive) => [
             ? "w-40 bg-gradient-to-r from-[#2EBAA1] to-green-400 text-white border-[#2EBAA1] rounded-r-full"
             : "w-40 text-white hover:border-l-4 hover:border-[#2EBAA1]"
         : isActive
-        ? "w-full bg-gradient-to-r from-[#2EBAA1] to-green-400 text-white"
-        : "w-full text-white hover:border-l-4 hover:border-[#2EBAA1]",
+            ? "w-full bg-gradient-to-r from-[#2EBAA1] to-green-400 text-white"
+            : "w-full text-white hover:border-l-4 hover:border-[#2EBAA1]",
     { "justify-center": !abrirSidebar.value },
 ];
 
@@ -72,118 +72,67 @@ defineProps({ title: String });
 </script>
 
 <template>
-    <div>
+    <div v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Admin'">
+
         <Head :title="title" />
         <Banner />
         <div class="flex min-h-screen bg-white">
-            <nav
-                class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
-                :class="abrirSidebar ? 'w-48' : 'w-20'"
-            >
+            <nav class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
+                :class="abrirSidebar ? 'w-48' : 'w-20'">
                 <div class="w-full py-4">
                     <div class="flex items-center justify-center mb-6">
                         <Link :href="route('dashboard')">
-                            <ApplicationMark class="block w-auto h-8" />
+                        <ApplicationMark class="block w-auto h-8" />
                         </Link>
                     </div>
 
-                    <div class="flex flex-col">
-                        <NavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                            :class="linkClasses(route().current('dashboard'))"
-                        >
-                            <font-awesome-icon
-                                icon="tachometer-alt"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Dashboard</span
-                            >
+                    <div v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Admin'"
+                        class="flex flex-col">
+                        <NavLink :href="route('dashboard')" :active="route().current('dashboard')"
+                            :class="linkClasses(route().current('dashboard'))">
+                            <font-awesome-icon icon="tachometer-alt" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Dashboard</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('ticket')"
-                            :active="route().current('ticket')"
-                            :class="linkClasses(route().current('ticket'))"
-                        >
+                        <NavLink :href="route('ticket')" :active="route().current('ticket')"
+                            :class="linkClasses(route().current('ticket'))">
                             <font-awesome-icon icon="ticket" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Tickets</span
-                            >
+                            <span v-if="abrirSidebar" class="ml-2">Tickets</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('sede')"
-                            :active="route().current('sede')"
-                            :class="linkClasses(route().current('sede'))"
-                        >
+                        <NavLink :href="route('sede')" :active="route().current('sede')"
+                            :class="linkClasses(route().current('sede'))">
                             <font-awesome-icon icon="city" class="text-lg" />
                             <span v-if="abrirSidebar" class="ml-2">Sedes</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('soporte')"
-                            :active="route().current('soporte')"
-                            :class="linkClasses(route().current('soporte'))"
-                        >
-                            <font-awesome-icon
-                                icon="user-shield"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Soportes</span
-                            >
+                        <NavLink :href="route('soporte')" :active="route().current('soporte')"
+                            :class="linkClasses(route().current('soporte'))">
+                            <font-awesome-icon icon="user-shield" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Soportes</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('usuario')"
-                            :active="route().current('usuario')"
-                            :class="linkClasses(route().current('usuario'))"
-                        >
-                            <font-awesome-icon
-                                icon="user-graduate"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Usuarios</span
-                            >
+                        <NavLink :href="route('usuario')" :active="route().current('usuario')"
+                            :class="linkClasses(route().current('usuario'))">
+                            <font-awesome-icon icon="user-graduate" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Usuarios</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('categoria')"
-                            :active="route().current('categoria')"
-                            :class="linkClasses(route().current('categoria'))"
-                        >
+                        <NavLink :href="route('categoria')" :active="route().current('categoria')"
+                            :class="linkClasses(route().current('categoria'))">
                             <font-awesome-icon icon="tags" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Categoria</span
-                            >
+                            <span v-if="abrirSidebar" class="ml-2">Categoria</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('pabellon')"
-                            :active="route().current('pabellon')"
-                            :class="linkClasses(route().current('pabellon'))"
-                        >
-                            <font-awesome-icon
-                                icon="building"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Pabellones</span
-                            >
+                        <NavLink :href="route('pabellon')" :active="route().current('pabellon')"
+                            :class="linkClasses(route().current('pabellon'))">
+                            <font-awesome-icon icon="building" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Pabellones</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('aula')"
-                            :active="route().current('aula')"
-                            :class="linkClasses(route().current('aula'))"
-                        >
-                            <font-awesome-icon
-                                icon="chalkboard"
-                                class="text-lg"
-                            />
+                        <NavLink :href="route('aula')" :active="route().current('aula')"
+                            :class="linkClasses(route().current('aula'))">
+                            <font-awesome-icon icon="chalkboard" class="text-lg" />
                             <span v-if="abrirSidebar" class="ml-2">Aulas</span>
                         </NavLink>
                     </div>
@@ -192,74 +141,36 @@ defineProps({ title: String });
 
             <div class="flex flex-col flex-1">
                 <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
-                    <div
-                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
-                    >
-                        <button
-                            @click="interactuarSidebar"
-                            class="text-white focus:outline-none"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="w-6 h-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    v-if="abrirSidebar"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                                <path
-                                    v-else
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
+                    <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+                        <button @click="interactuarSidebar" class="text-white focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path v-if="abrirSidebar" stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6 18L18 6M6 6l12 12" />
+                                <path v-else stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
 
                         <Dropdown align="right" width="48">
                             <template #trigger>
-                                <button
-                                    @click="interactuarDropdown"
-                                    class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
-                                >
-                                    <img
-                                        class="w-8 h-8 rounded-full"
-                                        :src="
-                                            $page.props.auth.user
-                                                .profile_photo_url
-                                        "
-                                        :alt="$page.props.auth.user.name"
-                                    />
-                                    <span
-                                        class="hidden ml-2 font-semibold text-white lg:block"
-                                        >{{ $page.props.auth.user.name }}</span
-                                    >
-                                    <font-awesome-icon
-                                        icon="chevron-down"
-                                        class="ml-2 text-white"
-                                    />
+                                <button @click="interactuarDropdown"
+                                    class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none">
+                                    <img class="w-8 h-8 rounded-full" :src="$page.props.auth.user
+                                        .profile_photo_url
+                                        " :alt="$page.props.auth.user.name" />
+                                    <span class="hidden ml-2 font-semibold text-white lg:block">{{
+                                        $page.props.auth.user.name }}</span>
+                                    <font-awesome-icon icon="chevron-down" class="ml-2 text-white" />
                                 </button>
                             </template>
                             <template #content>
-                                <DropdownLink :href="route('profile.show')"
-                                    >Perfil</DropdownLink
-                                >
-                                <DropdownLink
-                                    v-if="$page.props.jetstream.hasApiFeatures"
-                                    :href="route('api-tokens.index')"
-                                    >API Tokens</DropdownLink
-                                >
+                                <DropdownLink :href="route('profile.show')">Perfil</DropdownLink>
+                                <DropdownLink v-if="$page.props.jetstream.hasApiFeatures"
+                                    :href="route('api-tokens.index')">API Tokens</DropdownLink>
                                 <div class="border-t border-gray-200"></div>
                                 <form @submit.prevent="logout">
-                                    <DropdownLink as="button"
-                                        >Cerrar sesión</DropdownLink
-                                    >
+                                    <DropdownLink as="button">Cerrar sesión</DropdownLink>
                                 </form>
                             </template>
                         </Dropdown>
@@ -272,9 +183,234 @@ defineProps({ title: String });
                     </div>
                 </header>
 
-                <main class="flex-1">
+                <main
+                    v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Admin'"
+                    class="flex-1">
                     <slot />
                 </main>
+
+                <!-- Mensaje de error si el usuario no está autenticado o no tiene el rol adecuado -->
+                <div v-else class="flex items-center justify-center min-h-screen bg-white">
+                    <h1 class="text-xl font-semibold text-gray-800">
+                        No tienes acceso a esta página o no estás autenticado.
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-else-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Soporte'">
+
+        <Head :title="title" />
+        <Banner />
+        <div class="flex min-h-screen bg-white">
+            <nav class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
+                :class="abrirSidebar ? 'w-48' : 'w-20'">
+                <div class="w-full py-4">
+                    <div class="flex items-center justify-center mb-6">
+                        <Link :href="route('dashboard')">
+                        <ApplicationMark class="block w-auto h-8" />
+                        </Link>
+                    </div>
+
+                    <div v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Soporte'"
+                        class="flex flex-col">
+                        <NavLink :href="route('dashboard')" :active="route().current('dashboard')"
+                            :class="linkClasses(route().current('dashboard'))">
+                            <font-awesome-icon icon="tachometer-alt" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Dashboard</span>
+                        </NavLink>
+
+                        <NavLink :href="route('ticket')" :active="route().current('ticket')"
+                            :class="linkClasses(route().current('ticket'))">
+                            <font-awesome-icon icon="ticket" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Tickets</span>
+                        </NavLink>
+
+                        <NavLink :href="route('sede')" :active="route().current('sede')"
+                            :class="linkClasses(route().current('sede'))">
+                            <font-awesome-icon icon="city" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Sedes</span>
+                        </NavLink>
+
+                        <NavLink :href="route('soporte')" :active="route().current('soporte')"
+                            :class="linkClasses(route().current('soporte'))">
+                            <font-awesome-icon icon="user-shield" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Soportes</span>
+                        </NavLink>
+
+                        <NavLink :href="route('usuario')" :active="route().current('usuario')"
+                            :class="linkClasses(route().current('usuario'))">
+                            <font-awesome-icon icon="user-graduate" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Usuarios</span>
+                        </NavLink>
+
+                        <NavLink :href="route('categoria')" :active="route().current('categoria')"
+                            :class="linkClasses(route().current('categoria'))">
+                            <font-awesome-icon icon="tags" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Categoria</span>
+                        </NavLink>
+
+                        <NavLink :href="route('pabellon')" :active="route().current('pabellon')"
+                            :class="linkClasses(route().current('pabellon'))">
+                            <font-awesome-icon icon="building" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Pabellones</span>
+                        </NavLink>
+
+                        <NavLink :href="route('aula')" :active="route().current('aula')"
+                            :class="linkClasses(route().current('aula'))">
+                            <font-awesome-icon icon="chalkboard" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Aulas</span>
+                        </NavLink>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="flex flex-col flex-1">
+                <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
+                    <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+                        <button @click="interactuarSidebar" class="text-white focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path v-if="abrirSidebar" stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6 18L18 6M6 6l12 12" />
+                                <path v-else stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+
+                        <Dropdown align="right" width="48">
+                            <template #trigger>
+                                <button @click="interactuarDropdown"
+                                    class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none">
+                                    <img class="w-8 h-8 rounded-full" :src="$page.props.auth.user
+                                        .profile_photo_url
+                                        " :alt="$page.props.auth.user.name" />
+                                    <span class="hidden ml-2 font-semibold text-white lg:block">{{
+                                        $page.props.auth.user.name }}</span>
+                                    <font-awesome-icon icon="chevron-down" class="ml-2 text-white" />
+                                </button>
+                            </template>
+                            <template #content>
+                                <DropdownLink :href="route('profile.show')">Perfil</DropdownLink>
+                                <DropdownLink v-if="$page.props.jetstream.hasApiFeatures"
+                                    :href="route('api-tokens.index')">API Tokens</DropdownLink>
+                                <div class="border-t border-gray-200"></div>
+                                <form @submit.prevent="logout">
+                                    <DropdownLink as="button">Cerrar sesión</DropdownLink>
+                                </form>
+                            </template>
+                        </Dropdown>
+                    </div>
+                </nav>
+
+                <header v-if="$slots.header" class="bg-white shadow">
+                    <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                        <slot name="header" />
+                    </div>
+                </header>
+
+                <main
+                    v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Soporte'"
+                    class="flex-1">
+                    <slot />
+                </main>
+
+                <!-- Mensaje de error si el usuario no está autenticado o no tiene el rol adecuado -->
+                <div v-else class="flex items-center justify-center min-h-screen bg-white">
+                    <h1 class="text-xl font-semibold text-gray-800">
+                        No tienes acceso a esta página o no estás autenticado.
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-else-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Usuario'">
+
+        <Head :title="title" />
+        <Banner />
+        <div class="flex min-h-screen bg-white">
+            <nav class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
+                :class="abrirSidebar ? 'w-48' : 'w-20'">
+                <div class="w-full py-4">
+                    <div class="flex items-center justify-center mb-6">
+                        <Link :href="route('dashboard')">
+                        <ApplicationMark class="block w-auto h-8" />
+                        </Link>
+                    </div>
+
+                    <div v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Usuario'"
+                        class="flex flex-col">
+                        <NavLink :href="route('user-dashboard')" :active="route().current('user-dashboard')"
+                            :class="linkClasses(route().current('user-dashboard'))">
+                            <font-awesome-icon icon="tachometer-alt" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Dashboard</span>
+                        </NavLink>
+
+                        <NavLink :href="route('ticket')" :active="route().current('ticket')"
+                            :class="linkClasses(route().current('ticket'))">
+                            <font-awesome-icon icon="ticket" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Tickets</span>
+                        </NavLink>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="flex flex-col flex-1">
+                <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
+                    <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+                        <button @click="interactuarSidebar" class="text-white focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path v-if="abrirSidebar" stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6 18L18 6M6 6l12 12" />
+                                <path v-else stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+
+                        <Dropdown align="right" width="48">
+                            <template #trigger>
+                                <button @click="interactuarDropdown"
+                                    class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none">
+                                    <img class="w-8 h-8 rounded-full" :src="$page.props.auth.user
+                                        .profile_photo_url
+                                        " :alt="$page.props.auth.user.name" />
+                                    <span class="hidden ml-2 font-semibold text-white lg:block">{{
+                                        $page.props.auth.user.name }}</span>
+                                    <font-awesome-icon icon="chevron-down" class="ml-2 text-white" />
+                                </button>
+                            </template>
+                            <template #content>
+                                <DropdownLink :href="route('profile.show')">Perfil</DropdownLink>
+                                <DropdownLink v-if="$page.props.jetstream.hasApiFeatures"
+                                    :href="route('api-tokens.index')">API Tokens</DropdownLink>
+                                <div class="border-t border-gray-200"></div>
+                                <form @submit.prevent="logout">
+                                    <DropdownLink as="button">Cerrar sesión</DropdownLink>
+                                </form>
+                            </template>
+                        </Dropdown>
+                    </div>
+                </nav>
+
+                <header v-if="$slots.header" class="bg-white shadow">
+                    <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                        <slot name="header" />
+                    </div>
+                </header>
+
+                <main
+                    v-if="$page.props.auth.user && $page.props.auth.user.rol && $page.props.auth.user.rol.name === 'Usuario'"
+                    class="flex-1">
+                    <slot />
+                </main>
+
+                <!-- Mensaje de error si el usuario no está autenticado o no tiene el rol adecuado -->
+                <div v-else class="flex items-center justify-center min-h-screen bg-white">
+                    <h1 class="text-xl font-semibold text-gray-800">
+                        No tienes acceso a esta página o no estás autenticado.
+                    </h1>
+                </div>
             </div>
         </div>
     </div>
