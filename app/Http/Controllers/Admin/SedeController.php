@@ -22,7 +22,12 @@ class SedeController extends Controller
     public function traer()
     {
         $sedes = Sede::all();
-        return response()->json($sedes);
+        if (auth()->user()->hasAnyRole(['Admin', 'Soporte', 'Usuario'])) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+    
+        // Retornar el JSON si el usuario no tiene esos roles
+        return response()->json(['data' => $sedes]);
     }
 
     public function store(Request $request)
