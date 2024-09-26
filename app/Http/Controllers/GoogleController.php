@@ -33,7 +33,7 @@ class GoogleController extends Controller
                 $user->apellidos = $user_google->user['family_name'] ?? '';
                 $user->password = bcrypt(usuarioCorreo($user_google->email));
                 $user->email_verified_at = now();
-                $user->rol_id = 3;
+                $user->assignRole('Usuario');
                 $user->save();
                 Auth::login($user);
                 return redirect()->route('user-dashboard')->with('success', 'Ha iniciado sesión correctamente ');

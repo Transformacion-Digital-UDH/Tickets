@@ -40,7 +40,7 @@ class RegisteredUserController extends Controller
             $user->email = $request->email;
             $user->password = Hash::make($request->password);
             $user->sed_id = $request->sed_id ?? null;
-            $user->rol_id = 3;
+            $user->assignRole('Usuario');
             $user->save();
             Auth::login($user);
         } else {

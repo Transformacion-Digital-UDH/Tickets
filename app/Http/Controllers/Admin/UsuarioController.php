@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Rol;
 use App\Models\User;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -47,6 +47,7 @@ class UsuarioController extends Controller
 
     public function storeSoporte(Request $request)
     {
+        // Validar los datos del request
         $validarDatos = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
@@ -55,22 +56,35 @@ class UsuarioController extends Controller
             'password' => 'required|string|min:8',
             'activo' => 'boolean',
         ]);
-
+    
+        // Buscar el rol de 'Soporte'
         $soporte_rol = Rol::where('rol_nombre', 'Soporte')->first();
-
+    
+        // Verificar si el rol fue encontrado
         if (!$soporte_rol) {
             return response()->json(['message' => 'Rol Soporte no encontrado'], 404);
         }
-
+    
+        // Encriptar la contraseña
         $validarDatos['password'] = bcrypt($validarDatos['password']);
-        $validarDatos['rol_id'] = $soporte_rol->id;
-
-        $soporte = User::create($validarDatos);
-
-        return response()->json([
-            'message' => 'Soporte técnico creado exitosamente',
-            'soporte' => $soporte
-        ], 201);
+        $validarDatos['rol_id'] = $soporte_rol->id; // Asignar el rol_id
+    
+        try {
+            // Crear el nuevo usuario
+            $soporte = User::create($validarDatos);
+    
+            // Asignar el rol de 'Soporte' al nuevo usuario
+            $soporte->assignRole('Soporte');
+    
+            return response()->json([
+                'message' => 'Soporte técnico creado exitosamente',
+                'soporte' => $soporte,
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear soporte técnico: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function storeUsuario(Request $request)
@@ -97,7 +111,7 @@ class UsuarioController extends Controller
 
         return response()->json([
             'message' => 'Usuario creado exitosamente',
-            'usuario' => $usuario
+            'usuario' => $usuario,
         ], 201);
     }
 
@@ -133,12 +147,12 @@ class UsuarioController extends Controller
             return response()->json([
                 'status' => true,
                 'msg' => 'Soporte Técnico actualizado correctamente',
-                'user' => $user
+                'user' => $user,
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Soporte técnico no encontrado'
+                'msg' => 'Soporte técnico no encontrado',
             ], 404);
         } catch (Exception $e) {
             return response()->json([
@@ -180,12 +194,12 @@ class UsuarioController extends Controller
             return response()->json([
                 'status' => true,
                 'msg' => 'Usuario actualizado correctamente',
-                'user' => $user
+                'user' => $user,
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Usuario no encontrado'
+                'msg' => 'Usuario no encontrado',
             ], 404);
         } catch (Exception $e) {
             return response()->json([
