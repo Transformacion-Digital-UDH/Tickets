@@ -17,7 +17,9 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/dashboard';
+    public static $ADMINHOME = '/dashboard';
+    public static $SUPPORTHOME = '/support-dashboard';
+    public static $USERHOME = '/user-dashboard';
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.

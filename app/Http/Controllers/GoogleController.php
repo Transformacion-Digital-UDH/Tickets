@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Facades\Auth;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller
 {
@@ -33,15 +33,29 @@ class GoogleController extends Controller
                 $user->apellidos = $user_google->user['family_name'] ?? '';
                 $user->password = bcrypt(usuarioCorreo($user_google->email));
                 $user->email_verified_at = now();
+                $user->rol_id = 3;
                 $user->save();
                 Auth::login($user);
-                return redirect()->route('dashboard')->with('success', 'Ha iniciado sesión correctamente ');
+                return redirect()->route('user-dashboard')->with('success', 'Ha iniciado sesión correctamente ');
             } else {
                 if ($se_registro->estado == 2) {
                     return redirect()->redirect('login')->with('error', 'Su cuenta se encuentra suspendido');
                 }
                 Auth::login($se_registro);
-                return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'Ha iniciado sesión correctamente ');
+            }
+            // Aca extraeremos el nombre del rol...
+            $roleName = Auth::user()->rol->rol_nombre;
+
+            // Para luego compararlo con una condicional y poder redirigir a su ruta correcta...
+            if ($roleName === 'Admin') {
+                return redirect()->intended(RouteServiceProvider::$ADMINHOME)
+                    ->with('success', 'Ha iniciado sesión como administrador.');
+            } elseif ($roleName === 'Soporte') {
+                return redirect()->intended(RouteServiceProvider::$SUPPORTHOME)
+                    ->with('success', 'Ha iniciado sesión como soporte técnico.');
+            } else {
+                return redirect()->intended(RouteServiceProvider::$USERHOME)
+                    ->with('success', 'Ha iniciado sesión como usuario.');
             }
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Ocurrió un error al iniciar sesión.');
