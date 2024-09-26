@@ -21,13 +21,17 @@ class SedeController extends Controller
 
     public function traer()
     {
+        // Obtener todos los datos de las sedes
         $sedes = Sede::all();
-        if (auth()->user()->hasAnyRole(['Admin', 'Soporte', 'Usuario'])) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+    
+        // Verificar si el usuario tiene un rol restringido (Soporte o Usuario)
+        if (auth()->user()->hasAnyRole(['Soporte', 'Usuario'])) {
+            // Devolver un JSON vacío o con datos limitados para estos roles
+            return response()->json(['sedes' => []], 200);
         }
     
-        // Retornar el JSON si el usuario no tiene esos roles
-        return response()->json(['data' => $sedes]);
+        // Para otros roles (como Admin), devolver los datos completos de las sedes
+        return response()->json($sedes, 200);
     }
 
     public function store(Request $request)
