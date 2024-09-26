@@ -36,7 +36,7 @@ class GoogleController extends Controller
                 $user->assignRole('Usuario');
                 $user->save();
                 Auth::login($user);
-                return redirect()->route('user-dashboard')->with('success', 'Ha iniciado sesión correctamente ');
+                return redirect()->route('user-dashboard')->with('success', 'Ha iniciado sesión como usuario.');
             } else {
                 if ($se_registro->estado == 2) {
                     return redirect()->redirect('login')->with('error', 'Su cuenta se encuentra suspendido');
@@ -58,7 +58,7 @@ class GoogleController extends Controller
                     ->with('success', 'Ha iniciado sesión como usuario.');
             }
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Ocurrió un error al iniciar sesión.');
+            return redirect()->route('login')->with('error', 'Ocurrió un problema al iniciar sesión.');
         }
     }
 }

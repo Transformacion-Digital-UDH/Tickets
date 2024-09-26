@@ -33,7 +33,7 @@ function getDashboardRoute() {
 
     // Verificar si hay un usuario autenticado
     if (!user) {
-        return '/'; // Si no hay usuario autenticado, redirigir a la página principal
+        return "/"; // Si no hay usuario autenticado, redirigir a la página principal
     }
 
     // Verificar si el usuario tiene un rol y accedemos al nombre del rol
@@ -41,11 +41,11 @@ function getDashboardRoute() {
 
     // Lógica de redirección basada en el nombre del rol
     switch (role) {
-        case 'Admin':
-            return route('dashboard'); // Ruta para administradores
-        case 'Soporte':
-            return route('support-dashboard'); // Ruta para soporte
-            case "Usuario":
+        case "Admin":
+            return route("dashboard"); // Ruta para administradores
+        case "Soporte":
+            return route("support-dashboard"); // Ruta para soporte
+        case "Usuario":
             return route("user-dashboard"); // Ruta para usuarios
     }
 }
