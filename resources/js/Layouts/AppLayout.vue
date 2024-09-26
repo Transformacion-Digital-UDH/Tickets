@@ -593,13 +593,13 @@ defineProps({ title: String });
                         </NavLink>
 
                         <NavLink
-                            :href="route('ticket')"
-                            :active="route().current('ticket')"
-                            :class="linkClasses(route().current('ticket'))"
+                            :href="route('user-ticket')"
+                            :active="route().current('user-ticket')"
+                            :class="linkClasses(route().current('user-ticket'))"
                         >
                             <font-awesome-icon icon="ticket" class="text-lg" />
                             <span v-if="abrirSidebar" class="ml-2"
-                                >Tickets</span
+                                >Mis Tickets</span
                             >
                         </NavLink>
                     </div>

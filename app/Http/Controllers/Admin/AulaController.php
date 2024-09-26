@@ -13,7 +13,9 @@ class AulaController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Aula');
+        return Inertia::render('Admin/Aula', [
+            'success' => session('success'),
+        ]);
     }
 
     public function traer()

@@ -1,6 +1,16 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import listTicket from "@/Components/Admin/listTicket.vue";
+
+const props = defineProps({
+    success: String,
+});
+
+if (props.success) {
+    setTimeout(() => {
+        window.location.reload();
+    }, 10);
+}
 </script>
 
 <template>

@@ -10,7 +10,9 @@ class CategoriaController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Categoria');
+        return Inertia::render('Admin/Categoria', [
+            'success' => session('success'),
+        ]);
     }
 
     public function traer()

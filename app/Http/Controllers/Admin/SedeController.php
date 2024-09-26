@@ -16,20 +16,22 @@ class SedeController extends Controller
 
     public function index()
     {
-        return Inertia::render('Admin/Sedes');
+        return Inertia::render('Admin/Sedes', [
+            'success' => session('success'),
+        ]);
     }
 
     public function traer()
     {
         // Obtener todos los datos de las sedes
         $sedes = Sede::all();
-    
+
         // Verificar si el usuario tiene un rol restringido (Soporte o Usuario)
         if (auth()->user()->hasAnyRole(['Soporte', 'Usuario'])) {
             // Devolver un JSON vacío o con datos limitados para estos roles
             return response()->json(['sedes' => []], 200);
         }
-    
+
         // Para otros roles (como Admin), devolver los datos completos de las sedes
         return response()->json($sedes, 200);
     }
@@ -45,7 +47,7 @@ class SedeController extends Controller
         ]);
 
         $sede = Sede::create($validarDatos);
-        return response()->json($sede, 201);
+        return response()->json(['message' => 'Sede creada correctamente', 'sede' => $sede], 201);
     }
 
     public function update(Request $request, Sede $sede)
@@ -66,7 +68,7 @@ class SedeController extends Controller
     public function eliminar(Sede $sede)
     {
         $sede->delete();
-        return response()->json(['message' => 'Sede eliminada correctamente', 200]);
+        return response()->json(['message' => 'Sede eliminada correctamente', 204]);
     }
 
     public function desactivar(Sede $sede)
