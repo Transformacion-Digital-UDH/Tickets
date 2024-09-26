@@ -26,7 +26,20 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'Ha iniciado sesión correctamente ');
+        // Aca extraeremos el nombre del rol...
+        $roleName = Auth::user()->rol->rol_nombre;
+
+        // Para luego compararlo con una condicional y poder redirigir a su ruta correcta...
+        if ($roleName === 'Admin') {
+            return redirect()->intended(RouteServiceProvider::$ADMINHOME)
+                ->with('success', 'Ha iniciado sesión como administrador.');
+        } elseif ($roleName === 'Soporte') {
+            return redirect()->intended(RouteServiceProvider::$SUPPORTHOME)
+                ->with('success', 'Ha iniciado sesión como soporte técnico.');
+        } else {
+            return redirect()->intended(RouteServiceProvider::$USERHOME)
+                ->with('success', 'Ha iniciado sesión como usuario.');
+        }
     }
 
     public function destroy(Request $request): RedirectResponse

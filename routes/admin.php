@@ -13,8 +13,9 @@ use App\Http\Controllers\Admin\TicketController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/user-dashboard', [UsuarioDashboardController::class, 'index'])->name('user-dashboard');
+    Route::controller(DashboardController::class)->group(function () {
+        Route::get('/dashboard', 'index')->name('dashboard');
+    });
 
     Route::controller(SedeController::class)->group(function () {
         Route::get('/sede', 'index')->name('sede');

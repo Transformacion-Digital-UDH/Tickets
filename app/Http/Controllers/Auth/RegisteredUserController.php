@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
-use Inertia\Inertia;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Inertia\Inertia;
 
 class RegisteredUserController extends Controller
 {
@@ -40,6 +40,7 @@ class RegisteredUserController extends Controller
             $user->email = $request->email;
             $user->password = Hash::make($request->password);
             $user->sed_id = $request->sed_id ?? null;
+            $user->rol_id = 3;
             $user->save();
             Auth::login($user);
         } else {
@@ -50,6 +51,19 @@ class RegisteredUserController extends Controller
             $se_registro->save();
             Auth::login($se_registro);
         }
-        return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'Ha iniciado sesión correctamente ');
+        // Aca extraeremos el nombre del rol...
+        $roleName = Auth::user()->rol->rol_nombre;
+
+        // Para luego compararlo con una condicional y poder redirigir a su ruta correcta...
+        if ($roleName === 'Admin') {
+            return redirect()->intended(RouteServiceProvider::$ADMINHOME)
+                ->with('success', 'Ha iniciado sesión como administrador.');
+        } elseif ($roleName === 'Soporte') {
+            return redirect()->intended(RouteServiceProvider::$SUPPORTHOME)
+                ->with('success', 'Ha iniciado sesión como soporte técnico.');
+        } else {
+            return redirect()->intended(RouteServiceProvider::$USERHOME)
+                ->with('success', 'Ha iniciado sesión como usuario.');
+        }
     }
 }
