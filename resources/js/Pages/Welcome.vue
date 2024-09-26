@@ -45,8 +45,8 @@ function getDashboardRoute() {
             return route('dashboard'); // Ruta para administradores
         case 'Soporte':
             return route('support-dashboard'); // Ruta para soporte
-        default:
-            return route('user-dashboard'); // Ruta para usuarios
+            case "Usuario":
+            return route("user-dashboard"); // Ruta para usuarios
     }
 }
 </script>
