@@ -29,7 +29,7 @@ function getDashboardRoute() {
 
 <template>
     <!-- El SVG va dentro del link para hacer clic -->
-    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 48 50" fill="none" xmlns="http://www.w3.org/2000/svg">
         <!-- Verificar si el usuario está autenticado -->
         <Link
             v-if="$page.props.auth.user"
