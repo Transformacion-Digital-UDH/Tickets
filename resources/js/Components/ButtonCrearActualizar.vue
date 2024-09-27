@@ -1,9 +1,9 @@
 <script setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faTimes, faSpinner } from "@fortawesome/free-solid-svg-icons";
 
-library.add(faSave, faTimes);
+library.add(faSave, faTimes, faSpinner);
 
 const props = defineProps({
     loading: {
