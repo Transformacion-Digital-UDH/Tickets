@@ -44,7 +44,6 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
     Route::controller(CategoriaController::class)->group(function () {
         Route::get('/categoria', 'index')->name('categoria');
-        Route::get('/categorias', 'traer');
         Route::post('/categorias', 'store');
         Route::put('/categorias/{categoria}', 'update');
         Route::delete('/categorias/{categoria}/eliminar', 'eliminar');
@@ -52,7 +51,6 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
     Route::controller(PabellonController::class)->group(function () {
         Route::get('/pabellon', 'index')->name('pabellon');
-        Route::get('/pabellones', 'traer');
         Route::post('/pabellones', 'store');
         Route::put('/pabellones/{pabellon}', 'update');
         Route::delete('/pabellones/{pabellon}/eliminar', 'eliminar');
@@ -60,7 +58,6 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
     Route::controller(AulaController::class)->group(function () {
         Route::get('/aula', 'index')->name('aula');
-        Route::get('/aulas', 'traer');
         Route::post('/aulas', 'store');
         Route::put('/aulas/{aula}', 'update');
         Route::delete('/aulas/{aula}/eliminar', 'eliminar');
@@ -74,11 +71,25 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         Route::delete('/tickets/{ticket}/eliminar', 'eliminar');
     });
 
+    Route::controller(AsignadoController::class)->group(function () {
+        Route::post('/asignar/{ticket}', 'store');
+    });
+});
+
+Route::middleware(['auth', 'role:Admin|Usuario'])->group(function () {
     Route::controller(PrioridadController::class)->group(function () {
         Route::get('/prioridades', 'traer');
     });
 
-    Route::controller(AsignadoController::class)->group(function () {
-        Route::post('/asignar/{ticket}', 'store');
+    Route::controller(CategoriaController::class)->group(function () {
+        Route::get('/categorias', 'traer');
+    });
+
+    Route::controller(PabellonController::class)->group(function () {
+        Route::get('/pabellones', 'traer');
+    });
+
+    Route::controller(AulaController::class)->group(function () {
+        Route::get('/aulas', 'traer');
     });
 });
