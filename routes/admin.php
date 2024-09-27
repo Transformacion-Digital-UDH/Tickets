@@ -7,7 +7,6 @@ use App\Http\Controllers\Admin\SedeController;
 use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\AulaController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Usuario\UsuarioDashboardController;
 use App\Http\Controllers\Admin\PabellonController;
 use App\Http\Controllers\Admin\TicketController;
 use Illuminate\Support\Facades\Route;
