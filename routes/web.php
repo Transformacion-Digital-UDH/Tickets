@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AulaController;
+use App\Http\Controllers\Admin\CategoriaController;
+use App\Http\Controllers\Admin\PabellonController;
+use App\Http\Controllers\Admin\PrioridadController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
