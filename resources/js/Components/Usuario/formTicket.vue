@@ -129,7 +129,7 @@ onMounted(() => {
         <h1 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
             Crear Ticket
         </h1>
-        <div class="overflow-x-auto bg-white rounded-lg shadow-md p-6">
+        <div class="overflow-x-auto rounded-lg shadow-md p-6">
             <h2
                 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xm"
             >
