@@ -424,7 +424,7 @@ onMounted(() => {
             @cerrar="cerrarCrearModal" @crear="fetchTickets" />
 
         <ModalAsignar v-if="mostrarModalAsignar" :formFieldsAsignar="formFieldsAsignar" :soportes="soportes"
-            itemName="Soporte Técnico" endpoint="/tickets" @cerrar="cerrarAsignarModal" @crear="fetchTickets" />
+            itemName="Soporte Técnico" endpoint="/tickets" @cerrar="cerrarAsignarModal" @crear="asignarSoporte" />
 
         <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Ticket" :formFieldsVer="formFieldsVer"
             :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />

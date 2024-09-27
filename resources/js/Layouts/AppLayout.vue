@@ -17,6 +17,7 @@ import {
     faUserShield,
     faUserGraduate,
     faTags,
+    faList,
     faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -31,6 +32,7 @@ library.add(
     faUserShield,
     faUserGraduate,
     faTags,
+    faList,
     faChevronDown
 );
 
@@ -608,7 +610,7 @@ defineProps({ title: String });
                             :active="route().current('user-ticket')"
                             :class="linkClasses(route().current('user-ticket'))"
                         >
-                            <font-awesome-icon icon="ticket" class="text-lg" />
+                            <font-awesome-icon icon="list" class="text-lg" />
                             <span v-if="abrirSidebar" class="ml-2"
                                 >Mis Tickets</span
                             >
