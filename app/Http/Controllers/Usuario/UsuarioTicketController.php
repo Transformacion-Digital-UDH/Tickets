@@ -1,22 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Usuario;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Ticket;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
-class TicketController extends Controller
+class UsuarioTicketController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Ticket', [
-            'success' => session('success'),
-        ]);
+        return Inertia::render('Usuario/Ticket');
     }
 
     public function traer()

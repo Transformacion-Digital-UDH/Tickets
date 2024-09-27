@@ -15,7 +15,9 @@ class UsuarioController extends Controller
 {
     public function soporte()
     {
-        return Inertia::render("Admin/Soporte");
+        return Inertia::render("Admin/Soporte", [
+            'success' => session('success'),
+        ]);
     }
 
     public function traerSoporte()
@@ -31,7 +33,9 @@ class UsuarioController extends Controller
 
     public function usuario()
     {
-        return Inertia::render("Admin/Usuario");
+        return Inertia::render("Admin/Usuario", [
+            'success' => session('success'),
+        ]);
     }
 
     public function traerUsuario()

@@ -13,7 +13,9 @@ class PabellonController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Pabellon');
+        return Inertia::render('Admin/Pabellon', [
+            'success' => session('success'),
+        ]);
     }
 
     public function traer()
