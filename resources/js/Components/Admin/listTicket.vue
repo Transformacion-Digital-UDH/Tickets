@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, createApp } from "vue";
+import { ref, onMounted, computed } from "vue";
 import CardTickets from "@/Components/CardTickets.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalAsignar from "@/Components/ModalAsignar.vue";

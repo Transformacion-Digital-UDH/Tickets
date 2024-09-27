@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Usuario;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Ticket;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -23,13 +24,21 @@ class UsuarioTicketController extends Controller
         return response()->json($tickets);
     }
 
+    public function create()
+    {
+        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula')->get();
+
+        return Inertia::render('Usuario/CrearTicket', [
+            'tickets' => $tickets,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'tic_titulo' => 'required|string|max:255',
             'tic_descripcion' => 'required|string',
             'pri_id' => 'required|exists:prioridads,id',
-            'use_id' => 'required|exists:users,id',
             'cat_id' => 'required|exists:categorias,id',
             'pab_id' => 'required|exists:pabellons,id',
             'aul_id' => 'required|exists:aulas,id',
@@ -39,7 +48,7 @@ class UsuarioTicketController extends Controller
             'tic_titulo' => $validatedData['tic_titulo'],
             'tic_descripcion' => $validatedData['tic_descripcion'],
             'pri_id' => $validatedData['pri_id'],
-            'use_id' => $validatedData['use_id'],
+            'use_id' => Auth::id(),
             'cat_id' => $validatedData['cat_id'],
             'pab_id' => $validatedData['pab_id'],
             'aul_id' => $validatedData['aul_id'],
@@ -81,12 +90,12 @@ class UsuarioTicketController extends Controller
             return response()->json([
                 'status' => true,
                 'msg' => 'Ticket actualizado correctamente',
-                'ticket' => $ticket
+                'ticket' => $ticket,
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ticket no encontrado'
+                'msg' => 'Ticket no encontrado',
             ], 404);
         } catch (Exception $e) {
             return response()->json([
