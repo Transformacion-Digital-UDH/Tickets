@@ -56,7 +56,7 @@ class TicketController extends Controller
     public function asignarSoporte(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'use_id' => 'required|exists:users,id',
+            'sop_id' => 'required|exists:users,id',
             'es_asignado' => 'boolean',
         ]);
 
@@ -64,13 +64,13 @@ class TicketController extends Controller
 
         Asignado::create([
             'tic_id' => $ticket->id,
-            'use_id' => $validatedData['use_id'],
+            'sop_id' => $validatedData['sop_id'],
             'es_asignado' => $validatedData['es_asignado'] ?? true,
         ]);
 
         $ticket->update([
             'tic_estado' => 'En progreso',
-            'use_id' => $validatedData['use_id'],
+            'sop_id' => $validatedData['sop_id'],
         ]);
 
         return response()->json([
@@ -78,6 +78,39 @@ class TicketController extends Controller
             'msg' => 'Soporte asignado y estado actualizado a "En progreso".',
             'ticket' => $ticket,
         ]);
+    }
+
+    public function updateSoporte(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'sop_id' => 'required|exists:users,id',
+            'es_asignado' => 'boolean',
+        ]);
+
+        try {
+            $asignado = Asignado::where('tic_id', $id)->firstOrFail();
+
+            $asignado->update([
+                'sop_id' => $validatedData['sop_id'],
+                'es_asignado' => $validatedData['es_asignado'] ?? true,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Soporte actualizado correctamente.',
+                'asignado' => $asignado,
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'No se encontró el soporte asignado para este ticket.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Error al actualizar el soporte: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)

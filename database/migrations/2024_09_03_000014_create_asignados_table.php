@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('asignados', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tic_id')->constrained('tickets');
-            $table->foreignId('use_id')->constrained('users');
+            $table->foreignId('sop_id')->constrained('users');
             $table->boolean('es_asignado')->default(true);
             $table->timestamps();
         });

@@ -76,6 +76,7 @@ const fetchTickets = async () => {
             pri_id: ticket.pri_id,
             pri_nombre: ticket.prioridad ? ticket.prioridad.pri_nombre : "",
             use_id: ticket.use_id,
+            sop_id: ticket.sop_id,
             name: ticket.user ? ticket.user.name : "",
             cat_id: ticket.cat_id,
             cat_nombre: ticket.categoria ? ticket.categoria.cat_nombre : "",
@@ -133,7 +134,7 @@ const fetchSoportes = async () => {
                 text: soporte.name,
             }));
         formFieldsAsignar.value = formFieldsAsignar.value.map((field) => {
-            if (field.name == "use_id") {
+            if (field.name == "sop_id") {
                 return {
                     ...field,
                     options: soportes.value,
@@ -141,6 +142,7 @@ const fetchSoportes = async () => {
             }
             return field;
         });
+        formFieldsAsignar.value = [...formFieldsAsignar.value];
     } catch (error) {
         console.error("Error al cargar los soportes técnicos:", error);
     }
@@ -307,7 +309,7 @@ formFields.value = [
 
 formFieldsAsignar.value = [
     {
-        name: "use_id",
+        name: "sop_id",
         label: "Soporte",
         type: "select",
         options: soportes.value,
@@ -429,7 +431,7 @@ onMounted(() => {
         <CardTickets
             :isCardView="isCardView"
             :headers="headers"
-            :tickets="filtrarTickets"
+            :tickets="tickets"
             @asign="abrirAsignarModal"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
@@ -455,10 +457,16 @@ onMounted(() => {
             :formFieldsAsignar="formFieldsAsignar"
             :soportes="soportes"
             :ticketId="itemSeleccionado?.id"
+            :selectedSoporteId="itemSeleccionado?.sop_id"
             itemName="Soporte Técnico"
-            endpoint="/asignar"
+            :endpoint="
+                itemSeleccionado?.sop_id
+                    ? `/tickets/${itemSeleccionado?.id}/asignar`
+                    : `/tickets/${itemSeleccionado?.id}/actualizar`
+            "
             @cerrar="cerrarAsignarModal"
             @crear="fetchTickets"
+            @actualizar="fetchTickets"
         />
 
         <ModalVer
