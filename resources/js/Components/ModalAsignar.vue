@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
+import axios from "axios";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ButtonCerrar from "@/Components/ButtonCerrar.vue";
 
@@ -17,11 +18,15 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    ticketId: {
+        type: Number,
+        required: true,
+    },
 });
 
 const emit = defineEmits(["cerrar", "crear"]);
 
-const formData = ref({});
+const formData = ref({ use_id: null, tic_id: props.ticketId });
 const errores = ref([]);
 const loading = ref(false);
 const successMessage = ref("");
@@ -54,36 +59,39 @@ watch(
             });
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 
-const submitForm = async () => {
+const asignarSoporte = async () => {
     loading.value = true;
     successMessage.value = "";
     errores.value = [];
+
     try {
-        const response = await axios.post(props.endpoint, formData.value, {
+        const response = await axios.post(`/tickets/${props.ticketId}/asignar`, {
+            use_id: formData.value.use_id,
+            tic_estado: 'En progreso'
+        }, {
             headers: {
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
             },
         });
+
         emit("crear", response.data);
-        successMessage.value = "Creación exitosa!";
+        successMessage.value = "Asignación exitosa!";
+
         props.formFieldsAsignar.forEach((field) => {
-            if (field.type === "boolean") {
-                formData.value[field.name] = true;
-            } else {
-                formData.value[field.name] = field.default || "";
-            }
+            formData.value[field.name] = field.default || "";
         });
+
         emit("cerrar");
     } catch (error) {
         if (error.response && error.response.status === 422) {
             errores.value = error.response.data.errors;
         } else {
-            console.error("Error:", error);
+            console.error("Error inesperado:", error);
         }
     } finally {
         loading.value = false;
@@ -94,9 +102,7 @@ const cerrarModal = () => emit("cerrar");
 </script>
 
 <template>
-    <div
-        class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50"
-    >
+    <div class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50">
         <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
             <div class="border-2 border-blue-500 p-4 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-blue-500">
@@ -108,11 +114,9 @@ const cerrarModal = () => emit("cerrar");
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div v-for="(field, index) in visibleFields" :key="index">
-                        <label
-                            :for="field.name"
-                            class="block mb-2 text-gray-500"
-                            >{{ field.label }}:</label
-                        >
+                        <label :for="field.name" class="block mb-2 text-gray-500">
+                            {{ field.label }}:
+                        </label>
 
                         <template v-if="field.type === 'select'">
                             <select
@@ -121,10 +125,8 @@ const cerrarModal = () => emit("cerrar");
                                 v-model="formData[field.name]"
                                 :autocomplete="field.autocomplete || 'off'"
                                 :class="{
-                                    'text-blue-500':
-                                        formData[field.name] === '',
-                                    'text-gray-900':
-                                        formData[field.name] !== '',
+                                    'text-blue-500': formData[field.name] === '',
+                                    'text-gray-900': formData[field.name] !== '',
                                 }"
                                 class="w-full p-2 mb-1 placeholder-blue-500 border border-blue-500 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                             >
@@ -140,10 +142,7 @@ const cerrarModal = () => emit("cerrar");
                                 </option>
                             </select>
                         </template>
-                        <p
-                            v-if="errores[field.name]"
-                            class="text-sm text-red-500"
-                        >
+                        <p v-if="errores[field.name]" class="text-sm text-red-500">
                             {{ errores[field.name][0] }}
                         </p>
                     </div>
@@ -151,7 +150,7 @@ const cerrarModal = () => emit("cerrar");
 
                 <div class="flex justify-end mt-6 space-x-4">
                     <ButtonCrearActualizar
-                        @click="submitForm"
+                        @click="asignarSoporte"
                         :loading="loading"
                         :itemName="'Asignar'"
                     />

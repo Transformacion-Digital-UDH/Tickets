@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asignado;
 use App\Models\Ticket;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -52,6 +53,33 @@ class TicketController extends Controller
         return response()->json($ticket, 201);
     }
 
+    public function asignarSoporte(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'use_id' => 'required|exists:users,id',
+            'es_asignado' => 'boolean',
+        ]);
+
+        $ticket = Ticket::findOrFail($id);
+
+        Asignado::create([
+            'tic_id' => $ticket->id,
+            'use_id' => $validatedData['use_id'],
+            'es_asignado' => $validatedData['es_asignado'] ?? true,
+        ]);
+
+        $ticket->update([
+            'tic_estado' => 'En progreso',
+            'use_id' => $validatedData['use_id'],
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'msg' => 'Soporte asignado y estado actualizado a "En progreso".',
+            'ticket' => $ticket,
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         try {
@@ -65,6 +93,7 @@ class TicketController extends Controller
                 'pri_id' => 'required|exists:prioridads,id',
                 'pab_id' => 'required|exists:pabellons,id',
                 'aul_id' => 'required|exists:aulas,id',
+                'tic_estado' => 'nullable|string|in:Abierto,En progreso,Cerrado,Finalizado',
                 'tic_activo' => 'nullable|boolean',
             ]);
 
@@ -76,19 +105,20 @@ class TicketController extends Controller
                 ], 422);
             }
 
-            $data = $request->only(['tic_titulo', 'tic_descripcion', 'use_id', 'cat_id', 'pri_id', 'pab_id', 'aul_id', 'tic_activo']);
-
-            $ticket->update($data);
+            $ticket->update($request->only([
+                'tic_titulo', 'tic_descripcion', 'use_id', 'cat_id', 'pri_id',
+                'pab_id', 'aul_id', 'tic_estado', 'tic_activo',
+            ]));
 
             return response()->json([
                 'status' => true,
                 'msg' => 'Ticket actualizado correctamente',
-                'ticket' => $ticket
+                'ticket' => $ticket,
             ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
-                'msg' => 'Ticket no encontrado'
+                'msg' => 'Ticket no encontrado',
             ], 404);
         } catch (Exception $e) {
             return response()->json([

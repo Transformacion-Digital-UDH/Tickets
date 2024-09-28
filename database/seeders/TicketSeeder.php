@@ -35,7 +35,7 @@ class TicketSeeder extends Seeder
             'tic_titulo' => 'TITULO 2',
             'tic_descripcion' => 'DESCRIPCION 2',
             'tic_archivo' => 'ARCHIVO 2',
-            'tic_estado' => 'Cerrado',
+            'tic_estado' => 'Abierto',
             'tic_activo' => true,
         ]);
 
@@ -48,7 +48,7 @@ class TicketSeeder extends Seeder
             'tic_titulo' => 'TITULO 3',
             'tic_descripcion' => 'DESCRIPCION 3',
             'tic_archivo' => 'ARCHIVO 3',
-            'tic_estado' => 'En progreso',
+            'tic_estado' => 'Abierto',
             'tic_activo' => true,
         ]);
 
@@ -61,7 +61,7 @@ class TicketSeeder extends Seeder
             'tic_titulo' => 'TITULO 4',
             'tic_descripcion' => 'DESCRIPCION 4',
             'tic_archivo' => 'ARCHIVO 4',
-            'tic_estado' => 'Finalizado',
+            'tic_estado' => 'Abierto',
             'tic_activo' => true,
         ]);
     }
