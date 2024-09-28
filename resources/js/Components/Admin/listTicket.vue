@@ -381,14 +381,24 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
+const fetchAllData = async () => {
+    try {
+        await Promise.all([
+            fetchTickets(),
+            fetchPrioridades(),
+            fetchSoportes(),
+            fetchUsuarios(),
+            fetchCategorias(),
+            fetchPabellones(),
+            fetchAulas(),
+        ]);
+    } catch (error) {
+        console.error("Error al cargar los datos:", error);
+    }
+};
+
 onMounted(() => {
-    fetchTickets();
-    fetchPrioridades();
-    fetchSoportes();
-    fetchUsuarios();
-    fetchCategorias();
-    fetchPabellones();
-    fetchAulas();
+    fetchAllData();
 });
 </script>
 
@@ -430,6 +440,7 @@ onMounted(() => {
 
         <CardTickets
             :isCardView="isCardView"
+            :items="filtrarTickets"
             :headers="headers"
             :tickets="tickets"
             @asign="abrirAsignarModal"
@@ -456,14 +467,10 @@ onMounted(() => {
             v-if="mostrarModalAsignar"
             :formFieldsAsignar="formFieldsAsignar"
             :soportes="soportes"
-            :ticketId="itemSeleccionado?.id"
-            :selectedSoporteId="itemSeleccionado?.sop_id"
+            :ticketId="itemSeleccionado?.id || null"
+            :selectedSoporteId="itemSeleccionado?.sop_id || null"
             itemName="Soporte Técnico"
-            :endpoint="
-                itemSeleccionado?.sop_id
-                    ? `/tickets/${itemSeleccionado?.id}/asignar`
-                    : `/tickets/${itemSeleccionado?.id}/actualizar`
-            "
+            endpoint="/asignar"
             @cerrar="cerrarAsignarModal"
             @crear="fetchTickets"
             @actualizar="fetchTickets"
