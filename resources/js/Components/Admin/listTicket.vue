@@ -94,10 +94,12 @@ const fetchTickets = async () => {
 const fetchPrioridades = async () => {
     try {
         const response = await axios.get("/prioridades");
-        prioridades.value = response.data.filter((prioridad) => prioridad.pri_activo).map((prioridad) => ({
-            value: prioridad.id,
-            text: prioridad.pri_nombre,
-        }));
+        prioridades.value = response.data
+            .filter((prioridad) => prioridad.pri_activo)
+            .map((prioridad) => ({
+                value: prioridad.id,
+                text: prioridad.pri_nombre,
+            }));
         formFields.value = formFields.value.map((field) => {
             if (field.name === "pri_id") {
                 return {
@@ -124,10 +126,12 @@ const fetchPrioridades = async () => {
 const fetchSoportes = async () => {
     try {
         const response = await axios.get("/soportes");
-        soportes.value = response.data.filter((soporte) => soporte.activo).map((soporte) => ({
-            value: soporte.id,
-            text: soporte.name,
-        }));
+        soportes.value = response.data
+            .filter((soporte) => soporte.activo)
+            .map((soporte) => ({
+                value: soporte.id,
+                text: soporte.name,
+            }));
         formFieldsAsignar.value = formFieldsAsignar.value.map((field) => {
             if (field.name == "use_id") {
                 return {
@@ -145,10 +149,12 @@ const fetchSoportes = async () => {
 const fetchUsuarios = async () => {
     try {
         const response = await axios.get("/usuarios");
-        usuarios.value = response.data.filter((usuario) => usuario.activo).map((usuario) => ({
-            value: usuario.id,
-            text: usuario.name,
-        }));
+        usuarios.value = response.data
+            .filter((usuario) => usuario.activo)
+            .map((usuario) => ({
+                value: usuario.id,
+                text: usuario.name,
+            }));
         formFields.value = formFields.value.map((field) => {
             if (field.name === "use_id") {
                 return {
@@ -175,10 +181,12 @@ const fetchUsuarios = async () => {
 const fetchCategorias = async () => {
     try {
         const response = await axios.get("/categorias");
-        categorias.value = response.data.filter((categoria) => categoria.cat_activo).map((categoria) => ({
-            value: categoria.id,
-            text: categoria.cat_nombre,
-        }));
+        categorias.value = response.data
+            .filter((categoria) => categoria.cat_activo)
+            .map((categoria) => ({
+                value: categoria.id,
+                text: categoria.cat_nombre,
+            }));
         formFields.value = formFields.value.map((field) => {
             if (field.name === "cat_id") {
                 return {
@@ -205,10 +213,12 @@ const fetchCategorias = async () => {
 const fetchPabellones = async () => {
     try {
         const response = await axios.get("/pabellones");
-        pabellones.value = response.data.filter((pabellon) => pabellon.pab_activo).map((pabellon) => ({
-            value: pabellon.id,
-            text: pabellon.pab_nombre,
-        }));
+        pabellones.value = response.data
+            .filter((pabellon) => pabellon.pab_activo)
+            .map((pabellon) => ({
+                value: pabellon.id,
+                text: pabellon.pab_nombre,
+            }));
         formFields.value = formFields.value.map((field) => {
             if (field.name === "pab_id") {
                 return {
@@ -235,10 +245,12 @@ const fetchPabellones = async () => {
 const fetchAulas = async () => {
     try {
         const response = await axios.get("/aulas");
-        aulas.value = response.data.filter((aula) => aula.aul_activo).map((aula) => ({
-            value: aula.id,
-            text: aula.aul_numero,
-        }));
+        aulas.value = response.data
+            .filter((aula) => aula.aul_activo)
+            .map((aula) => ({
+                value: aula.id,
+                text: aula.aul_numero,
+            }));
         formFields.value = formFields.value.map((field) => {
             if (field.name === "aul_id") {
                 return {
@@ -313,20 +325,6 @@ formFieldsVer.value = [
     { name: "tic_estado", label: "Estado", type: "text" },
 ];
 
-const asignarSoporte = async () => {
-    if (itemSeleccionado.value) {
-        try {
-            await axios.put(
-                `/tickets/${itemSeleccionado.value.id}`
-            );
-            await fetchTickets();
-            mostrarModalAsignar.value = false;
-        } catch (error) {
-            console.error("Error al asignar un soporte técnico:", error);
-        }
-    }
-}
-
 const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
@@ -399,42 +397,102 @@ onMounted(() => {
         </h1>
         <div class="flex items-center justify-between mb-4">
             <div class="relative w-full sm:w-auto">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <span
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
-                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
+                <input
+                    type="text"
+                    v-model="buscarQuery"
+                    placeholder="Buscar..."
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
+                />
             </div>
             <div class="flex items-center space-x-1">
-                <font-awesome-icon @click="isCardView = true" :class="{ 'bg-gray-200': isCardView }"
+                <font-awesome-icon
+                    @click="isCardView = true"
+                    :class="{ 'bg-gray-200': isCardView }"
                     class="flex items-center px-4 py-2 text-sm font-semibold bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100"
-                    icon="th-large" />
-                <font-awesome-icon @click="isCardView = false" :class="{ 'bg-gray-200': !isCardView }"
+                    icon="th-large"
+                />
+                <font-awesome-icon
+                    @click="isCardView = false"
+                    :class="{ 'bg-gray-200': !isCardView }"
                     class="flex items-center px-4 py-2 text-sm font-semibold bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100"
-                    icon="table" />
+                    icon="table"
+                />
                 <ButtonNuevo @click="mostrarModalCrear = true" />
             </div>
         </div>
 
-        <CardTickets :isCardView="isCardView" :headers="headers" :tickets="filtrarTickets" @asign="abrirAsignarModal"
-            @view="abrirDetallesModal" @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
+        <CardTickets
+            :isCardView="isCardView"
+            :headers="headers"
+            :tickets="filtrarTickets"
+            @asign="abrirAsignarModal"
+            @view="abrirDetallesModal"
+            @edit="abrirEditarModal"
+            @eliminar="abrirEliminarModal"
+        />
 
-        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :prioridads="prioridades" :usuarios="usuarios"
-            :categorias="categorias" :pabellons="pabellones" :aulas="aulas" itemName="Ticket" endpoint="/tickets"
-            @cerrar="cerrarCrearModal" @crear="fetchTickets" />
+        <ModalCrear
+            v-if="mostrarModalCrear"
+            :formFields="formFields"
+            :prioridads="prioridades"
+            :usuarios="usuarios"
+            :categorias="categorias"
+            :pabellons="pabellones"
+            :aulas="aulas"
+            itemName="Ticket"
+            endpoint="/tickets"
+            @cerrar="cerrarCrearModal"
+            @crear="fetchTickets"
+        />
 
-        <ModalAsignar v-if="mostrarModalAsignar" :formFieldsAsignar="formFieldsAsignar" :soportes="soportes"
-            itemName="Soporte Técnico" endpoint="/tickets" @cerrar="cerrarAsignarModal" @crear="asignarSoporte" />
+        <ModalAsignar
+            v-if="mostrarModalAsignar"
+            :formFieldsAsignar="formFieldsAsignar"
+            :soportes="soportes"
+            :ticketId="itemSeleccionado?.id"
+            itemName="Soporte Técnico"
+            endpoint="/asignar"
+            @cerrar="cerrarAsignarModal"
+            @crear="fetchTickets"
+        />
 
-        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Ticket" :formFieldsVer="formFieldsVer"
-            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
+        <ModalVer
+            v-if="mostrarModalDetalles"
+            :item="itemSeleccionado"
+            itemName="Ticket"
+            :formFieldsVer="formFieldsVer"
+            :mostrarModalDetalles="mostrarModalDetalles"
+            @close="cerrarDetallesModal"
+        />
 
-        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Ticket" :formFields="formFields"
-            :prioridads="prioridades" :usuarios="usuarios" :categorias="categorias" :pabellons="pabellones"
-            :aulas="aulas" :mostrarModalEditar="mostrarModalEditar" endpoint="/tickets" @cerrar="cerrarEditarModal"
-            @update="fetchTickets" />
+        <ModalEditar
+            v-if="mostrarModalEditar"
+            :item="itemSeleccionado"
+            itemName="Ticket"
+            :formFields="formFields"
+            :prioridads="prioridades"
+            :usuarios="usuarios"
+            :categorias="categorias"
+            :pabellons="pabellones"
+            :aulas="aulas"
+            :mostrarModalEditar="mostrarModalEditar"
+            endpoint="/tickets"
+            @cerrar="cerrarEditarModal"
+            @update="fetchTickets"
+        />
 
-        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Ticket" fieldName="tic_titulo"
-            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
+        <ModalEliminar
+            v-if="mostrarModalEliminar"
+            :item="itemSeleccionado"
+            itemName="Ticket"
+            fieldName="tic_titulo"
+            @cancelar="cerrarEliminarModal"
+            @confirmar="eliminarItem"
+        />
     </div>
 </template>
