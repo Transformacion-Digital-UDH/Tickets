@@ -15,7 +15,7 @@ const loadTickets = async () => {
         const allTickets = response.data;
 
         tickets.value.open = allTickets.filter(ticket => ticket.tic_estado === 'Abierto');
-        tickets.value.inProgress = allTickets.filter(ticket => ticket.tic_estado === 'En Progreso');
+        tickets.value.inProgress = allTickets.filter(ticket => ticket.tic_estado === 'En progreso');
         tickets.value.closed = allTickets.filter(ticket => ticket.tic_estado === 'Cerrado');
     } catch (error) {
         console.error("Error al cargar tickets:", error);

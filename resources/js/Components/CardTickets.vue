@@ -12,10 +12,6 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
-    items: {
-        type: Array,
-        required: true,
-    },
 });
 
 const emit = defineEmits(["asign", "view", "edit", "eliminar"]);
@@ -146,7 +142,7 @@ const handleEliminar = (ticket) => {
             </thead>
             <tbody class="text-sm text-gray-700">
                 <tr
-                    v-for="(ticket, index) in items"
+                    v-for="ticket in tickets"
                     :key="ticket.id"
                     class="transition duration-300 ease-in-out border-b hover:bg-gray-100"
                 >
