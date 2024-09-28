@@ -9,7 +9,7 @@ class Asignado extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tic_id', 'use_id', 'es_asignado'];
+    protected $fillable = ['tic_id', 'sop_id', 'es_asignado'];
 
     public function ticket()
     {
@@ -18,6 +18,6 @@ class Asignado extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'use_id');
+        return $this->belongsTo(User::class, 'sop_id');
     }
 }

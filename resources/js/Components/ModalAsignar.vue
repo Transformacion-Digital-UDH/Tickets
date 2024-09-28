@@ -22,35 +22,56 @@ const props = defineProps({
         type: Number,
         required: true,
     },
+    selectedSoporteId: {
+        type: Number,
+        default: null,
+    },
 });
 
-const emit = defineEmits(["cerrar", "crear"]);
+const emit = defineEmits(["cerrar", "crear", "actualizar"]);
 
-const formData = ref({ use_id: null, tic_id: props.ticketId });
+const formData = ref({
+    sop_id: props.selectedSoporteId || null,
+    tic_id: props.ticketId,
+});
 const errores = ref([]);
 const loading = ref(false);
 const successMessage = ref("");
+const esActualizar = ref(!!props.selectedSoporteId);
 
 const visibleFields = computed(() => {
     return props.formFieldsAsignar.filter((field) => field.type !== "boolean");
 });
 
 onMounted(() => {
-    props.formFieldsAsignar.forEach((field) => {
-        if (field.type === "boolean") {
-            formData.value[field.name] = true;
-        } else {
-            formData.value[field.name] = field.default || "";
-        }
-    });
+    initializeForm();
 });
+
+const initializeForm = () => {
+    console.log("selectedSoporteId:", props.selectedSoporteId);
+    console.log("isUpdate:", esActualizar.value);
+
+    if (esActualizar.value) {
+        formData.value.sop_id = props.selectedSoporteId;
+        console.log("formData (update):", formData.value);
+    } else {
+        props.formFieldsAsignar.forEach((field) => {
+            if (field.type === "boolean") {
+                formData.value[field.name] = true;
+            } else if (field.name !== "sop_id") {
+                formData.value[field.name] = field.default || "";
+            }
+        });
+        console.log("formData (create):", formData.value);
+    }
+};
 
 watch(
     () => props.soportes,
     (newSoportes) => {
         if (newSoportes && newSoportes.length > 0) {
             props.formFieldsAsignar.forEach((field) => {
-                if (field.name === "use_id") {
+                if (field.name === "sop_id") {
                     field.options = newSoportes.map((soporte) => ({
                         value: soporte.value,
                         label: soporte.text,
@@ -59,19 +80,28 @@ watch(
             });
         }
     },
-    { immediate: true },
+    { immediate: true }
 );
 
 const asignarSoporte = async () => {
     loading.value = true;
     successMessage.value = "";
     errores.value = [];
+    console.log("Datos a enviar:", formData.value);
 
     try {
-        const response = await axios.post(`/tickets/${props.ticketId}/asignar`, {
-            use_id: formData.value.use_id,
-            tic_estado: 'En progreso'
-        }, {
+        const method = esActualizar.value ? "put" : "post";
+        const endpoint = esActualizar.value
+            ? `/tickets/${props.ticketId}/actualizar`
+            : `/tickets/${props.ticketId}/asignar`;
+
+        const requestData = {
+            sop_id: formData.value.sop_id,
+            es_asignado: true,
+            tic_estado: "En progreso",
+        };
+
+        const response = await axios[method](endpoint, requestData, {
             headers: {
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
@@ -79,12 +109,17 @@ const asignarSoporte = async () => {
             },
         });
 
-        emit("crear", response.data);
-        successMessage.value = "Asignación exitosa!";
+        // Cambiar el emisor de eventos según la operación
+        if (!esActualizar.value) {
+            emit("crear", response.data);  // Asignar
+            successMessage.value = "Soporte asignado exitosamente!";
+        } else {
+            emit("actualizar", response.data);  // Actualizar
+            successMessage.value = "Soporte actualizado exitosamente!";
+        }
 
-        props.formFieldsAsignar.forEach((field) => {
-            formData.value[field.name] = field.default || "";
-        });
+        // Reiniciar el formulario después de una operación exitosa
+        initializeForm();
 
         emit("cerrar");
     } catch (error) {
@@ -102,7 +137,9 @@ const cerrarModal = () => emit("cerrar");
 </script>
 
 <template>
-    <div class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50">
+    <div
+        class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50"
+    >
         <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
             <div class="border-2 border-blue-500 p-4 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-blue-500">
@@ -114,7 +151,10 @@ const cerrarModal = () => emit("cerrar");
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div v-for="(field, index) in visibleFields" :key="index">
-                        <label :for="field.name" class="block mb-2 text-gray-500">
+                        <label
+                            :for="field.name"
+                            class="block mb-2 text-gray-500"
+                        >
                             {{ field.label }}:
                         </label>
 
@@ -125,8 +165,10 @@ const cerrarModal = () => emit("cerrar");
                                 v-model="formData[field.name]"
                                 :autocomplete="field.autocomplete || 'off'"
                                 :class="{
-                                    'text-blue-500': formData[field.name] === '',
-                                    'text-gray-900': formData[field.name] !== '',
+                                    'text-blue-500':
+                                        formData[field.name] === '',
+                                    'text-gray-900':
+                                        formData[field.name] !== '',
                                 }"
                                 class="w-full p-2 mb-1 placeholder-blue-500 border border-blue-500 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                             >
@@ -142,7 +184,10 @@ const cerrarModal = () => emit("cerrar");
                                 </option>
                             </select>
                         </template>
-                        <p v-if="errores[field.name]" class="text-sm text-red-500">
+                        <p
+                            v-if="errores[field.name]"
+                            class="text-sm text-red-500"
+                        >
                             {{ errores[field.name][0] }}
                         </p>
                     </div>
@@ -152,7 +197,7 @@ const cerrarModal = () => emit("cerrar");
                     <ButtonCrearActualizar
                         @click="asignarSoporte"
                         :loading="loading"
-                        :itemName="'Asignar'"
+                        :itemName="esActualizar ? 'Actualizar' : 'Asignar'"
                     />
                     <ButtonCerrar @click="cerrarModal" />
                 </div>
