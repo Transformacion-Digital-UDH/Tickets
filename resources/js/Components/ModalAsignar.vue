@@ -37,24 +37,30 @@ const formData = ref({
 const errores = ref([]);
 const loading = ref(false);
 const successMessage = ref("");
-const esActualizar = ref(!!props.selectedSoporteId);
+const esActualizar = ref(!!props.selectedSoporteId); // Detectar si es para actualizar
 
+// Computed para filtrar campos visibles (excluir booleanos)
 const visibleFields = computed(() => {
     return props.formFieldsAsignar.filter((field) => field.type !== "boolean");
 });
 
+// Cargar información inicial
 onMounted(() => {
     initializeForm();
 });
 
+// Inicialización del formulario
 const initializeForm = () => {
-    console.log("selectedSoporteId:", props.selectedSoporteId);
-    console.log("isUpdate:", esActualizar.value);
-
     if (esActualizar.value) {
+        // Si ya hay un soporte asignado, lo cargamos
         formData.value.sop_id = props.selectedSoporteId;
-        console.log("formData (update):", formData.value);
     } else {
+        // Si es un nuevo registro, reiniciar los valores
+        formData.value = {
+            sop_id: null,
+            tic_id: props.ticketId,
+            es_asignado: false,
+        };
         props.formFieldsAsignar.forEach((field) => {
             if (field.type === "boolean") {
                 formData.value[field.name] = true;
@@ -62,10 +68,10 @@ const initializeForm = () => {
                 formData.value[field.name] = field.default || "";
             }
         });
-        console.log("formData (create):", formData.value);
     }
 };
 
+// Monitorear cambios en la lista de soportes
 watch(
     () => props.soportes,
     (newSoportes) => {
@@ -87,7 +93,6 @@ const asignarSoporte = async () => {
     loading.value = true;
     successMessage.value = "";
     errores.value = [];
-    console.log("Datos a enviar:", formData.value);
 
     try {
         const method = esActualizar.value ? "put" : "post";
@@ -109,18 +114,16 @@ const asignarSoporte = async () => {
             },
         });
 
-        // Cambiar el emisor de eventos según la operación
+        // Emit an event to notify the parent that the assignment has been made
         if (!esActualizar.value) {
-            emit("crear", response.data);  // Asignar
+            emit("crear", response.data); // If it's a new assignment
             successMessage.value = "Soporte asignado exitosamente!";
         } else {
-            emit("actualizar", response.data);  // Actualizar
+            emit("actualizar", response.data); // If updating an assignment
             successMessage.value = "Soporte actualizado exitosamente!";
         }
 
-        // Reiniciar el formulario después de una operación exitosa
-        initializeForm();
-
+        // Close the modal and refresh the parent component's state
         emit("cerrar");
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -133,6 +136,7 @@ const asignarSoporte = async () => {
     }
 };
 
+// Función para cerrar el modal
 const cerrarModal = () => emit("cerrar");
 </script>
 
@@ -143,7 +147,8 @@ const cerrarModal = () => emit("cerrar");
         <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
             <div class="border-2 border-blue-500 p-4 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-blue-500">
-                    Asignar a un {{ itemName }}
+                    {{ esActualizar ? "Actualizar" : "Asignar" }} a un
+                    {{ itemName }}
                 </h2>
                 <p v-if="successMessage" class="mb-4 text-green-500">
                     {{ successMessage }}
@@ -163,16 +168,9 @@ const cerrarModal = () => emit("cerrar");
                                 :id="field.name"
                                 :name="field.name"
                                 v-model="formData[field.name]"
-                                :autocomplete="field.autocomplete || 'off'"
-                                :class="{
-                                    'text-blue-500':
-                                        formData[field.name] === '',
-                                    'text-gray-900':
-                                        formData[field.name] !== '',
-                                }"
-                                class="w-full p-2 mb-1 placeholder-blue-500 border border-blue-500 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                                class="w-full p-2 mb-1 border border-blue-500 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                             >
-                                <option value="" disabled selected>
+                                <option value="" disabled>
                                     Seleccione su {{ field.label }}
                                 </option>
                                 <option

@@ -15,7 +15,9 @@ class UsuarioTicketController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Usuario/Ticket');
+        return Inertia::render('Usuario/Ticket', [
+            'success' => session('success'),
+        ]);
     }
 
     public function traer()
