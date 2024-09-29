@@ -22,7 +22,12 @@ class UsuarioTicketController extends Controller
 
     public function traer()
     {
-        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula')->get();
+        $userId = Auth::id();
+
+        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula')
+            ->where('use_id', $userId)
+            ->get();
+
         return response()->json($tickets);
     }
 
