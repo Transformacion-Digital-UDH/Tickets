@@ -70,6 +70,12 @@ onMounted(() => {
     }
 });
 
+const getInitials = (name) => {
+    if (!name) return "";
+    const initials = name.split(" ").map((n) => n[0]);
+    return initials.join("").toUpperCase();
+};
+
 defineProps({ title: String });
 </script>
 
@@ -209,7 +215,7 @@ defineProps({ title: String });
             <div class="flex flex-col flex-1">
                 <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
                     <div
-                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
+                        class="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8"
                     >
                         <button
                             @click="interactuarSidebar"
@@ -244,14 +250,33 @@ defineProps({ title: String });
                                     @click="interactuarDropdown"
                                     class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
                                 >
-                                    <img
-                                        class="w-8 h-8 rounded-full"
-                                        :src="
+                                    <template
+                                        v-if="
                                             $page.props.auth.user
                                                 .profile_photo_url
                                         "
-                                        :alt="$page.props.auth.user.name"
-                                    />
+                                    >
+                                        <img
+                                            class="w-8 h-8 rounded-full"
+                                            :src="
+                                                $page.props.auth.user
+                                                    .profile_photo_url
+                                            "
+                                            :alt="$page.props.auth.user.name"
+                                        />
+                                    </template>
+                                    <template v-else>
+                                        <div
+                                            class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full"
+                                        >
+                                            {{
+                                                getInitials(
+                                                    $page.props.auth.user.name
+                                                )
+                                            }}
+                                        </div>
+                                    </template>
+
                                     <span
                                         class="hidden ml-2 font-semibold text-white lg:block"
                                         >{{ $page.props.auth.user.name }}</span
@@ -311,7 +336,7 @@ defineProps({ title: String });
             </div>
         </div>
     </div>
-    <!--APPLAYOUT PARA SOPORTE-->
+    <!-- APPLAYOUT PARA SOPORTE -->
     <div
         v-else-if="
             $page.props.auth.user &&
@@ -446,7 +471,7 @@ defineProps({ title: String });
             <div class="flex flex-col flex-1">
                 <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
                     <div
-                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
+                        class="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8"
                     >
                         <button
                             @click="interactuarSidebar"
@@ -481,14 +506,33 @@ defineProps({ title: String });
                                     @click="interactuarDropdown"
                                     class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
                                 >
-                                    <img
-                                        class="w-8 h-8 rounded-full"
-                                        :src="
+                                    <template
+                                        v-if="
                                             $page.props.auth.user
                                                 .profile_photo_url
                                         "
-                                        :alt="$page.props.auth.user.name"
-                                    />
+                                    >
+                                        <img
+                                            class="w-8 h-8 rounded-full"
+                                            :src="
+                                                $page.props.auth.user
+                                                    .profile_photo_url
+                                            "
+                                            :alt="$page.props.auth.user.name"
+                                        />
+                                    </template>
+                                    <template v-else>
+                                        <div
+                                            class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full"
+                                        >
+                                            {{
+                                                getInitials(
+                                                    $page.props.auth.user.name
+                                                )
+                                            }}
+                                        </div>
+                                    </template>
+
                                     <span
                                         class="hidden ml-2 font-semibold text-white lg:block"
                                         >{{ $page.props.auth.user.name }}</span
@@ -597,7 +641,9 @@ defineProps({ title: String });
                         <NavLink
                             :href="route('create-tickets')"
                             :active="route().current('create-tickets')"
-                            :class="linkClasses(route().current('create-tickets'))"
+                            :class="
+                                linkClasses(route().current('create-tickets'))
+                            "
                         >
                             <font-awesome-icon icon="ticket" class="text-lg" />
                             <span v-if="abrirSidebar" class="ml-2"
@@ -622,7 +668,7 @@ defineProps({ title: String });
             <div class="flex flex-col flex-1">
                 <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
                     <div
-                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
+                        class="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8"
                     >
                         <button
                             @click="interactuarSidebar"
@@ -657,14 +703,33 @@ defineProps({ title: String });
                                     @click="interactuarDropdown"
                                     class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
                                 >
-                                    <img
-                                        class="w-8 h-8 rounded-full"
-                                        :src="
+                                    <template
+                                        v-if="
                                             $page.props.auth.user
                                                 .profile_photo_url
                                         "
-                                        :alt="$page.props.auth.user.name"
-                                    />
+                                    >
+                                        <img
+                                            class="w-8 h-8 rounded-full"
+                                            :src="
+                                                $page.props.auth.user
+                                                    .profile_photo_url
+                                            "
+                                            :alt="$page.props.auth.user.name"
+                                        />
+                                    </template>
+                                    <template v-else>
+                                        <div
+                                            class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full"
+                                        >
+                                            {{
+                                                getInitials(
+                                                    $page.props.auth.user.name
+                                                )
+                                            }}
+                                        </div>
+                                    </template>
+
                                     <span
                                         class="hidden ml-2 font-semibold text-white lg:block"
                                         >{{ $page.props.auth.user.name }}</span
