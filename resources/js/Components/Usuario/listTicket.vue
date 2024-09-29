@@ -9,6 +9,28 @@ const tickets = ref({
     closed: [],
 });
 
+const viewTicket = (ticket) => {
+    console.log("Ver ticket:", ticket);
+};
+
+// Función para editar ticket
+const editTicket = (ticket) => {
+    console.log("Editar ticket:", ticket);
+};
+
+const deleteTicket = async (id) => {
+    if (confirm("¿Estás seguro de que deseas eliminar este ticket?")) {
+        try {
+            await axios.delete(`/user-tickets/${id}/eliminar`);
+            await loadTickets();
+            alert("Ticket eliminado exitosamente");
+        } catch (error) {
+            console.error("Error al eliminar el ticket:", error);
+            alert("Ocurrió un error al eliminar el ticket");
+        }
+    }
+};
+
 const loadTickets = async () => {
     try {
         const response = await axios.get("/user-tickets");
@@ -101,6 +123,11 @@ const showTickets = (status) => {
                                 >
                                     Descripción
                                 </th>
+                                <th
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                >
+                                    Acciones
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,24 +152,24 @@ const showTickets = (status) => {
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:text-sm text-base space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
                                 >
                                     <button
-                                        @click="$emit('view', item)"
+                                        @click="viewTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
                                         title="Ver detalles"
                                     >
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <button
-                                        @click="$emit('edit', item)"
+                                        @click="editTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-teal-300 to-teal-500 hover:from-teal-400 hover:to-green-600"
                                         title="Editar"
                                     >
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button
-                                        @click="$emit('eliminar', item)"
+                                        @click="deleteTicket(ticket.id)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-red-300 to-red-500 hover:from-red-400 hover:to-red-600"
                                         title="Cancelar"
                                     >
@@ -173,6 +200,11 @@ const showTickets = (status) => {
                                 >
                                     Descripción
                                 </th>
+                                <th
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                >
+                                    Acciones
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -197,10 +229,10 @@ const showTickets = (status) => {
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:text-sm text-base space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
                                 >
                                     <button
-                                        @click="$emit('view', item)"
+                                        @click="viewTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
                                         title="Ver detalles"
                                     >
@@ -231,6 +263,11 @@ const showTickets = (status) => {
                                 >
                                     Descripción
                                 </th>
+                                <th
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                >
+                                    Acciones
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -255,10 +292,10 @@ const showTickets = (status) => {
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:text-sm text-base space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
                                 >
                                     <button
-                                        @click="$emit('view', item)"
+                                        @click="viewTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
                                         title="Ver detalles"
                                     >
