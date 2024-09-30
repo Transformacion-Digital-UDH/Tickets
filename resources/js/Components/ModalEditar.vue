@@ -151,7 +151,7 @@ const cerrarModal = () => emit("cerrar");
 <template>
     <div
         v-if="mostrarModalEditar"
-        class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50"
+        class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30"
     >
         <div
             class="w-full max-w-lg p-4 bg-white rounded-lg shadow-lg md:max-w-2xl"
