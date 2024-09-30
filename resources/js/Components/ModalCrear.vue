@@ -200,7 +200,7 @@ const cerrarModal = () => emit("cerrar");
 
 <template>
     <div
-        class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50"
+        class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30"
     >
         <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
             <div class="border-2 border-[#2EBAA1] p-4 rounded-lg">

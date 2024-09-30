@@ -5,6 +5,10 @@ import ModalVer from "@/Components/ModalVer.vue";
 import ModalEditar from "@/Components/ModalEditar.vue";
 import ModalEliminar from "@/Components/ModalEliminar.vue";
 
+const currentPage = ref(1);
+const totalPages = ref(0);
+const ticketsPerPage = ref(10);
+
 const activeTab = ref("open");
 const prioridades = ref([]);
 const categorias = ref([]);
@@ -22,6 +26,18 @@ const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        loadTickets(currentPage.value + 1);
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        loadTickets(currentPage.value - 1);
+    }
+};
+
 const viewTicket = (ticket) => {
     itemSeleccionado.value = ticket;
     mostrarModalDetalles.value = true;
@@ -37,23 +53,15 @@ const deleteTicket = async (ticket) => {
     mostrarModalEliminar.value = true;
 };
 
-const loadTickets = async () => {
+const loadTickets = async (page = 1) => {
     try {
-        const response = await axios.get("/user-tickets");
-        const allTickets = response.data.map((ticket) => ({
-            id: ticket.id,
-            tic_titulo: ticket.tic_titulo,
-            tic_descripcion: ticket.tic_descripcion,
-            pri_id: ticket.pri_id,
-            pri_nombre: ticket.prioridad ? ticket.prioridad.pri_nombre : "",
-            cat_id: ticket.cat_id,
-            cat_nombre: ticket.categoria ? ticket.categoria.cat_nombre : "",
-            pab_id: ticket.pab_id,
-            pab_nombre: ticket.pabellon ? ticket.pabellon.pab_nombre : "",
-            aul_id: ticket.aul_id,
-            aul_numero: ticket.aula ? ticket.aula.aul_numero : "",
-            tic_estado: ticket.tic_estado,
-        }));
+        const response = await axios.get("/user-tickets", {
+            params: {
+                page: page,
+                per_page: ticketsPerPage.value,
+            },
+        });
+        const allTickets = response.data.data;
 
         tickets.value.open = allTickets.filter(
             (ticket) => ticket.tic_estado === "Abierto"
@@ -64,6 +72,11 @@ const loadTickets = async () => {
         tickets.value.closed = allTickets.filter(
             (ticket) => ticket.tic_estado === "Cerrado"
         );
+
+        totalPages.value = Math.ceil(
+            response.data.total / ticketsPerPage.value
+        );
+        currentPage.value = page;
     } catch (error) {
         console.error("Error al cargar tickets:", error);
     }
@@ -251,7 +264,7 @@ const eliminarItem = async () => {
             await axios.delete(
                 `/user-tickets/${itemSeleccionado.value.id}/eliminar`
             );
-            await loadTickets();
+            await loadTickets(currentPage.value);
             mostrarModalEliminar.value = false;
         } catch (error) {
             console.error("Error al eliminar al ticket:", error);
@@ -265,6 +278,7 @@ onMounted(() => {
 
 const showTickets = (status) => {
     activeTab.value = status;
+    loadTickets(currentPage.value);
 };
 
 const cerrarDetallesModal = () => {
@@ -283,7 +297,7 @@ const cerrarEliminarModal = () => {
 <template>
     <div class="p-6 flex justify-center">
         <div
-            class="shadow-custom bg-white rounded-lg shadow-lg p-6 w-full max-w-6xl"
+            class="shadow-custom bg-white rounded-lg shadow-lg p-4 w-full max-w-6xl"
         >
             <h1
                 class="mb-2 text-sm font-bold text-gray-500 sm:text-lg md:text-xl"
@@ -291,10 +305,12 @@ const cerrarEliminarModal = () => {
                 Mis Tickets
             </h1>
 
-            <div class="overflow-x-auto pl-1 pt-5 pb-1 flex justify-left">
+            <div
+                class="overflow-x-auto pl-1 pt-5 pb-1 flex justify-left flex-wrap"
+            >
                 <button
                     :class="[
-                        'mr-5 w-full sm:w-auto flex justify-center items-center px-9 py-3 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
                         activeTab === 'open'
                             ? 'bg-[#2EBAA1] text-white'
                             : 'bg-white text-[#2EBAA1]',
@@ -305,18 +321,18 @@ const cerrarEliminarModal = () => {
                 </button>
                 <button
                     :class="[
-                        'mr-5 w-full sm:w-auto flex justify-center items-center px-9 py-3 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
                         activeTab === 'in-progress'
                             ? 'bg-[#2EBAA1] text-white'
                             : 'bg-white text-[#2EBAA1]',
                     ]"
                     @click="showTickets('in-progress')"
                 >
-                    Mis Tickets En progreso
+                    Mis Tickets En Progreso
                 </button>
                 <button
                     :class="[
-                        'mr-5 w-full sm:w-auto flex justify-center items-center px-9 py-3 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
                         activeTab === 'closed'
                             ? 'bg-[#2EBAA1] text-white'
                             : 'bg-white text-[#2EBAA1]',
@@ -328,27 +344,29 @@ const cerrarEliminarModal = () => {
             </div>
 
             <div class="overflow-x-auto">
-                <div v-if="activeTab === 'open'">
-                    <table class="min-w-full divide-y divide-gray-200">
+                <div class="hidden sm:block" v-if="activeTab === 'open'">
+                    <table
+                        class="min-w-full divide-y divide-gray-200 table-auto"
+                    >
                         <thead class="bg-white">
                             <tr>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     N°
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Título
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Descripción
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Acciones
                                 </th>
@@ -361,22 +379,22 @@ const cerrarEliminarModal = () => {
                                 class="transition-colors duration-200 border-b hover:bg-gray-100"
                             >
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ index + 1 }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ ticket.tic_titulo }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:text-sm text-base space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
                                 >
                                     <button
                                         @click="viewTicket(ticket)"
@@ -405,27 +423,73 @@ const cerrarEliminarModal = () => {
                     </table>
                 </div>
 
-                <div v-if="activeTab === 'in-progress'">
-                    <table class="min-w-full divide-y divide-gray-200">
+                <div class="block sm:hidden" v-if="activeTab === 'open'">
+                    <div
+                        v-for="(ticket, index) in tickets.open"
+                        :key="ticket.id"
+                        class="relative border rounded-lg p-4 mb-4 shadow-sm"
+                    >
+                        <p
+                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
+                        >
+                            {{ index + 1 }}
+                        </p>
+
+                        <p class="text-sm font-semibold text-gray-700">
+                            Título: {{ ticket.tic_titulo }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            Descripción: {{ ticket.tic_descripcion }}
+                        </p>
+                        <div class="flex space-x-4 mt-3">
+                            <button
+                                @click="viewTicket(ticket)"
+                                class="text-teal-600 hover:text-teal-800"
+                                title="Ver detalles"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button
+                                @click="editTicket(ticket)"
+                                class="text-green-600 hover:text-green-800"
+                                title="Editar"
+                            >
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button
+                                @click="deleteTicket(ticket)"
+                                class="text-red-600 hover:text-red-800"
+                                title="Eliminar"
+                            >
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden sm:block" v-if="activeTab === 'in-progress'">
+                    <table
+                        class="min-w-full divide-y divide-gray-200 table-auto"
+                    >
                         <thead class="bg-white">
                             <tr>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     N°
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Título
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Descripción
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Acciones
                                 </th>
@@ -438,22 +502,22 @@ const cerrarEliminarModal = () => {
                                 class="transition-colors duration-200 border-b hover:bg-gray-100"
                             >
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ index + 1 }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ ticket.tic_titulo }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:text-sm text-base space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
                                 >
                                     <button
                                         @click="viewTicket(ticket)"
@@ -468,27 +532,60 @@ const cerrarEliminarModal = () => {
                     </table>
                 </div>
 
-                <div v-if="activeTab === 'closed'">
-                    <table class="min-w-full divide-y divide-gray-200">
+                <div class="block sm:hidden" v-if="activeTab === 'in-progress'">
+                    <div
+                        v-for="(ticket, index) in tickets.inProgress"
+                        :key="ticket.id"
+                        class="relative border rounded-lg p-4 mb-4 shadow-sm"
+                    >
+                        <p
+                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
+                        >
+                            {{ index + 1 }}
+                        </p>
+
+                        <p class="text-sm font-semibold text-gray-700">
+                            Título: {{ ticket.tic_titulo }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            Descripción: {{ ticket.tic_descripcion }}
+                        </p>
+
+                        <div class="flex space-x-4 mt-3">
+                            <button
+                                @click="viewTicket(ticket)"
+                                class="text-teal-600 hover:text-teal-800"
+                                title="Ver detalles"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden sm:block" v-if="activeTab === 'closed'">
+                    <table
+                        class="min-w-full divide-y divide-gray-200 table-auto"
+                    >
                         <thead class="bg-white">
                             <tr>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     N°
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Título
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Descripción
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     Acciones
                                 </th>
@@ -501,22 +598,22 @@ const cerrarEliminarModal = () => {
                                 class="transition-colors duration-200 border-b hover:bg-gray-100"
                             >
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ index + 1 }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ ticket.tic_titulo }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-base"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:text-sm text-base space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
                                 >
                                     <button
                                         @click="viewTicket(ticket)"
@@ -530,7 +627,60 @@ const cerrarEliminarModal = () => {
                         </tbody>
                     </table>
                 </div>
+                <div class="block sm:hidden" v-if="activeTab === 'closed'">
+                    <div
+                        v-for="(ticket, index) in tickets.closed"
+                        :key="ticket.id"
+                        class="relative border rounded-lg p-4 mb-4 shadow-sm"
+                    >
+                        <p
+                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
+                        >
+                            {{ index + 1 }}
+                        </p>
+
+                        <p class="text-sm font-semibold text-gray-700">
+                            Título: {{ ticket.tic_titulo }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            Descripción: {{ ticket.tic_descripcion }}
+                        </p>
+
+                        <div class="flex space-x-4 mt-3">
+                            <button
+                                @click="viewTicket(ticket)"
+                                class="text-teal-600 hover:text-teal-800"
+                                title="Ver detalles"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <div class="mt-5 flex justify-between">
+                <button
+                    @click="prevPage"
+                    :disabled="currentPage === 1"
+                    class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+                >
+                    Previous
+                </button>
+
+                <p class="text-sm text-gray-600">
+                    Página {{ currentPage }} de {{ totalPages }}
+                </p>
+
+                <button
+                    @click="nextPage"
+                    :disabled="currentPage === totalPages"
+                    class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+                >
+                    Next
+                </button>
+            </div>
+
             <ModalVer
                 v-if="mostrarModalDetalles"
                 :item="itemSeleccionado"

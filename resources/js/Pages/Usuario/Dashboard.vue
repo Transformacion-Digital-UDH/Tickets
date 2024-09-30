@@ -3,7 +3,7 @@ import { h } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import listDashboard from "@/Components/Admin/listDashboard.vue";
+import listDashboard from "@/Components/Usuario/listDashboard.vue";
 import StarMessage from "@/Components/StarMessage.vue";
 
 const props = defineProps({

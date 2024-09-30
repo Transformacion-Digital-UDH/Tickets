@@ -15,7 +15,7 @@ const cancel = () => {
 </script>
 
 <template>
-    <div v-if="visible" class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-50">
+    <div v-if="visible" class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30">
         <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg">
             <div class="p-4 border-2 border-yellow-500 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-yellow-500">Advertencia</h2>

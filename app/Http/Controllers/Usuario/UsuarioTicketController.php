@@ -20,13 +20,15 @@ class UsuarioTicketController extends Controller
         ]);
     }
 
-    public function traer()
+    public function traer(Request $request)
     {
         $userId = Auth::id();
 
+        $perPage = $request->input('per_page', 10);
+
         $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula')
             ->where('use_id', $userId)
-            ->get();
+            ->paginate($perPage);
 
         return response()->json($tickets);
     }
@@ -92,11 +94,11 @@ class UsuarioTicketController extends Controller
 
             $ticket->update($data);
 
-            return response()->json([
-                'status' => true,
-                'msg' => 'Ticket actualizado correctamente',
-                'ticket' => $ticket,
-            ], 200);
+            // return response()->json([
+            //     'status' => true,
+            //     'msg' => 'Ticket actualizado correctamente',
+            //     'ticket' => $ticket,
+            // ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
