@@ -14,7 +14,7 @@ Route::middleware(['auth', 'role:Usuario'])->group(function () {
         Route::get('/user-tickets', 'traer');
         Route::get('/user-tickets/create', 'create')->name('create-tickets');
         Route::post('/user-tickets/store', 'store');
-        Route::put('/user-tickets/{user-ticket}', 'update');
-        Route::delete('/user-tickets/{user-ticket}/eliminar', 'eliminar');
+        Route::put('/user-tickets/{ticket}', 'update');
+        Route::delete('/user-tickets/{ticket}/eliminar', 'eliminar');
     });
 });
