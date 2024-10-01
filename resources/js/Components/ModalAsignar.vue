@@ -37,41 +37,28 @@ const formData = ref({
 const errores = ref([]);
 const loading = ref(false);
 const successMessage = ref("");
-const esActualizar = ref(!!props.selectedSoporteId); // Detectar si es para actualizar
+const esActualizar = ref(!!props.selectedSoporteId);
 
-// Computed para filtrar campos visibles (excluir booleanos)
 const visibleFields = computed(() => {
     return props.formFieldsAsignar.filter((field) => field.type !== "boolean");
 });
 
-// Cargar información inicial
 onMounted(() => {
     initializeForm();
 });
 
-// Inicialización del formulario
 const initializeForm = () => {
     if (esActualizar.value) {
-        // Si ya hay un soporte asignado, lo cargamos
         formData.value.sop_id = props.selectedSoporteId;
     } else {
-        // Si es un nuevo registro, reiniciar los valores
         formData.value = {
-            sop_id: null,
+            sop_id: "",
             tic_id: props.ticketId,
             es_asignado: false,
         };
-        props.formFieldsAsignar.forEach((field) => {
-            if (field.type === "boolean") {
-                formData.value[field.name] = true;
-            } else if (field.name !== "sop_id") {
-                formData.value[field.name] = field.default || "";
-            }
-        });
     }
 };
 
-// Monitorear cambios en la lista de soportes
 watch(
     () => props.soportes,
     (newSoportes) => {
@@ -103,7 +90,7 @@ const asignarSoporte = async () => {
         const requestData = {
             sop_id: formData.value.sop_id,
             es_asignado: true,
-            tic_estado: "En progreso",
+            tic_estado: "Asignado",
         };
 
         const response = await axios[method](endpoint, requestData, {
@@ -114,16 +101,14 @@ const asignarSoporte = async () => {
             },
         });
 
-        // Emit an event to notify the parent that the assignment has been made
         if (!esActualizar.value) {
-            emit("crear", response.data); // If it's a new assignment
+            emit("crear", response.data);
             successMessage.value = "Soporte asignado exitosamente!";
         } else {
-            emit("actualizar", response.data); // If updating an assignment
+            emit("actualizar", response.data);
             successMessage.value = "Soporte actualizado exitosamente!";
         }
 
-        // Close the modal and refresh the parent component's state
         emit("cerrar");
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -136,7 +121,6 @@ const asignarSoporte = async () => {
     }
 };
 
-// Función para cerrar el modal
 const cerrarModal = () => emit("cerrar");
 </script>
 

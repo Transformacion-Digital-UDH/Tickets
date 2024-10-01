@@ -18,6 +18,6 @@ class Asignado extends Model
 
     public function soporte()
     {
-        return $this->belongsTo(User::class, 'sop_id', 'id'); // Si el usuario es soporte
+        return $this->belongsTo(User::class, 'sop_id', 'id');
     }
 }
