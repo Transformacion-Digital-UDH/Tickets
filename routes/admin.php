@@ -68,8 +68,8 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         Route::post('/tickets', 'store');
         Route::post('/tickets/{id}/asignar', 'asignarSoporte');
         Route::put('/tickets/{id}/actualizar', 'asignarSoporte');
-        Route::put('/tickets/{ticket}', 'update');
-        Route::delete('/tickets/{ticket}/eliminar', 'eliminar');
+        Route::put('/tickets/{id}', 'update');
+        Route::delete('/tickets/{id}/eliminar', 'eliminar');
     });
 });
 
