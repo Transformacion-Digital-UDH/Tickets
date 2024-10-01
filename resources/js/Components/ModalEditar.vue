@@ -41,7 +41,7 @@ const props = defineProps({
 const emit = defineEmits(["cerrar", "update"]);
 
 const formData = ref({});
-const errores = ref([]);
+const errores = ref({});
 const loading = ref(false);
 const successMessage = ref("");
 const clickInicial = ref(false);
@@ -110,8 +110,7 @@ watch(
 onMounted(() => {
     props.formFields.forEach((field) => {
         if (field.type === "boolean" && clickInicial.value) {
-            formData.value[field.name] = !formData.value[field.name];
-            formData.value[field.name] = !formData.value[field.name];
+            formData.value[field.name] = !!formData.value[field.name];
         }
     });
     clickInicial.value = false;
@@ -120,8 +119,57 @@ onMounted(() => {
 const editarItem = async () => {
     loading.value = true;
     successMessage.value = "";
-    errores.value = [];
+    errores.value = {};
+    let isValid = true;
+    props.formFields.forEach((field) => {
+        const fieldValue = formData.value[field.name];
 
+        if (field.required && !fieldValue) {
+            errores.value[field.name] = [
+                `El campo ${field.label} es requerido`,
+            ];
+            isValid = false;
+        }
+
+        if (field.label.toLowerCase().includes("teléfono")) {
+            if (!fieldValue) {
+                errores.value[field.name] = [
+                    `El campo ${field.label} es requerido`,
+                ];
+                isValid = false;
+            } else {
+                if (fieldValue.startsWith("+51")) {
+                    formData.value[field.name] = fieldValue
+                        .replace("+51", "")
+                        .trim();
+                }
+
+                const regex = /^[0-9]+$/;
+                if (!regex.test(formData.value[field.name])) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe contener solo números.`,
+                    ];
+                    isValid = false;
+                }
+
+                if (formData.value[field.name].length !== 9) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe tener exactamente 9 dígitos.`,
+                    ];
+                    isValid = false;
+                }
+            }
+        }
+
+        if (field.type === "boolean") {
+            formData.value[field.name] = formData.value[field.name] ? 1 : 0;
+        }
+    });
+
+    if (!isValid) {
+        loading.value = false;
+        return;
+    }
     try {
         const response = await axios.put(
             `${props.endpoint}/${props.item.id}`,
@@ -187,6 +235,7 @@ const cerrarModal = () => emit("cerrar");
                         >
                             {{ field.label }}:
                         </label>
+
                         <template v-if="field.type === 'select'">
                             <select
                                 :id="`form-${field.name}`"
@@ -204,7 +253,41 @@ const cerrarModal = () => emit("cerrar");
                                     {{ option.text }}
                                 </option>
                             </select>
+
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
                         </template>
+
+                        <template
+                            v-else-if="
+                                field.type === 'text' ||
+                                field.label === 'Teléfono'
+                            "
+                        >
+                            <input
+                                :id="`form-${field.name}`"
+                                :type="
+                                    field.type === 'number' &&
+                                    field.label !== 'Teléfono'
+                                        ? 'number'
+                                        : 'text'
+                                "
+                                v-model="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            />
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
+                        </template>
+
                         <template
                             v-else-if="
                                 field.type === 'text' || field.type === 'email'
@@ -217,7 +300,15 @@ const cerrarModal = () => emit("cerrar");
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                             />
+
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
                         </template>
+
                         <template v-else-if="field.type === 'textarea'">
                             <textarea
                                 :id="`form-${field.name}`"
@@ -225,7 +316,15 @@ const cerrarModal = () => emit("cerrar");
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                             ></textarea>
+
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
                         </template>
+
                         <template v-if="field.type === 'boolean'">
                             <div class="flex items-center mb-4">
                                 <input
@@ -263,12 +362,6 @@ const cerrarModal = () => emit("cerrar");
                                 </span>
                             </div>
                         </template>
-                        <p
-                            v-if="errores[field.name]"
-                            class="text-sm text-red-500"
-                        >
-                            {{ errores[field.name][0] }}
-                        </p>
                     </div>
                 </div>
 

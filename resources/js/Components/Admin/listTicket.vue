@@ -277,33 +277,48 @@ const fetchAulas = async () => {
 };
 
 formFields.value = [
-    { name: "tic_titulo", label: "Título", type: "text" },
+    { name: "tic_titulo", label: "Título", type: "text", required: true },
     {
         name: "pri_id",
         label: "Prioridad",
         type: "select",
+        required: true,
         options: prioridades.value,
     },
     {
         name: "use_id",
         label: "Usuario",
         type: "select",
+        required: true,
         options: usuarios.value,
     },
     {
         name: "cat_id",
         label: "Categoría",
         type: "select",
+        required: true,
         options: categorias.value,
     },
     {
         name: "pab_id",
         label: "Pabellón",
         type: "select",
+        required: true,
         options: pabellones.value,
     },
-    { name: "aul_id", label: "Aula", type: "select", options: aulas.value },
-    { name: "tic_descripcion", label: "Descripción", type: "textarea" },
+    {
+        name: "aul_id",
+        label: "Aula",
+        type: "select",
+        required: true,
+        options: aulas.value,
+    },
+    {
+        name: "tic_descripcion",
+        label: "Descripción",
+        type: "textarea",
+        required: true,
+    },
     { name: "tic_activo", label: "Activo", type: "boolean" },
 ];
 
@@ -336,14 +351,17 @@ const eliminarItem = async () => {
             await fetchTickets();
             mostrarModalEliminar.value = false;
         } catch (error) {
-            toast.error("No puedes eliminar este ticket, por el momento solo desactivelo", {
-                autoClose: 5000,
-                position: "bottom-right",
-                style: {
-                    width: "400px",
-                },
-                className: "border-l-4 border-red-500 p-4",
-            });
+            toast.error(
+                "No puedes eliminar este ticket, por el momento solo desactivelo",
+                {
+                    autoClose: 5000,
+                    position: "bottom-right",
+                    style: {
+                        width: "400px",
+                    },
+                    className: "border-l-4 border-red-500 p-4",
+                }
+            );
         }
     }
 };

@@ -97,11 +97,12 @@ const fetchSedes = async () => {
 };
 
 formFields.value = [
-    { name: "pab_nombre", label: "Pabellon", type: "text" },
+    { name: "pab_nombre", label: "Pabellon", type: "text", required: true },
     {
         name: "sed_id",
         label: "Sede",
         type: "select",
+        required: true,
         options: sedes.value,
     },
     { name: "pab_activo", label: "Estado", type: "boolean" },

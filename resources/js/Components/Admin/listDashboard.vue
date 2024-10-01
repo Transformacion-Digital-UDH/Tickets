@@ -83,7 +83,6 @@ export default {
   gap: 1rem;
 }
 
-/* Nueva tarjeta de estilo unificado */
 .card {
   background-color: #757776;
   border-radius: 15px;

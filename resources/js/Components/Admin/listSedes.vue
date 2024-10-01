@@ -67,10 +67,10 @@ const fetchSedes = async () => {
 };
 
 const formFields = [
-    { name: "sed_nombre", label: "Nombre", type: "text" },
-    { name: "sed_direccion", label: "Dirección", type: "text" },
-    { name: "sed_ciudad", label: "Ciudad", type: "text" },
-    { name: "sed_telefono", label: "Teléfono", type: "text" },
+    { name: "sed_nombre", label: "Nombre", type: "text", required: true },
+    { name: "sed_direccion", label: "Dirección", type: "text", required: true },
+    { name: "sed_ciudad", label: "Ciudad", type: "text", required: true },
+    { name: "sed_telefono", label: "Teléfono", type: "number", required: true },
     { name: "sed_activo", label: "Estado", type: "boolean" },
 ];
 
@@ -78,7 +78,7 @@ const formFieldsVer = [
     { name: "sed_nombre", label: "Sede", type: "text" },
     { name: "sed_direccion", label: "Dirección", type: "text" },
     { name: "sed_ciudad", label: "Ciudad", type: "text" },
-    { name: "sed_telefono", label: "Teléfono", type: "text" },
+    { name: "sed_telefono", label: "Teléfono", type: "number" },
 ];
 
 const eliminarItem = async () => {

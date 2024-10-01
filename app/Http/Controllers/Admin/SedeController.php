@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Sede;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -23,16 +24,12 @@ class SedeController extends Controller
 
     public function traer()
     {
-        // Obtener todos los datos de las sedes
         $sedes = Sede::all();
-
-        // Verificar si el usuario tiene un rol restringido (Soporte o Usuario)
-        if (auth()->user()->hasAnyRole(['Soporte', 'Usuario'])) {
-            // Devolver un JSON vacío o con datos limitados para estos roles
+    
+        if (Auth::user()->hasAnyRole(['Soporte', 'Usuario'])) {
             return response()->json(['sedes' => []], 200);
         }
-
-        // Para otros roles (como Admin), devolver los datos completos de las sedes
+    
         return response()->json($sedes, 200);
     }
 
@@ -42,7 +39,7 @@ class SedeController extends Controller
             'sed_nombre' => 'required|string|max:255',
             'sed_direccion' => 'required|string|max:255',
             'sed_ciudad' => 'required|string|max:255',
-            'sed_telefono' => 'required|string|max:20',
+            'sed_telefono' => 'required|numeric|digits:9',
             'sed_activo' => 'boolean',
         ]);
 
@@ -56,7 +53,7 @@ class SedeController extends Controller
             'sed_nombre' => 'required|string|max:255',
             'sed_direccion' => 'required|string|max:255',
             'sed_ciudad' => 'required|string|max:255',
-            'sed_telefono' => 'required|string|max:20',
+            'sed_telefono' => 'required|numeric|digits:9',
             'sed_activo' => 'nullable|boolean',
         ]);
 

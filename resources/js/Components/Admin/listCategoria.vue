@@ -49,7 +49,7 @@ const fetchCategorias = async () => {
 };
 
 const formFields = [
-    { name: "cat_nombre", label: "Nombre", type: "text" },
+    { name: "cat_nombre", label: "Nombre", type: "text", required: true },
     { name: "cat_activo", label: "Estado", type: "boolean" },
 ];
 
