@@ -88,10 +88,12 @@ const fetchUsuarios = async () => {
 const fetchSedes = async () => {
     try {
         const response = await axios.get("/sedes");
-        sedes.value = response.data.filter((sede) => sede.sed_activo).map((sede) => ({
-            value: sede.id,
-            text: sede.sed_nombre,
-        }));
+        sedes.value = response.data
+            .filter((sede) => sede.sed_activo)
+            .map((sede) => ({
+                value: sede.id,
+                text: sede.sed_nombre,
+            }));
         formFields.value = formFields.value.map((field) => {
             if (field.name === "sed_id") {
                 return {
@@ -123,15 +125,21 @@ const fetchSedes = async () => {
 };
 
 formFields.value = [
-    { name: "name", label: "Nombre", type: "text" },
+    { name: "name", label: "Nombre", type: "text", required: true },
     {
         name: "sed_id",
         label: "Sede",
         type: "select",
+        required: true,
         options: sedes.value,
     },
-    { name: "email", label: "Correo", type: "email" },
-    { name: "celular", label: "Teléfono", type: "text" },
+    { name: "email", label: "Correo", type: "email", required: true },
+    {
+        name: "celular",
+        label: "Teléfono",
+        type: "number",
+        required: true,
+    },
     {
         name: "password",
         label: "Contraseña",
@@ -145,7 +153,7 @@ formFieldsVer.value = [
     { name: "name", label: "Nombre", type: "text" },
     { name: "sed_nombre", label: "Sede", type: "text" },
     { name: "email", label: "Correo", type: "email" },
-    { name: "celular", label: "Teléfono", type: "text" },
+    { name: "celular", label: "Teléfono", type: "number" },
 ];
 
 const eliminarItem = async () => {
@@ -158,14 +166,17 @@ const eliminarItem = async () => {
             mostrarModalEliminar.value = false;
             alertaEliminar();
         } catch (error) {
-            toast.error("No puedes eliminar a este soporte técnico, por el momento solo desactivelo", {
-                autoClose: 5000,
-                position: "bottom-right",
-                style: {
-                    width: "400px",
-                },
-                className: "border-l-4 border-red-500 p-4",
-            });
+            toast.error(
+                "No puedes eliminar a este soporte técnico, por el momento solo desactivelo",
+                {
+                    autoClose: 5000,
+                    position: "bottom-right",
+                    style: {
+                        width: "400px",
+                    },
+                    className: "border-l-4 border-red-500 p-4",
+                }
+            );
         }
     }
 };
@@ -211,7 +222,7 @@ const alertaEliminar = () => {
         },
         className: "border-l-4 border-green-500 p-4",
     });
-}
+};
 
 onMounted(() => {
     fetchUsuarios();

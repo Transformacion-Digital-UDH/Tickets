@@ -45,22 +45,24 @@ const deleteTicket = async (ticket) => {
     mostrarModalEliminar.value = true;
 };
 
-const mapTicketData = (ticket, index, totalTickets) => ({
-    id: ticket.id,
-    tic_titulo: ticket.tic_titulo,
-    tic_descripcion: ticket.tic_descripcion,
-    pri_id: ticket.pri_id,
-    pri_nombre: ticket.prioridad?.pri_nombre || "No disponible",
-    cat_id: ticket.cat_id,
-    cat_nombre: ticket.categoria?.cat_nombre || "No disponible",
-    pab_id: ticket.pab_id,
-    pab_nombre: ticket.pabellon?.pab_nombre || "No disponible",
-    aul_id: ticket.aul_id,
-    aul_numero: ticket.aula?.aul_numero || "No disponible",
-    tic_estado: ticket.tic_estado,
-    row_number:
-        totalTickets - ((currentPage.value - 1) * itemsPerPage.value + index),
-});
+const mapTicketData = (ticket, index, totalTickets) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: ticket.id,
+        tic_titulo: ticket.tic_titulo,
+        tic_descripcion: ticket.tic_descripcion,
+        pri_id: ticket.pri_id,
+        pri_nombre: ticket.prioridad?.pri_nombre || "No disponible",
+        cat_id: ticket.cat_id,
+        cat_nombre: ticket.categoria?.cat_nombre || "No disponible",
+        pab_id: ticket.pab_id,
+        pab_nombre: ticket.pabellon?.pab_nombre || "No disponible",
+        aul_id: ticket.aul_id,
+        aul_numero: ticket.aula?.aul_numero || "No disponible",
+        tic_estado: ticket.tic_estado,
+        row_number: totalTickets - (startIndex + index),
+    };
+};
 
 const loadTickets = async (page = 1) => {
     try {
@@ -316,6 +318,7 @@ onMounted(() => {
 const showTickets = (status) => {
     activeTab.value = status;
     localStorage.setItem("activeTab", status);
+    currentPage.value = 1;
     loadTickets(1);
 };
 
