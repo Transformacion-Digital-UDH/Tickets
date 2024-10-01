@@ -1,15 +1,29 @@
-<script>
-export default {
-    data() {
-        return {
-            assignedTickets: 120,
-            pendingTickets: 45,
-            inProgressTickets: 30,
-            urgentTickets: 10,
-            todayTickets: 20,
-        };
-    },
+<script setup>
+import { ref, onMounted } from "vue";
+import axios from "axios";
+
+const openTickets = ref(0);
+const inProgressTickets = ref(0);
+const closeTickets = ref(0);
+const todayTickets = ref(0);
+
+const fetchTicketsData = async () => {
+    try {
+        const response = await axios.get("/user-dashboard/fetch-tickets-data");
+        const data = response.data;
+
+        openTickets.value = data.openTickets;
+        inProgressTickets.value = data.inProgressTickets;
+        closeTickets.value = data.closeTickets;
+        todayTickets.value = data.todayTickets;
+    } catch (error) {
+        console.error("Error fetching tickets data:", error);
+    }
 };
+
+onMounted(() => {
+    fetchTicketsData();
+});
 </script>
 
 <template>
@@ -21,9 +35,9 @@ export default {
                 <i class="fas fa-hourglass-half icon"></i>
             </div>
             <div class="content">
-                <h3>Recientes</h3>
-                <p class="number">{{ pendingTickets }}</p>
-                <p class="status">+5 since last update</p>
+                <h3>Abiertos</h3>
+                <p class="number">{{ openTickets }}</p>
+                <p class="status">{{ openTickets }} tickets abiertos</p>
             </div>
         </div>
 
@@ -34,18 +48,20 @@ export default {
             <div class="content">
                 <h3>En Progreso</h3>
                 <p class="number">{{ inProgressTickets }}</p>
-                <p class="status">+2 since last update</p>
+                <p class="status">
+                    {{ inProgressTickets }} tickets en progreso
+                </p>
             </div>
         </div>
 
         <div class="card">
             <div class="icon-container">
-                <i class="fas fa-exclamation-triangle icon"></i>
+                <i class="fas fa-check icon"></i>
             </div>
             <div class="content">
-                <h3>Finalizados</h3>
-                <p class="number">{{ urgentTickets }}</p>
-                <p class="status">+2 since last update</p>
+                <h3>Cerrados</h3>
+                <p class="number">{{ closeTickets }}</p>
+                <p class="status">{{ closeTickets }} tickets cerrados</p>
             </div>
         </div>
 
@@ -54,9 +70,9 @@ export default {
                 <i class="fas fa-calendar-day icon"></i>
             </div>
             <div class="content">
-                <h3>Rechazados</h3>
+                <h3>Hoy</h3>
                 <p class="number">{{ todayTickets }}</p>
-                <p class="status">+1 since last update</p>
+                <p class="status">{{ todayTickets }} tickets creados hoy</p>
             </div>
         </div>
     </div>
@@ -69,7 +85,6 @@ export default {
     gap: 1rem;
 }
 
-/* Nueva tarjeta de estilo unificado */
 .card {
     background-color: #757776;
     border-radius: 15px;

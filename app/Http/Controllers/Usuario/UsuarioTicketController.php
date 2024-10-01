@@ -20,14 +20,26 @@ class UsuarioTicketController extends Controller
         ]);
     }
 
-    public function traer()
+    public function traer(Request $request)
     {
         $userId = Auth::id();
 
-        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula')
+        $estado = $request->input('estado', 'Abierto');
+
+        $totalTickets = Ticket::where('use_id', $userId)
+            ->where('tic_estado', $estado)
+            ->count();
+
+        $tickets = Ticket::with('prioridad', 'categoria', 'pabellon', 'aula')
             ->where('use_id', $userId)
-            ->orderBy('created_at', 'asc')
-            ->paginate();
+            ->where('tic_estado', $estado)
+            ->orderBy('created_at', 'desc')
+            ->paginate(8);
+
+        $tickets->getCollection()->transform(function ($ticket, $key) use ($totalTickets, $tickets) {
+            $ticket->row_number = $totalTickets - (($tickets->currentPage() - 1) * $tickets->perPage() + $key);
+            return $ticket;
+        });
 
         return response()->json($tickets);
     }

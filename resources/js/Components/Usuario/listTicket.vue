@@ -5,7 +5,9 @@ import ModalVer from "@/Components/ModalVer.vue";
 import ModalEditar from "@/Components/ModalEditar.vue";
 import ModalEliminar from "@/Components/ModalEliminar.vue";
 
-const activeTab = ref("open");
+const storedTab = localStorage.getItem("activeTab") || "open";
+const activeTab = ref(storedTab);
+
 const prioridades = ref([]);
 const categorias = ref([]);
 const pabellones = ref([]);
@@ -22,6 +24,10 @@ const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalPages = ref(1);
+
 const viewTicket = (ticket) => {
     itemSeleccionado.value = ticket;
     mostrarModalDetalles.value = true;
@@ -37,32 +43,56 @@ const deleteTicket = async (ticket) => {
     mostrarModalEliminar.value = true;
 };
 
-const mapTicketData = (ticket) => ({
+const mapTicketData = (ticket, index, totalTickets) => ({
     id: ticket.id,
     tic_titulo: ticket.tic_titulo,
     tic_descripcion: ticket.tic_descripcion,
     pri_id: ticket.pri_id,
-    pri_nombre: ticket.prioridad?.pri_nombre || "",
+    pri_nombre: ticket.prioridad?.pri_nombre || "No disponible",
     cat_id: ticket.cat_id,
-    cat_nombre: ticket.categoria?.cat_nombre || "",
+    cat_nombre: ticket.categoria?.cat_nombre || "No disponible",
     pab_id: ticket.pab_id,
-    pab_nombre: ticket.pabellon?.pab_nombre || "",
+    pab_nombre: ticket.pabellon?.pab_nombre || "No disponible",
     aul_id: ticket.aul_id,
-    aul_numero: ticket.aula?.aul_numero || "",
+    aul_numero: ticket.aula?.aul_numero || "No disponible",
     tic_estado: ticket.tic_estado,
+    row_number: totalTickets - ((currentPage.value - 1) * itemsPerPage.value + index),
 });
 
 const loadTickets = async (page = 1) => {
     try {
-        const response = await axios.get("/user-tickets");
+        const estado =
+            activeTab.value === "open"
+                ? "Abierto"
+                : activeTab.value === "in-progress"
+                ? "En progreso"
+                : "Cerrado";
 
-        const allTickets = (response.data.data || response.data).map(mapTicketData);
+        const response = await axios.get(
+            `/user-tickets?page=${page}&estado=${estado}`
+        );
 
-        tickets.value.open = allTickets.filter(ticket => ticket.tic_estado === "Abierto");
-        tickets.value.inProgress = allTickets.filter(ticket => ticket.tic_estado === "En progreso");
-        tickets.value.closed = allTickets.filter(ticket => ticket.tic_estado === "Cerrado");
+        const totalTickets = response.data.total;
+        const ticketData = response.data.data.map((ticket, index) => 
+            mapTicketData(ticket, index, totalTickets)
+        );
+
+        currentPage.value = response.data.current_page;
+        itemsPerPage.value = response.data.per_page;
+        totalPages.value = response.data.last_page;
+
+        if (activeTab.value === "open") {
+            tickets.value.open = ticketData;
+        } else if (activeTab.value === "in-progress") {
+            tickets.value.inProgress = ticketData;
+        } else if (activeTab.value === "closed") {
+            tickets.value.closed = ticketData;
+        }
     } catch (error) {
-        console.error("Error al cargar los tickets:", error?.response?.data?.message || error.message);
+        console.error(
+            "Error al cargar los tickets:",
+            error?.response?.data?.message || error.message
+        );
     }
 };
 
@@ -256,13 +286,19 @@ const eliminarItem = async () => {
     }
 };
 
+const changePage = (pageNumber) => {
+    currentPage.value = pageNumber;
+    loadTickets(pageNumber);
+};
+
 onMounted(() => {
     fetchAllData();
 });
 
 const showTickets = (status) => {
     activeTab.value = status;
-    loadTickets();
+    localStorage.setItem("activeTab", status);
+    loadTickets(1);
 };
 
 const cerrarDetallesModal = () => {
@@ -365,7 +401,7 @@ const cerrarEliminarModal = () => {
                                 <td
                                     class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
-                                    {{ index + 1 }}
+                                    {{ ticket.row_number }}
                                 </td>
                                 <td
                                     class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
@@ -405,6 +441,24 @@ const cerrarEliminarModal = () => {
                             </tr>
                         </tbody>
                     </table>
+                    <div class="mt-4 flex justify-center">
+                        <button
+                            v-for="page in Array.from(
+                                { length: totalPages },
+                                (_, i) => i + 1
+                            )"
+                            :key="page"
+                            :class="[
+                                currentPage === page
+                                    ? 'bg-[#2EBAA1] text-white'
+                                    : 'bg-white text-[#2EBAA1]',
+                                'mx-2 px-3 py-1 rounded-lg',
+                            ]"
+                            @click="changePage(page)"
+                        >
+                            {{ page }}
+                        </button>
+                    </div>
                 </div>
 
                 <div class="block sm:hidden" v-if="activeTab === 'open'">
@@ -416,7 +470,7 @@ const cerrarEliminarModal = () => {
                         <p
                             class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
                         >
-                            {{ index + 1 }}
+                            {{ ticket.row_number }}
                         </p>
 
                         <p class="text-sm font-semibold text-gray-700">
@@ -448,6 +502,24 @@ const cerrarEliminarModal = () => {
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
+                    </div>
+                    <div class="mt-4 flex justify-center">
+                        <button
+                            v-for="page in Array.from(
+                                { length: totalPages },
+                                (_, i) => i + 1
+                            )"
+                            :key="page"
+                            :class="[
+                                currentPage === page
+                                    ? 'bg-[#2EBAA1] text-white'
+                                    : 'bg-white text-[#2EBAA1]',
+                                'mx-2 px-3 py-1 rounded-lg',
+                            ]"
+                            @click="changePage(page)"
+                        >
+                            {{ page }}
+                        </button>
                     </div>
                 </div>
 
@@ -488,7 +560,7 @@ const cerrarEliminarModal = () => {
                                 <td
                                     class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
-                                    {{ index + 1 }}
+                                    {{ ticket.row_number }}
                                 </td>
                                 <td
                                     class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
@@ -514,6 +586,24 @@ const cerrarEliminarModal = () => {
                             </tr>
                         </tbody>
                     </table>
+                    <div class="mt-4 flex justify-center">
+                        <button
+                            v-for="page in Array.from(
+                                { length: totalPages },
+                                (_, i) => i + 1
+                            )"
+                            :key="page"
+                            :class="[
+                                currentPage === page
+                                    ? 'bg-[#2EBAA1] text-white'
+                                    : 'bg-white text-[#2EBAA1]',
+                                'mx-2 px-3 py-1 rounded-lg',
+                            ]"
+                            @click="changePage(page)"
+                        >
+                            {{ page }}
+                        </button>
+                    </div>
                 </div>
 
                 <div class="block sm:hidden" v-if="activeTab === 'in-progress'">
@@ -525,7 +615,7 @@ const cerrarEliminarModal = () => {
                         <p
                             class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
                         >
-                            {{ index + 1 }}
+                            {{ ticket.row_number }}
                         </p>
 
                         <p class="text-sm font-semibold text-gray-700">
@@ -542,6 +632,24 @@ const cerrarEliminarModal = () => {
                                 title="Ver detalles"
                             >
                                 <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="mt-4 flex justify-center">
+                            <button
+                                v-for="page in Array.from(
+                                    { length: totalPages },
+                                    (_, i) => i + 1
+                                )"
+                                :key="page"
+                                :class="[
+                                    currentPage === page
+                                        ? 'bg-[#2EBAA1] text-white'
+                                        : 'bg-white text-[#2EBAA1]',
+                                    'mx-2 px-3 py-1 rounded-lg',
+                                ]"
+                                @click="changePage(page)"
+                            >
+                                {{ page }}
                             </button>
                         </div>
                     </div>
@@ -584,7 +692,7 @@ const cerrarEliminarModal = () => {
                                 <td
                                     class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
                                 >
-                                    {{ index + 1 }}
+                                    {{ ticket.row_number }}
                                 </td>
                                 <td
                                     class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
@@ -610,6 +718,24 @@ const cerrarEliminarModal = () => {
                             </tr>
                         </tbody>
                     </table>
+                    <div class="mt-4 flex justify-center">
+                        <button
+                            v-for="page in Array.from(
+                                { length: totalPages },
+                                (_, i) => i + 1
+                            )"
+                            :key="page"
+                            :class="[
+                                currentPage === page
+                                    ? 'bg-[#2EBAA1] text-white'
+                                    : 'bg-white text-[#2EBAA1]',
+                                'mx-2 px-3 py-1 rounded-lg',
+                            ]"
+                            @click="changePage(page)"
+                        >
+                            {{ page }}
+                        </button>
+                    </div>
                 </div>
                 <div class="block sm:hidden" v-if="activeTab === 'closed'">
                     <div
@@ -620,7 +746,7 @@ const cerrarEliminarModal = () => {
                         <p
                             class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
                         >
-                            {{ index + 1 }}
+                            {{ ticket.row_number }}
                         </p>
 
                         <p class="text-sm font-semibold text-gray-700">
@@ -639,6 +765,24 @@ const cerrarEliminarModal = () => {
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
+                    </div>
+                    <div class="mt-4 flex justify-center">
+                        <button
+                            v-for="page in Array.from(
+                                { length: totalPages },
+                                (_, i) => i + 1
+                            )"
+                            :key="page"
+                            :class="[
+                                currentPage === page
+                                    ? 'bg-[#2EBAA1] text-white'
+                                    : 'bg-white text-[#2EBAA1]',
+                                'mx-2 px-3 py-1 rounded-lg',
+                            ]"
+                            @click="changePage(page)"
+                        >
+                            {{ page }}
+                        </button>
                     </div>
                 </div>
             </div>
