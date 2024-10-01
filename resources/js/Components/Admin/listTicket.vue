@@ -336,7 +336,14 @@ const eliminarItem = async () => {
             await fetchTickets();
             mostrarModalEliminar.value = false;
         } catch (error) {
-            console.error("Error al eliminar al ticket:", error);
+            toast.error("No puedes eliminar este ticket, por el momento solo desactivelo", {
+                autoClose: 5000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         }
     }
 };
