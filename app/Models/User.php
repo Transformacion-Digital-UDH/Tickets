@@ -101,4 +101,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Sede::class, 'sed_id');
     }
+    
+    public function asignados()
+    {
+        return $this->hasMany(Asignado::class, 'sop_id', 'id');
+    }
 }

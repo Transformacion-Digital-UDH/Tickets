@@ -13,11 +13,11 @@ class Asignado extends Model
 
     public function ticket()
     {
-        return $this->belongsTo(Ticket::class, 'tic_id');
+        return $this->belongsTo(Ticket::class, 'tic_id', 'id');
     }
 
-    public function user()
+    public function soporte()
     {
-        return $this->belongsTo(User::class, 'sop_id');
+        return $this->belongsTo(User::class, 'sop_id', 'id'); // Si el usuario es soporte
     }
 }
