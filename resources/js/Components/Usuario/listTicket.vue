@@ -5,10 +5,6 @@ import ModalVer from "@/Components/ModalVer.vue";
 import ModalEditar from "@/Components/ModalEditar.vue";
 import ModalEliminar from "@/Components/ModalEliminar.vue";
 
-const currentPage = ref(1);
-const totalPages = ref(0);
-const ticketsPerPage = ref(10);
-
 const activeTab = ref("open");
 const prioridades = ref([]);
 const categorias = ref([]);
@@ -26,18 +22,6 @@ const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 
-const nextPage = () => {
-    if (currentPage.value < totalPages.value) {
-        loadTickets(currentPage.value + 1);
-    }
-};
-
-const prevPage = () => {
-    if (currentPage.value > 1) {
-        loadTickets(currentPage.value - 1);
-    }
-};
-
 const viewTicket = (ticket) => {
     itemSeleccionado.value = ticket;
     mostrarModalDetalles.value = true;
@@ -53,32 +37,32 @@ const deleteTicket = async (ticket) => {
     mostrarModalEliminar.value = true;
 };
 
+const mapTicketData = (ticket) => ({
+    id: ticket.id,
+    tic_titulo: ticket.tic_titulo,
+    tic_descripcion: ticket.tic_descripcion,
+    pri_id: ticket.pri_id,
+    pri_nombre: ticket.prioridad?.pri_nombre || "",
+    cat_id: ticket.cat_id,
+    cat_nombre: ticket.categoria?.cat_nombre || "",
+    pab_id: ticket.pab_id,
+    pab_nombre: ticket.pabellon?.pab_nombre || "",
+    aul_id: ticket.aul_id,
+    aul_numero: ticket.aula?.aul_numero || "",
+    tic_estado: ticket.tic_estado,
+});
+
 const loadTickets = async (page = 1) => {
     try {
-        const response = await axios.get("/user-tickets", {
-            params: {
-                page: page,
-                per_page: ticketsPerPage.value,
-            },
-        });
-        const allTickets = response.data.data;
+        const response = await axios.get("/user-tickets");
 
-        tickets.value.open = allTickets.filter(
-            (ticket) => ticket.tic_estado === "Abierto"
-        );
-        tickets.value.inProgress = allTickets.filter(
-            (ticket) => ticket.tic_estado === "En progreso"
-        );
-        tickets.value.closed = allTickets.filter(
-            (ticket) => ticket.tic_estado === "Cerrado"
-        );
+        const allTickets = (response.data.data || response.data).map(mapTicketData);
 
-        totalPages.value = Math.ceil(
-            response.data.total / ticketsPerPage.value
-        );
-        currentPage.value = page;
+        tickets.value.open = allTickets.filter(ticket => ticket.tic_estado === "Abierto");
+        tickets.value.inProgress = allTickets.filter(ticket => ticket.tic_estado === "En progreso");
+        tickets.value.closed = allTickets.filter(ticket => ticket.tic_estado === "Cerrado");
     } catch (error) {
-        console.error("Error al cargar tickets:", error);
+        console.error("Error al cargar los tickets:", error?.response?.data?.message || error.message);
     }
 };
 
@@ -264,7 +248,7 @@ const eliminarItem = async () => {
             await axios.delete(
                 `/user-tickets/${itemSeleccionado.value.id}/eliminar`
             );
-            await loadTickets(currentPage.value);
+            await loadTickets();
             mostrarModalEliminar.value = false;
         } catch (error) {
             console.error("Error al eliminar al ticket:", error);
@@ -278,7 +262,7 @@ onMounted(() => {
 
 const showTickets = (status) => {
     activeTab.value = status;
-    loadTickets(currentPage.value);
+    loadTickets();
 };
 
 const cerrarDetallesModal = () => {
@@ -657,28 +641,6 @@ const cerrarEliminarModal = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="mt-5 flex justify-between">
-                <button
-                    @click="prevPage"
-                    :disabled="currentPage === 1"
-                    class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
-                >
-                    Previous
-                </button>
-
-                <p class="text-sm text-gray-600">
-                    Página {{ currentPage }} de {{ totalPages }}
-                </p>
-
-                <button
-                    @click="nextPage"
-                    :disabled="currentPage === totalPages"
-                    class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
-                >
-                    Next
-                </button>
             </div>
 
             <ModalVer
