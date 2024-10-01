@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ButtonCerrar from "@/Components/ButtonCerrar.vue";
 
@@ -174,6 +176,12 @@ const submitForm = async () => {
                     .getAttribute("content"),
             },
         });
+        toast.success(`${props.itemName} creado correctamente`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-green-500 p-2",
+        });
         emit("crear", response.data);
         successMessage.value = "Creación exitosa!";
         props.formFields.forEach((field) => {
@@ -190,6 +198,12 @@ const submitForm = async () => {
         } else {
             console.error("Error:", error);
         }
+        toast.error(`Error al crear ${props.itemName}`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
     } finally {
         loading.value = false;
     }

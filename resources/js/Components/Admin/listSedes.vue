@@ -132,30 +132,6 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const alertaCreacion = () => {
-    fetchSedes();
-    toast.success("Sede creada correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
-const alertaEditar = () => {
-    fetchSedes();
-    toast.success("Sede actualizada correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
 const alertaEliminar = () => {
     fetchSedes();
     toast.success("Sede eliminada correctamente", {
@@ -191,14 +167,14 @@ onMounted(() => fetchSedes());
             @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
 
         <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" itemName="Sede" endpoint="/sedes"
-            @cerrar="cerrarCrearModal" @crear="alertaCreacion" />
+            @cerrar="cerrarCrearModal" @crear="fetchSedes" />
 
         <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Sede" :formFieldsVer="formFieldsVer"
             :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
         <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Sede" :formFields="formFields"
             :mostrarModalEditar="mostrarModalEditar" endpoint="/sedes" @cerrar="cerrarEditarModal"
-            @update="alertaEditar" />
+            @update="fetchSedes" />
 
         <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Sede" fieldName="sed_nombre"
             @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />

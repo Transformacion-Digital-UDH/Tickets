@@ -155,30 +155,6 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const alertaCreacion = () => {
-    fetchAulas();
-    toast.success("Aula creado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
-const alertaEditar = () => {
-    fetchAulas();
-    toast.success("Aula actualizado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
 const alertaEliminar = () => {
     fetchAulas();
     toast.success("Aula eliminado correctamente", {
@@ -237,7 +213,7 @@ onMounted(() => {
             itemName="Aula"
             endpoint="/aulas"
             @cerrar="cerrarCrearModal"
-            @crear="alertaCreacion"
+            @crear="fetchAulas"
         />
 
         <ModalVer
@@ -258,7 +234,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/aulas"
             @cerrar="cerrarEditarModal"
-            @update="alertaEditar"
+            @update="fetchAulas"
         />
 
         <ModalEliminar

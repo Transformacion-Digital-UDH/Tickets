@@ -1,5 +1,7 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ButtonCerrar from "@/Components/ButtonCerrar.vue";
 import axios from "axios";
@@ -119,6 +121,7 @@ const editarItem = async () => {
     loading.value = true;
     successMessage.value = "";
     errores.value = [];
+
     try {
         const response = await axios.put(
             `${props.endpoint}/${props.item.id}`,
@@ -132,6 +135,12 @@ const editarItem = async () => {
                 },
             }
         );
+        toast.success(`${props.itemName} actualizado correctamente`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-green-500 p-2",
+        });
         emit("update", response.data);
         cerrarModal();
     } catch (error) {
@@ -140,6 +149,12 @@ const editarItem = async () => {
         } else {
             console.error("Error:", error);
         }
+        toast.error(`Error al actualizar ${props.itemName}`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
     } finally {
         loading.value = false;
     }
@@ -269,3 +284,9 @@ const cerrarModal = () => emit("cerrar");
         </div>
     </div>
 </template>
+
+<style scoped>
+option[disabled] {
+    color: #2ebaa1;
+}
+</style>

@@ -187,11 +187,14 @@ const handleConfirm = async () => {
         emit("crear", response.data);
         emit("cerrar");
     } catch (error) {
-        if (error.response && error.response.status === 422) {
-            errores.value = Object.values(error.response.data.errors).flat();
-        } else {
-            console.error("Error:", error);
-        }
+        toast.error("Hubo un error al crear su ticket", {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-green-500 p-2",
+        });
     } finally {
         loading.value = false;
     }
@@ -235,7 +238,7 @@ const triggerConfetti = () => {
 const alertaCreacion = () => {
     toast.success("Su ticket se ha creado correctamente", {
         autoClose: 3000,
-        position: "top-right",
+        position: "bottom-right",
         style: {
             width: "400px",
         },
@@ -258,25 +261,39 @@ onMounted(() => {
             Formulario para crear Tickets
         </h1>
         <div class="overflow-x-auto rounded-lg shadow-custom p-3 pt-5">
-            <h2 class="dynamic-text mb-3 text-xs font-bold text-gray-500 sm:text-sm md:text-base lg:text-lg xl:text-xl">
+            <h2
+                class="dynamic-text mb-3 text-xs font-bold text-gray-500 sm:text-sm md:text-base lg:text-lg xl:text-xl"
+            >
                 {{ currentMessage }}
             </h2>
             <div class="mb-3">
-                <h3 class="block mb-1 text-gray-500 flex">Título<p class="text-red-600">*</p></h3>
+                <h3 class="block mb-1 text-gray-500 flex">
+                    Título
+                    <p class="text-red-600">*</p>
+                </h3>
                 <input
                     v-model="formData.tic_titulo"
                     type="text"
                     placeholder="Escribe el título..."
                     class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                 />
-                <span class="text-red-500 text-sm">{{ errores.tic_titulo }}</span>
+                <span class="text-red-500 text-sm">{{
+                    errores.tic_titulo
+                }}</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <h3 class="block mb-1 text-gray-500 flex">Prioridad<p class="text-red-600">*</p></h3>
+                    <h3 class="block mb-1 text-gray-500 flex">
+                        Prioridad
+                        <p class="text-red-600">*</p>
+                    </h3>
                     <select
                         v-model="formData.pri_id"
-                        class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                        :class="{
+                            'w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50': true,
+                            'text-[#2EBAA1]': !formData.pri_id,
+                            'text-black': formData.pri_id,
+                        }"
                     >
                         <option value="" disabled selected>
                             Seleccione su prioridad
@@ -289,13 +306,22 @@ onMounted(() => {
                             {{ prioridad.text }}
                         </option>
                     </select>
-                    <span class="text-red-500 text-sm">{{ errores.pri_id }}</span>
+                    <span class="text-red-500 text-sm">{{
+                        errores.pri_id
+                    }}</span>
                 </div>
                 <div>
-                    <h3 class="block mb-1 text-gray-500 flex">Categoría<p class="text-red-600">*</p></h3>
+                    <h3 class="block mb-1 text-gray-500 flex">
+                        Categoría
+                        <p class="text-red-600">*</p>
+                    </h3>
                     <select
                         v-model="formData.cat_id"
-                        class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                        :class="{
+                            'w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50': true,
+                            'text-[#2EBAA1]': !formData.cat_id,
+                            'text-black': formData.cat_id,
+                        }"
                     >
                         <option value="" disabled selected>
                             Seleccione su categoría
@@ -308,13 +334,22 @@ onMounted(() => {
                             {{ categoria.text }}
                         </option>
                     </select>
-                    <span class="text-red-500 text-sm">{{ errores.cat_id }}</span>
+                    <span class="text-red-500 text-sm">{{
+                        errores.cat_id
+                    }}</span>
                 </div>
                 <div>
-                    <h3 class="block mb-1 text-gray-500 flex">Pabellón<p class="text-red-600">*</p></h3>
+                    <h3 class="block mb-1 text-gray-500 flex">
+                        Pabellón
+                        <p class="text-red-600">*</p>
+                    </h3>
                     <select
                         v-model="formData.pab_id"
-                        class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                        :class="{
+                            'w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50': true,
+                            'text-[#2EBAA1]': !formData.pab_id,
+                            'text-black': formData.pab_id,
+                        }"
                     >
                         <option value="" disabled selected>
                             Seleccione su pabellón
@@ -327,13 +362,22 @@ onMounted(() => {
                             {{ pabellon.text }}
                         </option>
                     </select>
-                    <span class="text-red-500 text-sm">{{ errores.pab_id }}</span>
+                    <span class="text-red-500 text-sm">{{
+                        errores.pab_id
+                    }}</span>
                 </div>
                 <div>
-                    <h3 class="block mb-1 text-gray-500 flex">Aula<p class="text-red-600">*</p></h3>
+                    <h3 class="block mb-1 text-gray-500 flex">
+                        Aula
+                        <p class="text-red-600">*</p>
+                    </h3>
                     <select
                         v-model="formData.aul_id"
-                        class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                        :class="{
+                            'w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50': true,
+                            'text-[#2EBAA1]': !formData.aul_id,
+                            'text-black': formData.aul_id,
+                        }"
                     >
                         <option value="" disabled selected>
                             Seleccione su aula
@@ -346,18 +390,25 @@ onMounted(() => {
                             {{ aula.text }}
                         </option>
                     </select>
-                    <span class="text-red-500 text-sm">{{ errores.aul_id }}</span>
+                    <span class="text-red-500 text-sm">{{
+                        errores.aul_id
+                    }}</span>
                 </div>
             </div>
             <div>
-                <h3 class="block mb-1 mt-4 text-gray-500 flex">Descripción<p class="text-red-600">*</p></h3>
+                <h3 class="block mb-1 mt-4 text-gray-500 flex">
+                    Descripción
+                    <p class="text-red-600">*</p>
+                </h3>
                 <textarea
                     v-model="formData.tic_descripcion"
                     rows="4"
                     placeholder="Escribe la descripción..."
                     class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                 ></textarea>
-                <span class="text-red-500 text-sm">{{ errores.tic_descripcion }}</span>
+                <span class="text-red-500 text-sm">{{
+                    errores.tic_descripcion
+                }}</span>
             </div>
             <div class="flex justify-end mt-6 space-x-4">
                 <ButtonCrearActualizar
@@ -399,5 +450,9 @@ onMounted(() => {
 
 .shadow-custom {
     box-shadow: 0 5px 8px rgba(0, 0, 0, 0.5);
+}
+
+option[disabled] {
+    color: #2ebaa1;
 }
 </style>

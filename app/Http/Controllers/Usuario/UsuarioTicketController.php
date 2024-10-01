@@ -28,11 +28,13 @@ class UsuarioTicketController extends Controller
 
         $totalTickets = Ticket::where('use_id', $userId)
             ->where('tic_estado', $estado)
+            ->where('tic_activo', true)
             ->count();
 
         $tickets = Ticket::with('prioridad', 'categoria', 'pabellon', 'aula')
             ->where('use_id', $userId)
             ->where('tic_estado', $estado)
+            ->where('tic_activo', true)
             ->orderBy('created_at', 'desc')
             ->paginate(8);
 

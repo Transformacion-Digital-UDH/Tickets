@@ -201,30 +201,6 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const alertaCreacion = () => {
-    fetchUsuarios();
-    toast.success("Usuario creado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
-const alertaEditar = () => {
-    fetchUsuarios();
-    toast.success("Usuario actualizado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
 const alertaEliminar = () => {
     fetchUsuarios();
     toast.success("Usuario eliminado correctamente", {
@@ -283,7 +259,7 @@ onMounted(() => {
             itemName="Usuario"
             endpoint="/usuarios"
             @cerrar="cerrarCrearModal"
-            @crear="alertaCreacion"
+            @crear="fetchUsuarios"
         />
 
         <ModalVer
@@ -304,7 +280,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/usuarios"
             @cerrar="cerrarEditarModal"
-            @update="alertaEditar"
+            @update="fetchUsuarios"
         />
 
         <ModalEliminar

@@ -201,30 +201,6 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const alertaCreacion = () => {
-    fetchSoportes();
-    toast.success("Soporte técnico creado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
-const alertaEditar = () => {
-    fetchSoportes();
-    toast.success("Soporte técnico actualizado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
 const alertaEliminar = () => {
     fetchSoportes();
     toast.success("Soporte técnico eliminado correctamente", {
@@ -283,7 +259,7 @@ onMounted(() => {
             itemName="Soporte"
             endpoint="/soportes"
             @cerrar="cerrarCrearModal"
-            @crear="alertaCreacion"
+            @crear="fetchSoportes"
         />
 
         <ModalVer
@@ -304,7 +280,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/soportes"
             @cerrar="cerrarEditarModal"
-            @update="alertaEditar"
+            @update="fetchSoportes"
         />
 
         <ModalEliminar

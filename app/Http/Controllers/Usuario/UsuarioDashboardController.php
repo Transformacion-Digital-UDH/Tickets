@@ -22,17 +22,21 @@ class UsuarioDashboardController extends Controller
 
         $openTickets = Ticket::where('use_id', $userId)
             ->where('tic_estado', 'Abierto')
+            ->where('tic_activo', true)
             ->count();
 
         $inProgressTickets = Ticket::where('use_id', $userId)
             ->where('tic_estado', 'En progreso')
+            ->where('tic_activo', true)
             ->count();
 
         $closeTickets = Ticket::where('use_id', $userId)
             ->where('tic_estado', 'Cerrado')
+            ->where('tic_activo', true)
             ->count();
 
         $todayTickets = Ticket::where('use_id', $userId)
+            ->where('tic_activo', true)
             ->whereDate('created_at', now())
             ->count();
 
