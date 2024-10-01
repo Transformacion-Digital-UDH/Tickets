@@ -24,11 +24,22 @@ class UsuarioTicketController extends Controller
     {
         $userId = Auth::id();
 
-        $perPage = $request->input('per_page', 10);
+        $estado = $request->input('estado', 'Abierto');
 
-        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula')
+        $totalTickets = Ticket::where('use_id', $userId)
+            ->where('tic_estado', $estado)
+            ->count();
+
+        $tickets = Ticket::with('prioridad', 'categoria', 'pabellon', 'aula')
             ->where('use_id', $userId)
-            ->paginate($perPage);
+            ->where('tic_estado', $estado)
+            ->orderBy('created_at', 'desc')
+            ->paginate(8);
+
+        $tickets->getCollection()->transform(function ($ticket, $key) use ($totalTickets, $tickets) {
+            $ticket->row_number = $totalTickets - (($tickets->currentPage() - 1) * $tickets->perPage() + $key);
+            return $ticket;
+        });
 
         return response()->json($tickets);
     }
