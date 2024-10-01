@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import CardTickets from "@/Components/CardTickets.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalAsignar from "@/Components/ModalAsignar.vue";
@@ -378,6 +380,7 @@ const eliminarItem = async () => {
             );
             await fetchTickets();
             mostrarModalEliminar.value = false;
+            alertaEliminar();
         } catch (error) {
             toast.error(
                 "No puedes eliminar este ticket, por el momento solo desactivelo",
@@ -392,6 +395,18 @@ const eliminarItem = async () => {
             );
         }
     }
+};
+
+const alertaEliminar = () => {
+    fetchTickets();
+    toast.success("Ticket eliminado correctamente", {
+        autoClose: 3000,
+        position: "bottom-right",
+        style: {
+            width: "400px",
+        },
+        className: "border-l-4 border-green-500 p-4",
+    });
 };
 
 const cerrarCrearModal = () => {
@@ -520,7 +535,7 @@ const getEstadoLabelClass = (estado) => {
                     v-if="!isMobile"
                     @click="isCardView = true"
                     :class="[
-                        'flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100',
+                        'flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
                         isCardView
                             ? 'bg-[#2EBAA1] text-white'
                             : 'bg-white text-gray-600',
@@ -531,7 +546,7 @@ const getEstadoLabelClass = (estado) => {
                     v-if="!isMobile"
                     @click="isCardView = false"
                     :class="[
-                        'flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100',
+                        'flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
                         !isCardView
                             ? 'bg-[#2EBAA1] text-white'
                             : 'bg-white text-gray-600',

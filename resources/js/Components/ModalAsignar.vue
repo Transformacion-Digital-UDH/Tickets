@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import axios from "axios";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ButtonCerrar from "@/Components/ButtonCerrar.vue";
@@ -102,13 +104,22 @@ const asignarSoporte = async () => {
         });
 
         if (!esActualizar.value) {
+            toast.success(`Soporte asignado exitosamente!`, {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: { width: "400px" },
+                className: "border-l-4 border-green-500 p-2",
+            });
             emit("crear", response.data);
-            successMessage.value = "Soporte asignado exitosamente!";
         } else {
+            toast.success(`Soporte actualizado exitosamente!`, {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: { width: "400px" },
+                className: "border-l-4 border-green-500 p-2",
+            });
             emit("actualizar", response.data);
-            successMessage.value = "Soporte actualizado exitosamente!";
         }
-
         emit("cerrar");
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -116,6 +127,12 @@ const asignarSoporte = async () => {
         } else {
             console.error("Error inesperado:", error);
         }
+        toast.error(`Error al asignar o actualizar al soporte técnico`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
     } finally {
         loading.value = false;
     }
