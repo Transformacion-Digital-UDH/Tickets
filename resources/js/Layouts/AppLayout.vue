@@ -367,9 +367,9 @@ defineProps({ title: String });
                         class="flex flex-col"
                     >
                         <NavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                            :class="linkClasses(route().current('dashboard'))"
+                            :href="route('support-dashboard')"
+                            :active="route().current('support-dashboard')"
+                            :class="linkClasses(route().current('support-dashboard'))"
                         >
                             <font-awesome-icon
                                 icon="tachometer-alt"
@@ -381,68 +381,9 @@ defineProps({ title: String });
                         </NavLink>
 
                         <NavLink
-                            :href="route('ticket')"
-                            :active="route().current('ticket')"
-                            :class="linkClasses(route().current('ticket'))"
-                        >
-                            <font-awesome-icon icon="ticket" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Tickets</span
-                            >
-                        </NavLink>
-
-                        <NavLink
-                            :href="route('sede')"
-                            :active="route().current('sede')"
-                            :class="linkClasses(route().current('sede'))"
-                        >
-                            <font-awesome-icon icon="city" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2">Sedes</span>
-                        </NavLink>
-
-                        <NavLink
-                            :href="route('soporte')"
-                            :active="route().current('soporte')"
-                            :class="linkClasses(route().current('soporte'))"
-                        >
-                            <font-awesome-icon
-                                icon="user-shield"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Soportes</span
-                            >
-                        </NavLink>
-
-                        <NavLink
-                            :href="route('usuario')"
-                            :active="route().current('usuario')"
-                            :class="linkClasses(route().current('usuario'))"
-                        >
-                            <font-awesome-icon
-                                icon="user-graduate"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Usuarios</span
-                            >
-                        </NavLink>
-
-                        <NavLink
-                            :href="route('categoria')"
-                            :active="route().current('categoria')"
-                            :class="linkClasses(route().current('categoria'))"
-                        >
-                            <font-awesome-icon icon="tags" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Categoria</span
-                            >
-                        </NavLink>
-
-                        <NavLink
-                            :href="route('pabellon')"
-                            :active="route().current('pabellon')"
-                            :class="linkClasses(route().current('pabellon'))"
+                            :href="route('support-ticket')"
+                            :active="route().current('support-ticket')"
+                            :class="linkClasses(route().current('support-ticket'))"
                         >
                             <font-awesome-icon
                                 icon="building"

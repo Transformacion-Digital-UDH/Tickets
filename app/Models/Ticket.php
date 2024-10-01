@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = [
+  protected $fillable = [
     'use_id',
     'cat_id',
     'pri_id',
@@ -46,5 +46,10 @@ class Ticket extends Model
   {
     return $this->belongsTo(Aula::class, foreignKey: 'aul_id');
   }
+
+  public function asignados()
+{
+    return $this->belongsToMany(User::class, 'asignados', 'tic_id', 'sop_id')->withPivot('id');
+}
 
 }
