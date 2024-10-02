@@ -56,16 +56,16 @@
           <!-- Información del ticket -->
           <div class="mt-4">
             <h2 class="text-lg font-bold text-gray-800 uppercase truncate">
-              {{ ticket.cat_nombre }}
+              {{ ticket.tic_titulo }}
             </h2>
             <hr class="my-2 border-gray-200" />
           </div>
 
           <!-- Detalles del ticket -->
           <div class="flex flex-col space-y-2 text-sm text-gray-600">
-            <span><strong>Título:</strong> {{ ticket.tic_titulo || "N/A" }}</span>
-            <span><strong>Prioridad:</strong> {{ ticket.tic_estado || "N/A" }}</span>
-            <span><strong>Soporte:</strong> {{ ticket.tic_titulo || "N/A" }}</span>
+            <span><strong>Prioridad:</strong> {{ ticket.prioridad?.nombre || "N/A" }}</span>
+            <span><strong>Categoría:</strong> {{ ticket.categoria?.nombre || "N/A" }}</span>
+            <span><strong>Creado el:</strong> {{ new Date(ticket.created_at).toLocaleDateString() }}</span>
           </div>
 
           <!-- Acciones -->

@@ -12,5 +12,6 @@ Route::middleware(['auth', 'role:Soporte'])->group(function () {
         Route::get('/support-ticket', 'index')->name('support-ticket');
         Route::get('/support-optener', 'obtenerTickets')->name('support-optener');
         Route::post('/soporte/tickets/finalizar/{id}',  'finalizarTicket')->name('support-finalizar');
+    
     });
 });
