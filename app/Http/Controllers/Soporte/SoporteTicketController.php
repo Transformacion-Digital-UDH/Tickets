@@ -17,6 +17,28 @@ class SoporteTicketController extends Controller
         ]);
     }
 
+    // Método para aceptar un ticket y cambiar su estado a "En progreso"
+    public function aceptarTicket(Request $request, $id)
+    {
+        $ticket = Ticket::findOrFail($id); // Buscar el ticket por ID
+
+        if ($ticket->tic_estado === 'Asignado') {
+            // Cambiar el estado del ticket a "En progreso"
+            $ticket->update(['tic_estado' => 'En progreso']);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Ticket aceptado y cambiado a En progreso.',
+                'ticket' => $ticket,
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'msg' => 'El ticket no se puede aceptar porque no está en estado Asignado.',
+            ], 400);
+        }
+    }
+
     // Método para obtener tickets asignados al soporte
     public function obtenerTickets()
     {
