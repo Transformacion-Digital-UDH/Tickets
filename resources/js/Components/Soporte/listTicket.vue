@@ -72,31 +72,21 @@
             <span><strong>Creado el:</strong> {{ new Date(ticket.created_at).toLocaleDateString() }}</span>
           </div>
 
+          <!-- Acciones solo necesarias para soporte -->
           <div class="flex justify-end mt-auto space-x-3">
-            <button
-              v-if="['Abierto', 'Asignado', 'Reabierto'].includes(ticket.tic_estado)"
-              @click="$emit('asign', ticket)"
-              class="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-            >
-              <i class="mr-1 fas fa-user-plus"></i>
-            </button>
+            <!-- Botón para ver detalles -->
             <button
               @click="$emit('view', ticket)"
               class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
             >
               <i class="mr-1 fas fa-eye"></i>
             </button>
+            <!-- Botón para editar ticket -->
             <button
               @click="$emit('edit', ticket)"
               class="text-green-500 hover:text-green-700 transition-colors duration-200"
             >
               <i class="mr-1 fas fa-edit"></i>
-            </button>
-            <button
-              @click="$emit('eliminar', ticket)"
-              class="text-red-500 hover:text-red-700 transition-colors duration-200"
-            >
-              <i class="mr-1 fas fa-trash"></i>
             </button>
           </div>
         </div>
@@ -124,23 +114,19 @@
             <td class="px-6 py-4 border-b">{{ ticket.categoria?.nombre || 'N/A' }}</td>
             <td class="px-6 py-4 border-b">{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
             <td class="px-6 py-4 border-b space-x-2">
+              <!-- Botón para ver detalles -->
               <button
                 @click="$emit('view', ticket)"
                 class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
               >
                 <i class="fas fa-eye"></i>
               </button>
+              <!-- Botón para editar ticket -->
               <button
                 @click="$emit('edit', ticket)"
                 class="text-green-500 hover:text-green-700 transition-colors duration-200"
               >
                 <i class="fas fa-edit"></i>
-              </button>
-              <button
-                @click="$emit('eliminar', ticket)"
-                class="text-red-500 hover:text-red-700 transition-colors duration-200"
-              >
-                <i class="fas fa-trash"></i>
               </button>
             </td>
           </tr>
