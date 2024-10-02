@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import ModalVer from "@/Components/ModalVer.vue";
 import ModalEditar from "@/Components/ModalEditar.vue";
 import ModalEliminar from "@/Components/ModalEliminar.vue";
@@ -43,21 +45,24 @@ const deleteTicket = async (ticket) => {
     mostrarModalEliminar.value = true;
 };
 
-const mapTicketData = (ticket, index, totalTickets) => ({
-    id: ticket.id,
-    tic_titulo: ticket.tic_titulo,
-    tic_descripcion: ticket.tic_descripcion,
-    pri_id: ticket.pri_id,
-    pri_nombre: ticket.prioridad?.pri_nombre || "No disponible",
-    cat_id: ticket.cat_id,
-    cat_nombre: ticket.categoria?.cat_nombre || "No disponible",
-    pab_id: ticket.pab_id,
-    pab_nombre: ticket.pabellon?.pab_nombre || "No disponible",
-    aul_id: ticket.aul_id,
-    aul_numero: ticket.aula?.aul_numero || "No disponible",
-    tic_estado: ticket.tic_estado,
-    row_number: totalTickets - ((currentPage.value - 1) * itemsPerPage.value + index),
-});
+const mapTicketData = (ticket, index, totalTickets) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: ticket.id,
+        tic_titulo: ticket.tic_titulo,
+        tic_descripcion: ticket.tic_descripcion,
+        pri_id: ticket.pri_id,
+        pri_nombre: ticket.prioridad?.pri_nombre || "No disponible",
+        cat_id: ticket.cat_id,
+        cat_nombre: ticket.categoria?.cat_nombre || "No disponible",
+        pab_id: ticket.pab_id,
+        pab_nombre: ticket.pabellon?.pab_nombre || "No disponible",
+        aul_id: ticket.aul_id,
+        aul_numero: ticket.aula?.aul_numero || "No disponible",
+        tic_estado: ticket.tic_estado,
+        row_number: totalTickets - (startIndex + index),
+    };
+};
 
 const loadTickets = async (page = 1) => {
     try {
@@ -73,9 +78,9 @@ const loadTickets = async (page = 1) => {
         );
 
         const totalTickets = response.data.total;
-        const ticketData = response.data.data.map((ticket, index) => 
-            mapTicketData(ticket, index, totalTickets)
-        );
+        const ticketData = response.data.data
+            .filter((ticket) => ticket.tic_activo)
+            .map((ticket, index) => mapTicketData(ticket, index, totalTickets));
 
         currentPage.value = response.data.current_page;
         itemsPerPage.value = response.data.per_page;
@@ -280,8 +285,23 @@ const eliminarItem = async () => {
             );
             await loadTickets();
             mostrarModalEliminar.value = false;
+            toast.success("Su ticket se ha eliminado correctamente", {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-green-500 p-2",
+            });
         } catch (error) {
-            console.error("Error al eliminar al ticket:", error);
+            toast.error("Hubo un error al eliminar el ticket", {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-green-500 p-2",
+            });
         }
     }
 };
@@ -298,6 +318,7 @@ onMounted(() => {
 const showTickets = (status) => {
     activeTab.value = status;
     localStorage.setItem("activeTab", status);
+    currentPage.value = 1;
     loadTickets(1);
 };
 

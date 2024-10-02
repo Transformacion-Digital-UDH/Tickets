@@ -35,7 +35,7 @@ export default {
         handleResize() {
             clearTimeout(this.resizeTimeout);
             this.resizeTimeout = setTimeout(() => {
-                this.isMobile = window.innerWidth < 530;
+                this.isMobile = window.innerWidth < 768;
             }, 150);
         },
     },

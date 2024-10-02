@@ -54,10 +54,12 @@ const fetchAulas = async () => {
 const fetchPabellones = async () => {
     try {
         const response = await axios.get("/pabellones");
-        pabellons.value = response.data.filter((pabellon) => pabellon.pab_activo).map((pabellon) => ({
-            value: pabellon.id,
-            text: pabellon.pab_nombre,
-        }));
+        pabellons.value = response.data
+            .filter((pabellon) => pabellon.pab_activo)
+            .map((pabellon) => ({
+                value: pabellon.id,
+                text: pabellon.pab_nombre,
+            }));
         formFields.value = formFields.value.map((field) => {
             if (field.name === "pab_id") {
                 return {
@@ -89,11 +91,12 @@ const fetchPabellones = async () => {
 };
 
 formFields.value = [
-    { name: "aul_numero", label: "Aula", type: "text" },
+    { name: "aul_numero", label: "Aula", type: "text", required: true },
     {
         name: "pab_id",
         label: "Pabellon",
         type: "select",
+        required: true,
         options: pabellons.value,
     },
     { name: "aul_activo", label: "Estado", type: "boolean" },
@@ -112,14 +115,17 @@ const eliminarItem = async () => {
             mostrarModalEliminar.value = false;
             alertaEliminar();
         } catch (error) {
-            toast.error("No puedes eliminar esta aula, por el momento solo desactivelo", {
-                autoClose: 5000,
-                position: "bottom-right",
-                style: {
-                    width: "400px",
-                },
-                className: "border-l-4 border-red-500 p-4",
-            });
+            toast.error(
+                "No puedes eliminar esta aula, por el momento solo desactivelo",
+                {
+                    autoClose: 5000,
+                    position: "bottom-right",
+                    style: {
+                        width: "400px",
+                    },
+                    className: "border-l-4 border-red-500 p-4",
+                }
+            );
         }
     }
 };
@@ -155,30 +161,6 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const alertaCreacion = () => {
-    fetchAulas();
-    toast.success("Aula creado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
-const alertaEditar = () => {
-    fetchAulas();
-    toast.success("Aula actualizado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
 const alertaEliminar = () => {
     fetchAulas();
     toast.success("Aula eliminado correctamente", {
@@ -189,7 +171,7 @@ const alertaEliminar = () => {
         },
         className: "border-l-4 border-green-500 p-4",
     });
-}
+};
 
 onMounted(() => {
     fetchAulas();
@@ -237,7 +219,7 @@ onMounted(() => {
             itemName="Aula"
             endpoint="/aulas"
             @cerrar="cerrarCrearModal"
-            @crear="alertaCreacion"
+            @crear="fetchAulas"
         />
 
         <ModalVer
@@ -258,7 +240,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/aulas"
             @cerrar="cerrarEditarModal"
-            @update="alertaEditar"
+            @update="fetchAulas"
         />
 
         <ModalEliminar

@@ -22,7 +22,7 @@ class TicketController extends Controller
 
     public function traer()
     {
-        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula')->get();
+        $tickets = Ticket::with('prioridad', 'user', 'categoria', 'pabellon', 'aula', 'soporteActual.soporte')->get();
         return response()->json($tickets);
     }
 
@@ -59,57 +59,43 @@ class TicketController extends Controller
             'sop_id' => 'required|exists:users,id',
             'es_asignado' => 'boolean',
         ]);
-
+    
         $ticket = Ticket::findOrFail($id);
-
-        Asignado::create([
-            'tic_id' => $ticket->id,
-            'sop_id' => $validatedData['sop_id'],
-            'es_asignado' => $validatedData['es_asignado'] ?? true,
-        ]);
-
-        $ticket->update([
-            'tic_estado' => 'En progreso',
-            'sop_id' => $validatedData['sop_id'],
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'msg' => 'Soporte asignado y estado actualizado a "En progreso".',
-            'ticket' => $ticket,
-        ]);
-    }
-
-    public function updateSoporte(Request $request, $id)
-    {
-        $validatedData = $request->validate([
-            'sop_id' => 'required|exists:users,id',
-            'es_asignado' => 'boolean',
-        ]);
-
-        try {
-            $asignado = Asignado::where('tic_id', $id)->firstOrFail();
-
+    
+        $asignado = Asignado::where('tic_id', $ticket->id)->first();
+    
+        if ($asignado) {
             $asignado->update([
                 'sop_id' => $validatedData['sop_id'],
                 'es_asignado' => $validatedData['es_asignado'] ?? true,
             ]);
-
+            $ticket->update([
+                'tic_estado' => 'Asignado',
+                'sop_id' => $validatedData['sop_id'],
+            ]);
+    
             return response()->json([
                 'status' => true,
-                'msg' => 'Soporte actualizado correctamente.',
-                'asignado' => $asignado,
-            ], 200);
-        } catch (ModelNotFoundException $e) {
+                'msg' => 'Soporte actualizado y estado actualizado a "Asignado".',
+                'ticket' => $ticket,
+            ]);
+        } else {
+            Asignado::create([
+                'tic_id' => $ticket->id,
+                'sop_id' => $validatedData['sop_id'],
+                'es_asignado' => $validatedData['es_asignado'] ?? true,
+            ]);
+    
+            $ticket->update([
+                'tic_estado' => 'Asignado',
+                'sop_id' => $validatedData['sop_id'],
+            ]);
+    
             return response()->json([
-                'status' => false,
-                'msg' => 'No se encontró el soporte asignado para este ticket.',
-            ], 404);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => false,
-                'msg' => 'Error al actualizar el soporte: ' . $e->getMessage(),
-            ], 500);
+                'status' => true,
+                'msg' => 'Soporte asignado y estado actualizado a "Asignado".',
+                'ticket' => $ticket,
+            ]);
         }
     }
 

@@ -49,7 +49,7 @@ const fetchCategorias = async () => {
 };
 
 const formFields = [
-    { name: "cat_nombre", label: "Nombre", type: "text" },
+    { name: "cat_nombre", label: "Nombre", type: "text", required: true },
     { name: "cat_activo", label: "Estado", type: "boolean" },
 ];
 
@@ -110,30 +110,6 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const alertaCreacion = () => {
-    fetchCategorias();
-    toast.success("Categoria creado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
-const alertaEditar = () => {
-    fetchCategorias();
-    toast.success("Categoria actualizado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-}
-
 const alertaEliminar = () => {
     fetchCategorias();
     toast.success("Categoria eliminado correctamente", {
@@ -188,7 +164,7 @@ onMounted(() => fetchCategorias());
             itemName="Categoría"
             endpoint="/categorias"
             @cerrar="cerrarCrearModal"
-            @crear="alertaCreacion"
+            @crear="fetchCategorias"
         />
 
         <ModalVer
@@ -208,7 +184,7 @@ onMounted(() => fetchCategorias());
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/categorias"
             @cerrar="cerrarEditarModal"
-            @update="alertaEditar"
+            @update="fetchCategorias"
         />
 
         <ModalEliminar

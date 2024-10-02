@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import axios from "axios";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ButtonCerrar from "@/Components/ButtonCerrar.vue";
@@ -37,41 +39,28 @@ const formData = ref({
 const errores = ref([]);
 const loading = ref(false);
 const successMessage = ref("");
-const esActualizar = ref(!!props.selectedSoporteId); // Detectar si es para actualizar
+const esActualizar = ref(!!props.selectedSoporteId);
 
-// Computed para filtrar campos visibles (excluir booleanos)
 const visibleFields = computed(() => {
     return props.formFieldsAsignar.filter((field) => field.type !== "boolean");
 });
 
-// Cargar información inicial
 onMounted(() => {
     initializeForm();
 });
 
-// Inicialización del formulario
 const initializeForm = () => {
     if (esActualizar.value) {
-        // Si ya hay un soporte asignado, lo cargamos
         formData.value.sop_id = props.selectedSoporteId;
     } else {
-        // Si es un nuevo registro, reiniciar los valores
         formData.value = {
-            sop_id: null,
+            sop_id: "",
             tic_id: props.ticketId,
             es_asignado: false,
         };
-        props.formFieldsAsignar.forEach((field) => {
-            if (field.type === "boolean") {
-                formData.value[field.name] = true;
-            } else if (field.name !== "sop_id") {
-                formData.value[field.name] = field.default || "";
-            }
-        });
     }
 };
 
-// Monitorear cambios en la lista de soportes
 watch(
     () => props.soportes,
     (newSoportes) => {
@@ -103,7 +92,7 @@ const asignarSoporte = async () => {
         const requestData = {
             sop_id: formData.value.sop_id,
             es_asignado: true,
-            tic_estado: "En progreso",
+            tic_estado: "Asignado",
         };
 
         const response = await axios[method](endpoint, requestData, {
@@ -114,16 +103,23 @@ const asignarSoporte = async () => {
             },
         });
 
-        // Emit an event to notify the parent that the assignment has been made
         if (!esActualizar.value) {
-            emit("crear", response.data); // If it's a new assignment
-            successMessage.value = "Soporte asignado exitosamente!";
+            toast.success(`Soporte asignado exitosamente!`, {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: { width: "400px" },
+                className: "border-l-4 border-green-500 p-2",
+            });
+            emit("crear", response.data);
         } else {
-            emit("actualizar", response.data); // If updating an assignment
-            successMessage.value = "Soporte actualizado exitosamente!";
+            toast.success(`Soporte actualizado exitosamente!`, {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: { width: "400px" },
+                className: "border-l-4 border-green-500 p-2",
+            });
+            emit("actualizar", response.data);
         }
-
-        // Close the modal and refresh the parent component's state
         emit("cerrar");
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -131,12 +127,17 @@ const asignarSoporte = async () => {
         } else {
             console.error("Error inesperado:", error);
         }
+        toast.error(`Error al asignar o actualizar al soporte técnico`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
     } finally {
         loading.value = false;
     }
 };
 
-// Función para cerrar el modal
 const cerrarModal = () => emit("cerrar");
 </script>
 

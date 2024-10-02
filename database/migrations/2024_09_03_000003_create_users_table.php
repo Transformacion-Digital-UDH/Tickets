@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('foto')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->string('celular', 15)->nullable();
+            $table->unsignedBigInteger('celular')->nullable();
             $table->string('google_id')->nullable();
             $table->boolean('se_registro')->default(false);
             $table->boolean('activo')->default(true);

@@ -97,11 +97,12 @@ const fetchSedes = async () => {
 };
 
 formFields.value = [
-    { name: "pab_nombre", label: "Pabellon", type: "text" },
+    { name: "pab_nombre", label: "Pabellon", type: "text", required: true },
     {
         name: "sed_id",
         label: "Sede",
         type: "select",
+        required: true,
         options: sedes.value,
     },
     { name: "pab_activo", label: "Estado", type: "boolean" },
@@ -168,30 +169,6 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const alertaCreacion = () => {
-    fetchPabellones();
-    toast.success("Pabellon creado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-};
-
-const alertaEditar = () => {
-    fetchPabellones();
-    toast.success("Pabellon actualizado correctamente", {
-        autoClose: 3000,
-        position: "bottom-right",
-        style: {
-            width: "400px",
-        },
-        className: "border-l-4 border-green-500 p-4",
-    });
-};
-
 const alertaEliminar = () => {
     fetchPabellones();
     toast.success("Pabellon eliminado correctamente", {
@@ -250,7 +227,7 @@ onMounted(() => {
             itemName="Pabellon"
             endpoint="/pabellones"
             @cerrar="cerrarCrearModal"
-            @crear="alertaCreacion"
+            @crear="fetchPabellones"
         />
 
         <ModalVer
@@ -271,7 +248,7 @@ onMounted(() => {
             :mostrarModalEditar="mostrarModalEditar"
             endpoint="/pabellones"
             @cerrar="cerrarEditarModal"
-            @update="alertaEditar"
+            @update="fetchPabellones"
         />
 
         <ModalEliminar

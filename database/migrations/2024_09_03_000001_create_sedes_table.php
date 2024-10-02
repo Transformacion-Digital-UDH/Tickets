@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('sedes', function (Blueprint $table) {
             $table->id();
-            $table->string('sed_nombre');
-            $table->string('sed_direccion');
-            $table->string('sed_ciudad');
-            $table->string('sed_telefono');
+            $table->string('sed_nombre')->nullable();
+            $table->string('sed_direccion')->nullable();
+            $table->string('sed_ciudad')->nullable();
+            $table->unsignedBigInteger('sed_telefono')->nullable();
             $table->boolean('sed_activo')->default(true);
             $table->timestamps();
         });

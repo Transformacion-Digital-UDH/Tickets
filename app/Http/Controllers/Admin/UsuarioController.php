@@ -55,7 +55,7 @@ class UsuarioController extends Controller
         $validarDatos = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
-            'celular' => 'required|string|max:30',
+            'celular' => 'required|numeric|digits:9',
             'sed_id' => 'required|exists:sedes,id',
             'password' => 'required|string|min:8',
             'activo' => 'boolean',
@@ -96,7 +96,7 @@ class UsuarioController extends Controller
         $validarDatos = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
-            'celular' => 'required|string|max:30',
+            'celular' => 'required|numeric|digits:9',
             'sed_id' => 'required|exists:sedes,id',
             'password' => 'required|string|min:8',
             'activo' => 'boolean',
@@ -127,7 +127,7 @@ class UsuarioController extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-                'celular' => 'required|string|max:30',
+                'celular' => 'required|numeric|digits:9',
                 'sed_id' => 'required|exists:sedes,id',
                 'password' => 'nullable|string|min:8',
                 'activo' => 'nullable|boolean',
@@ -174,7 +174,7 @@ class UsuarioController extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-                'celular' => 'required|string|max:30',
+                'celular' => 'required|numeric|digits:9',
                 'sed_id' => 'required|exists:sedes,id',
                 'password' => 'nullable|string|min:8',
                 'activo' => 'nullable|boolean',

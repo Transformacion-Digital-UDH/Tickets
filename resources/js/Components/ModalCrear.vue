@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ButtonCerrar from "@/Components/ButtonCerrar.vue";
 
@@ -166,6 +168,73 @@ const submitForm = async () => {
     loading.value = true;
     successMessage.value = "";
     errores.value = [];
+    let isValid = true;
+    props.formFields.forEach((field) => {
+        const fieldValue = formData.value[field.name];
+
+        if (field.required && !fieldValue) {
+            errores.value[field.name] = [
+                `El campo ${field.label} es requerido`,
+            ];
+            isValid = false;
+        }
+
+        if (field.label.toLowerCase().includes("teléfono")) {
+            if (!fieldValue) {
+                errores.value[field.name] = [
+                    `El campo ${field.label} es requerido`,
+                ];
+                isValid = false;
+            } else {
+                const phoneValue = String(fieldValue);
+
+                if (phoneValue.startsWith("+51")) {
+                    formData.value[field.name] = phoneValue
+                        .replace("+51", "")
+                        .trim();
+                } else {
+                    formData.value[field.name] = phoneValue.trim();
+                }
+
+                const regex = /^[0-9]+$/;
+                if (!regex.test(formData.value[field.name])) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe contener solo números.`,
+                    ];
+                    isValid = false;
+                }
+
+                if (formData.value[field.name].length !== 9) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe tener exactamente 9 dígitos.`,
+                    ];
+                    isValid = false;
+                }
+            }
+        }
+
+        if (field.label === "Correo") {
+            if (!fieldValue) {
+                errores.value[field.name] = [
+                    `El campo ${field.label} es requerido`,
+                ];
+                isValid = false;
+            } else {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(fieldValue)) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe ser un correo válido.`,
+                    ];
+                    isValid = false;
+                }
+            }
+        }
+    });
+
+    if (!isValid) {
+        loading.value = false;
+        return;
+    }
     try {
         const response = await axios.post(props.endpoint, formData.value, {
             headers: {
@@ -173,6 +242,12 @@ const submitForm = async () => {
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
             },
+        });
+        toast.success(`${props.itemName} creado correctamente`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-green-500 p-2",
         });
         emit("crear", response.data);
         successMessage.value = "Creación exitosa!";
@@ -190,6 +265,12 @@ const submitForm = async () => {
         } else {
             console.error("Error:", error);
         }
+        toast.error(`Error al crear ${props.itemName}`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
     } finally {
         loading.value = false;
     }
@@ -244,6 +325,12 @@ const cerrarModal = () => emit("cerrar");
                                     {{ option.label }}
                                 </option>
                             </select>
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
                         </template>
                         <template v-else-if="field.type === 'textarea'">
                             <textarea
@@ -254,6 +341,29 @@ const cerrarModal = () => emit("cerrar");
                                 :autocomplete="field.autocomplete || 'off'"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                             ></textarea>
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
+                        </template>
+                        <template v-else-if="field.type === 'number'">
+                            <input
+                                :id="field.name"
+                                :name="field.name"
+                                :type="field.type"
+                                v-model.number="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                :autocomplete="field.autocomplete || 'off'"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            />
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
                         </template>
                         <template v-else>
                             <input
@@ -265,13 +375,13 @@ const cerrarModal = () => emit("cerrar");
                                 :autocomplete="field.autocomplete || 'off'"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                             />
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
                         </template>
-                        <p
-                            v-if="errores[field.name]"
-                            class="text-sm text-red-500"
-                        >
-                            {{ errores[field.name][0] }}
-                        </p>
                     </div>
                 </div>
 
