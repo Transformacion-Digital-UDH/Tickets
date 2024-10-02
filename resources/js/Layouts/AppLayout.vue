@@ -367,9 +367,9 @@ defineProps({ title: String });
                         class="flex flex-col"
                     >
                         <NavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                            :class="linkClasses(route().current('dashboard'))"
+                            :href="route('support-dashboard')"
+                            :active="route().current('support-dashboard')"
+                            :class="linkClasses(route().current('support-dashboard'))"
                         >
                             <font-awesome-icon
                                 icon="tachometer-alt"
