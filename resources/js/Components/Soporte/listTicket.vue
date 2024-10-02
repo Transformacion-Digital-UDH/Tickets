@@ -4,10 +4,8 @@
 
     <!-- Botón para cambiar la vista -->
     <div class="text-right mb-4">
-      <button
-        @click="toggleView"
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-300"
-      >
+      <button @click="toggleView"
+        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-300">
         {{ isTableView ? 'Vista de Tarjetas' : 'Vista de Tabla' }}
       </button>
     </div>
@@ -18,22 +16,17 @@
     </div>
 
     <!-- Vista de Tarjetas -->
-    <div
-      v-if="!isTableView && tickets.length > 0"
-      class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-    >
+    <div v-if="!isTableView && tickets.length > 0"
+      class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       <div v-for="ticket in tickets" :key="ticket.id" class="relative w-full">
-        <span
-          class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg"
-          :class="{
-            'bg-orange-600': ticket.tic_estado === 'Abierto',
-            'bg-gray-600': ticket.tic_estado === 'Asignado',
-            'bg-blue-600': ticket.tic_estado === 'En progreso',
-            'bg-green-600': ticket.tic_estado === 'Resuelto',
-            'bg-red-600': ticket.tic_estado === 'Cerrado',
-            'bg-yellow-600': ticket.tic_estado === 'Reabierto',
-          }"
-        ></span>
+        <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
+          'bg-orange-600': ticket.tic_estado === 'Abierto',
+          'bg-gray-600': ticket.tic_estado === 'Asignado',
+          'bg-blue-600': ticket.tic_estado === 'En progreso',
+          'bg-green-600': ticket.tic_estado === 'Resuelto',
+          'bg-red-600': ticket.tic_estado === 'Cerrado',
+          'bg-yellow-600': ticket.tic_estado === 'Reabierto',
+        }"></span>
         <div
           class="relative h-full p-4 bg-white border-2 rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl"
           :class="{
@@ -43,8 +36,7 @@
             'border-green-600': ticket.tic_estado === 'Resuelto',
             'border-red-600': ticket.tic_estado === 'Cerrado',
             'border-yellow-600': ticket.tic_estado === 'Reabierto',
-          }"
-        >
+          }">
           <div
             class="absolute px-3 py-1 text-xs font-semibold transition-colors duration-300 rounded-full shadow-md top-2 right-2"
             :class="{
@@ -54,8 +46,7 @@
               'bg-green-600 text-white': ticket.tic_estado === 'Resuelto',
               'bg-red-600 text-white': ticket.tic_estado === 'Cerrado',
               'bg-yellow-600 text-white': ticket.tic_estado === 'Reabierto',
-            }"
-          >
+            }">
             {{ ticket.tic_estado }}
           </div>
 
@@ -74,18 +65,20 @@
 
           <!-- Acciones solo necesarias para soporte -->
           <div class="flex justify-end mt-auto space-x-3">
+            <!-- Botón Aceptar solo si el estado es "Asignado" -->
+            <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
+              class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
+              <i class="fas fa-check mr-1"></i> Aceptar
+            </button>
+
             <!-- Botón para ver detalles -->
-            <button
-              @click="$emit('view', ticket)"
-              class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
-            >
+            <button @click="$emit('view', ticket)"
+              class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
               <i class="mr-1 fas fa-eye"></i>
             </button>
             <!-- Botón para editar ticket -->
-            <button
-              @click="$emit('edit', ticket)"
-              class="text-green-500 hover:text-green-700 transition-colors duration-200"
-            >
+            <button @click="$emit('edit', ticket)"
+              class="text-green-500 hover:text-green-700 transition-colors duration-200">
               <i class="mr-1 fas fa-edit"></i>
             </button>
           </div>
@@ -114,18 +107,21 @@
             <td class="px-6 py-4 border-b">{{ ticket.categoria?.nombre || 'N/A' }}</td>
             <td class="px-6 py-4 border-b">{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
             <td class="px-6 py-4 border-b space-x-2">
+              <!-- Botón Aceptar solo si el estado es "Asignado" -->
+              <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
+                class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
+                <i class="fas fa-check mr-1"></i> Aceptar
+              </button>
+
               <!-- Botón para ver detalles -->
-              <button
-                @click="$emit('view', ticket)"
-                class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
-              >
+              <button @click="$emit('view', ticket)"
+                class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
                 <i class="fas fa-eye"></i>
               </button>
+
               <!-- Botón para editar ticket -->
-              <button
-                @click="$emit('edit', ticket)"
-                class="text-green-500 hover:text-green-700 transition-colors duration-200"
-              >
+              <button @click="$emit('edit', ticket)"
+                class="text-green-500 hover:text-green-700 transition-colors duration-200">
                 <i class="fas fa-edit"></i>
               </button>
             </td>
@@ -167,7 +163,39 @@ export default {
       }
     });
 
-    return { tickets, isTableView, toggleView };
+    // Método para aceptar un ticket (cambiar estado a "En progreso")
+    const aceptarTicket = async (ticket) => {
+      try {
+        const response = await fetch(`/soporte/tickets/aceptar/${ticket.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al aceptar el ticket');
+        }
+
+        const data = await response.json();
+
+        if (data.status) {
+          // Actualizar el ticket en la lista de tickets
+          const index = tickets.value.findIndex((t) => t.id === ticket.id);
+          if (index !== -1) {
+            tickets.value[index] = data.ticket;
+          }
+        } else {
+          console.error(data.msg);
+        }
+      } catch (error) {
+        console.error('Error al aceptar el ticket:', error);
+      }
+    };
+
+
+    return { tickets, isTableView, toggleView, aceptarTicket };
   },
 };
 </script>
