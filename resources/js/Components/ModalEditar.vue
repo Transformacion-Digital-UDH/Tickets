@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
@@ -42,14 +42,38 @@ const emit = defineEmits(["cerrar", "update"]);
 
 const formData = ref({});
 const errores = ref({});
+const isMobile = ref(false);
 const loading = ref(false);
 const successMessage = ref("");
 const clickInicial = ref(false);
+const selectedFileName = ref({});
+const selectedFilePreviews = ref({});
+
+const handleResize = () => {
+    isMobile.value = window.innerWidth <= 768;
+};
+
+onMounted(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener("resize", handleResize);
+});
 
 const initializeFormData = (item) => {
     formData.value = {};
     props.formFields.forEach((field) => {
         formData.value[field.name] = item?.[field.name] || "";
+
+        if (field.type === "file" && item?.[field.name]) {
+            selectedFileName.value[field.name] = item[field.name];
+            selectedFilePreviews.value[field.name] = {
+                name: item[field.name],
+                url: `/storage/${item[field.name]}`,
+            };
+        }
     });
     clickInicial.value = true;
 };
@@ -116,11 +140,28 @@ onMounted(() => {
     clickInicial.value = false;
 });
 
+const handleFileChange = (event, fieldName) => {
+    const file = event.target.files[0];
+    if (file) {
+        selectedFileName.value[fieldName] = file.name;
+        formData.value[fieldName] = file;
+
+        const previewURL = URL.createObjectURL(file);
+        selectedFilePreviews.value[fieldName] = {
+            name: file.name,
+            url: previewURL,
+        };
+    }
+};
+
 const editarItem = async () => {
     loading.value = true;
     successMessage.value = "";
     errores.value = {};
     let isValid = true;
+
+    const data = new FormData();
+
     props.formFields.forEach((field) => {
         const fieldValue = formData.value[field.name];
 
@@ -164,16 +205,23 @@ const editarItem = async () => {
         if (field.type === "boolean") {
             formData.value[field.name] = formData.value[field.name] ? 1 : 0;
         }
+
+        if (field.type === "file" && formData.value[field.name]) {
+            data.append(field.name, formData.value[field.name]);
+        } else if (field.type !== "file") {
+            data.append(field.name, formData.value[field.name]);
+        }
     });
 
     if (!isValid) {
         loading.value = false;
         return;
     }
+
     try {
         const response = await axios.put(
             `${props.endpoint}/${props.item.id}`,
-            formData.value,
+            data,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -183,13 +231,16 @@ const editarItem = async () => {
                 },
             }
         );
+
         toast.success(`${props.itemName} actualizado correctamente`, {
             autoClose: 3000,
             position: "bottom-right",
             style: { width: "400px" },
             className: "border-l-4 border-green-500 p-2",
         });
+
         emit("update", response.data);
+
         cerrarModal();
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -197,6 +248,7 @@ const editarItem = async () => {
         } else {
             console.error("Error:", error);
         }
+
         toast.error(`Error al actualizar ${props.itemName}`, {
             autoClose: 3000,
             position: "bottom-right",
@@ -213,11 +265,10 @@ const cerrarModal = () => emit("cerrar");
 
 <template>
     <div
-        v-if="mostrarModalEditar"
         class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30"
     >
         <div
-            class="w-full max-w-lg p-4 bg-white rounded-lg shadow-lg md:max-w-2xl"
+            class="w-full h-full md:h-auto md:max-w-2xl p-6 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] md:max-h-[100vh]"
         >
             <div class="border-2 border-[#2EBAA1] p-4 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-[#2EBAA1]">
@@ -227,8 +278,19 @@ const cerrarModal = () => emit("cerrar");
                     {{ successMessage }}
                 </p>
 
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div v-for="(field, index) in formFields" :key="index">
+                <div class="grid gap-4">
+                    <div
+                        v-for="(field, index) in formFields"
+                        :key="index"
+                        :class="{
+                            'md:col-span-1 grid-cols-1':
+                                field.type !== 'textarea' &&
+                                field.type !== 'file',
+                            'md:col-span-2 grid-cols-2':
+                                field.type === 'textarea' ||
+                                field.type === 'file',
+                        }"
+                    >
                         <label
                             :for="`form-${field.name}`"
                             class="block mb-2 text-gray-500"
@@ -253,7 +315,6 @@ const cerrarModal = () => emit("cerrar");
                                     {{ option.text }}
                                 </option>
                             </select>
-
                             <span
                                 v-if="errores[field.name]"
                                 class="text-red-500 text-sm"
@@ -264,33 +325,7 @@ const cerrarModal = () => emit("cerrar");
 
                         <template
                             v-else-if="
-                                field.type === 'text' ||
-                                field.label === 'Teléfono'
-                            "
-                        >
-                            <input
-                                :id="`form-${field.name}`"
-                                :type="
-                                    field.type === 'number' &&
-                                    field.label !== 'Teléfono'
-                                        ? 'number'
-                                        : 'text'
-                                "
-                                v-model="formData[field.name]"
-                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
-                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                            />
-                            <span
-                                v-if="errores[field.name]"
-                                class="text-red-500 text-sm"
-                            >
-                                {{ errores[field.name][0] }}
-                            </span>
-                        </template>
-
-                        <template
-                            v-else-if="
-                                field.type === 'text' || field.type === 'email'
+                                field.type === 'text' || field.type === 'number'
                             "
                         >
                             <input
@@ -300,7 +335,6 @@ const cerrarModal = () => emit("cerrar");
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                             />
-
                             <span
                                 v-if="errores[field.name]"
                                 class="text-red-500 text-sm"
@@ -316,13 +350,70 @@ const cerrarModal = () => emit("cerrar");
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                             ></textarea>
-
                             <span
                                 v-if="errores[field.name]"
                                 class="text-red-500 text-sm"
                             >
                                 {{ errores[field.name][0] }}
                             </span>
+                        </template>
+
+                        <template v-else-if="field.type === 'file'">
+                            <div class="file-upload-wrapper">
+                                <input
+                                    :id="`form-${field.name}`"
+                                    :name="field.name"
+                                    type="file"
+                                    class="hidden"
+                                    @change="
+                                        handleFileChange($event, field.name)
+                                    "
+                                />
+                                <label
+                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                                    :for="`form-${field.name}`"
+                                >
+                                    Seleccionar {{ field.label }}
+                                </label>
+
+                                <div class="mt-2">
+                                    <div
+                                        v-if="selectedFileName[field.name] && !isMobile"
+                                        class="text-sm text-gray-500"
+                                    >
+                                        Archivo seleccionado:
+                                        {{ selectedFileName[field.name] }}
+                                    </div>
+
+                                    <div
+                                        v-if="selectedFilePreviews[field.name]"
+                                        class="mt-4"
+                                    >
+                                        <div
+                                            v-for="(file, index) in [
+                                                selectedFilePreviews[
+                                                    field.name
+                                                ],
+                                            ]"
+                                            :key="index"
+                                            class="overflow-hidden border border-gray-300 rounded-lg"
+                                        >
+                                            <img
+                                                :src="file.url"
+                                                :alt="file.name"
+                                                class="object-cover w-full h-50"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <span
+                                    v-if="errores[field.name]"
+                                    class="text-red-500 text-sm"
+                                >
+                                    {{ errores[field.name][0] }}
+                                </span>
+                            </div>
                         </template>
 
                         <template v-if="field.type === 'boolean'">

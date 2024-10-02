@@ -54,15 +54,6 @@ onBeforeUnmount(() => {
     window.removeEventListener("resize", handleResize);
 });
 
-const headers = [
-    "Título",
-    "Categoría",
-    "Descripción",
-    "Prioridad",
-    "Estado",
-    "Soporte",
-];
-
 const filtrarTickets = computed(() => {
     let filteredTickets = tickets.value;
 
@@ -99,6 +90,7 @@ const fetchTickets = async () => {
             id: ticket.id,
             tic_titulo: ticket.tic_titulo,
             tic_descripcion: ticket.tic_descripcion,
+            tic_archivo: ticket.tic_archivo,
             pri_id: ticket.pri_id,
             pri_nombre: ticket.prioridad ? ticket.prioridad.pri_nombre : "",
             use_id: ticket.use_id,
@@ -349,6 +341,12 @@ formFields.value = [
         type: "textarea",
         required: true,
     },
+    {
+        name: "tic_archivo",
+        label: "Imágenes",
+        type: "file",
+        required: false,
+    },
     { name: "tic_activo", label: "Activo", type: "boolean" },
 ];
 
@@ -535,7 +533,7 @@ const getEstadoLabelClass = (estado) => {
                     v-if="!isMobile"
                     @click="isCardView = true"
                     :class="[
-                        'flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
+                        'cursor-pointer flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
                         isCardView
                             ? 'bg-[#2EBAA1] text-white'
                             : 'bg-white text-gray-600',
@@ -546,7 +544,7 @@ const getEstadoLabelClass = (estado) => {
                     v-if="!isMobile"
                     @click="isCardView = false"
                     :class="[
-                        'flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
+                        'cursor-pointer flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
                         !isCardView
                             ? 'bg-[#2EBAA1] text-white'
                             : 'bg-white text-gray-600',

@@ -35,7 +35,6 @@ class TicketSeeder extends Seeder
             'aul_id' => 2,
             'tic_titulo' => 'TITULO 2',
             'tic_descripcion' => 'DESCRIPCION 2',
-            'tic_archivo' => 'ARCHIVO 2',
             'tic_estado' => 'Abierto',
             'tic_activo' => true,
         ]);

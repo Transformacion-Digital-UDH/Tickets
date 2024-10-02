@@ -44,7 +44,7 @@ class Ticket extends Model
 
     public function aula()
     {
-        return $this->belongsTo(Aula::class, foreignKey: 'aul_id');
+        return $this->belongsTo(Aula::class, 'aul_id');
     }
 
     public function asignados()

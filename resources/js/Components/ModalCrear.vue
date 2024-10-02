@@ -1,9 +1,12 @@
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch, computed, onBeforeUnmount } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ButtonCerrar from "@/Components/ButtonCerrar.vue";
+
+const selectedFileName = ref({});
+const selectedFilePreviews = ref({});
 
 const props = defineProps({
     formFields: {
@@ -46,7 +49,21 @@ const emit = defineEmits(["cerrar", "crear"]);
 const formData = ref({});
 const errores = ref([]);
 const loading = ref(false);
+const isMobile = ref(false);
 const successMessage = ref("");
+
+const handleResize = () => {
+    isMobile.value = window.innerWidth <= 768;
+};
+
+onMounted(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener("resize", handleResize);
+});
 
 const visibleFields = computed(() => {
     return props.formFields.filter((field) => field.type !== "boolean");
@@ -164,6 +181,21 @@ watch(
     { immediate: true }
 );
 
+const handleFileChange = (event, fieldName) => {
+    const file = event.target.files[0];
+    if (file) {
+        selectedFileName.value[fieldName] = [file.name];
+        formData.value[fieldName] = file;
+
+        selectedFilePreviews.value[fieldName] = [
+            {
+                name: file.name,
+                url: URL.createObjectURL(file),
+            },
+        ];
+    }
+};
+
 const submitForm = async () => {
     loading.value = true;
     successMessage.value = "";
@@ -235,9 +267,22 @@ const submitForm = async () => {
         loading.value = false;
         return;
     }
+
+    const data = new FormData();
+    props.formFields.forEach((field) => {
+        if (field.type === "file") {
+            if (formData.value[field.name]) {
+                data.append(field.name, formData.value[field.name]);
+            }
+        } else {
+            data.append(field.name, formData.value[field.name] || "");
+        }
+    });
+
     try {
-        const response = await axios.post(props.endpoint, formData.value, {
+        const response = await axios.post(props.endpoint, data, {
             headers: {
+                "Content-Type": "multipart/form-data",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
@@ -251,13 +296,6 @@ const submitForm = async () => {
         });
         emit("crear", response.data);
         successMessage.value = "Creación exitosa!";
-        props.formFields.forEach((field) => {
-            if (field.type === "boolean") {
-                formData.value[field.name] = true;
-            } else {
-                formData.value[field.name] = field.default || "";
-            }
-        });
         emit("cerrar");
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -283,7 +321,9 @@ const cerrarModal = () => emit("cerrar");
     <div
         class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30"
     >
-        <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
+        <div
+            class="w-full h-full md:h-auto md:max-w-2xl p-6 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] md:max-h-[100vh]"
+        >
             <div class="border-2 border-[#2EBAA1] p-4 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-[#2EBAA1]">
                     Crear {{ itemName }}
@@ -292,8 +332,19 @@ const cerrarModal = () => emit("cerrar");
                     {{ successMessage }}
                 </p>
 
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div v-for="(field, index) in visibleFields" :key="index">
+                <div class="grid gap-4">
+                    <div
+                        v-for="(field, index) in visibleFields"
+                        :key="index"
+                        :class="{
+                            'md:col-span-1 grid-cols-1':
+                                field.type !== 'textarea' &&
+                                field.type !== 'file',
+                            'md:col-span-2 grid-cols-2':
+                                field.type === 'textarea' ||
+                                field.type === 'file',
+                        }"
+                    >
                         <label
                             :for="field.name"
                             class="block mb-2 text-gray-500"
@@ -328,31 +379,15 @@ const cerrarModal = () => emit("cerrar");
                             <span
                                 v-if="errores[field.name]"
                                 class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
                             >
-                                {{ errores[field.name][0] }}
-                            </span>
                         </template>
-                        <template v-else-if="field.type === 'textarea'">
-                            <textarea
-                                :id="field.name"
-                                :name="field.name"
-                                v-model="formData[field.name]"
-                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
-                                :autocomplete="field.autocomplete || 'off'"
-                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                            ></textarea>
-                            <span
-                                v-if="errores[field.name]"
-                                class="text-red-500 text-sm"
-                            >
-                                {{ errores[field.name][0] }}
-                            </span>
-                        </template>
+
                         <template v-else-if="field.type === 'number'">
                             <input
                                 :id="field.name"
                                 :name="field.name"
-                                :type="field.type"
+                                type="number"
                                 v-model.number="formData[field.name]"
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 :autocomplete="field.autocomplete || 'off'"
@@ -361,10 +396,109 @@ const cerrarModal = () => emit("cerrar");
                             <span
                                 v-if="errores[field.name]"
                                 class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
                             >
-                                {{ errores[field.name][0] }}
-                            </span>
                         </template>
+
+                        <template v-else-if="field.type === 'text'">
+                            <input
+                                :id="field.name"
+                                :name="field.name"
+                                type="text"
+                                v-model="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                :autocomplete="field.autocomplete || 'off'"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            />
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
+                            >
+                        </template>
+
+                        <template v-else-if="field.type === 'textarea'">
+                            <textarea
+                                :id="field.name"
+                                :name="field.name"
+                                v-model="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                :autocomplete="field.autocomplete || 'off'"
+                                class="w-full h-32 p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            ></textarea>
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
+                            >
+                        </template>
+
+                        <template v-else-if="field.type === 'file'">
+                            <div class="file-upload-wrapper">
+                                <input
+                                    :id="field.name"
+                                    :name="field.name"
+                                    type="file"
+                                    class="hidden"
+                                    @change="
+                                        handleFileChange($event, field.name)
+                                    "
+                                />
+                                <label
+                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                                    :for="field.name"
+                                >
+                                    Seleccionar {{ field.label }}
+                                </label>
+
+                                <div class="mt-2">
+                                    <div
+                                        v-if="selectedFileName[field.name] && !isMobile"
+                                        class="text-sm text-gray-500"
+                                    >
+                                        Archivo seleccionado:
+                                        <ul>
+                                            <li
+                                                v-for="file in selectedFileName[
+                                                    field.name
+                                                ]"
+                                                :key="file"
+                                            >
+                                                {{ file }}
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div
+                                        v-if="selectedFilePreviews[field.name]"
+                                        class="mt-4"
+                                    >
+                                        <div
+                                            v-for="(
+                                                file, index
+                                            ) in selectedFilePreviews[
+                                                field.name
+                                            ]"
+                                            :key="index"
+                                            class="overflow-hidden border border-gray-300 rounded-lg"
+                                        >
+                                            <img
+                                                :src="file.url"
+                                                :alt="file.name"
+                                                class="object-cover w-full h-50"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <span
+                                    v-if="errores[field.name]"
+                                    class="text-red-500 text-sm"
+                                    >{{ errores[field.name][0] }}</span
+                                >
+                            </div>
+                        </template>
+
                         <template v-else>
                             <input
                                 :id="field.name"
@@ -378,9 +512,8 @@ const cerrarModal = () => emit("cerrar");
                             <span
                                 v-if="errores[field.name]"
                                 class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
                             >
-                                {{ errores[field.name][0] }}
-                            </span>
                         </template>
                     </div>
                 </div>
