@@ -8,6 +8,7 @@ use App\Models\Ticket;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -30,7 +31,8 @@ class TicketController extends Controller
     {
         $validatedData = $request->validate([
             'tic_titulo' => 'required|string|max:255',
-            'tic_descripcion' => 'required|string',
+            'tic_descripcion' => 'required|string|max:400',
+            'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'pri_id' => 'required|exists:prioridads,id',
             'use_id' => 'required|exists:users,id',
             'cat_id' => 'required|exists:categorias,id',
@@ -38,13 +40,20 @@ class TicketController extends Controller
             'aul_id' => 'required|exists:aulas,id',
         ]);
 
+        $filePath = null;
+        if ($request->hasFile('tic_archivo')) {
+            $filePath = $request->file('tic_archivo')->store('ticket_images', 'public');
+        }
+
         $ticket = Ticket::create([
             'tic_titulo' => $validatedData['tic_titulo'],
             'tic_descripcion' => $validatedData['tic_descripcion'],
+            'tic_archivo' => $filePath,
             'pri_id' => $validatedData['pri_id'],
             'use_id' => $validatedData['use_id'],
             'cat_id' => $validatedData['cat_id'],
             'pab_id' => $validatedData['pab_id'],
+            'aul_id' => $validatedData['aul_id'],
             'aul_id' => $validatedData['aul_id'],
             'tic_estado' => 'Abierto',
             'tic_activo' => true,
@@ -59,11 +68,11 @@ class TicketController extends Controller
             'sop_id' => 'required|exists:users,id',
             'es_asignado' => 'boolean',
         ]);
-    
+
         $ticket = Ticket::findOrFail($id);
-    
+
         $asignado = Asignado::where('tic_id', $ticket->id)->first();
-    
+
         if ($asignado) {
             $asignado->update([
                 'sop_id' => $validatedData['sop_id'],
@@ -73,7 +82,7 @@ class TicketController extends Controller
                 'tic_estado' => 'Asignado',
                 'sop_id' => $validatedData['sop_id'],
             ]);
-    
+
             return response()->json([
                 'status' => true,
                 'msg' => 'Soporte actualizado y estado actualizado a "Asignado".',
@@ -85,12 +94,12 @@ class TicketController extends Controller
                 'sop_id' => $validatedData['sop_id'],
                 'es_asignado' => $validatedData['es_asignado'] ?? true,
             ]);
-    
+
             $ticket->update([
                 'tic_estado' => 'Asignado',
                 'sop_id' => $validatedData['sop_id'],
             ]);
-    
+
             return response()->json([
                 'status' => true,
                 'msg' => 'Soporte asignado y estado actualizado a "Asignado".',
@@ -107,6 +116,7 @@ class TicketController extends Controller
             $validator = Validator::make($request->all(), [
                 'tic_titulo' => 'required|string|max:255',
                 'tic_descripcion' => 'required|string|max:400',
+                'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'use_id' => 'required|exists:users,id',
                 'cat_id' => 'required|exists:categorias,id',
                 'pri_id' => 'required|exists:prioridads,id',
@@ -124,8 +134,16 @@ class TicketController extends Controller
                 ], 422);
             }
 
+            if ($request->hasFile('tic_archivo')) {
+                if ($ticket->tic_archivo) {
+                    Storage::disk('public')->delete($ticket->tic_archivo);
+                }
+                $filePath = $request->file('tic_archivo')->store('ticket_images', 'public');
+                $ticket->tic_archivo = $filePath;
+            }
+
             $ticket->update($request->only([
-                'tic_titulo', 'tic_descripcion', 'use_id', 'cat_id', 'pri_id',
+                'tic_titulo', 'tic_descripcion', 'tic_archivo', 'use_id', 'cat_id', 'pri_id',
                 'pab_id', 'aul_id', 'tic_estado', 'tic_activo',
             ]));
 
@@ -151,6 +169,10 @@ class TicketController extends Controller
     {
         try {
             $ticket = Ticket::findOrFail($id);
+
+            if ($ticket->tic_archivo) {
+                Storage::disk('public')->delete($ticket->tic_archivo);
+            }
 
             $ticket->delete();
 
