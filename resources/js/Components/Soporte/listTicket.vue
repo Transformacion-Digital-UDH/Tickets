@@ -17,9 +17,8 @@
 
     <!-- Vista de Tarjetas -->
     <div v-if="!isTableView && tickets.length > 0"
-      class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
       <div v-for="ticket in tickets" :key="ticket.id" class="relative w-full">
-        <!-- Colores para los estados del ticket -->
         <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
           'bg-orange-600': ticket.tic_estado === 'Abierto',
           'bg-gray-600': ticket.tic_estado === 'Asignado',
@@ -58,83 +57,57 @@
             <hr class="my-2 border-gray-200" />
           </div>
 
-          <!-- Información del ticket -->
           <div class="flex flex-col space-y-2 text-sm text-gray-600">
             <span><strong>Prioridad:</strong> {{ ticket.prioridad }}</span>
             <span><strong>Categoría:</strong> {{ ticket.categoria }}</span>
             <span><strong>Creado el:</strong> {{ new Date(ticket.created_at).toLocaleDateString() }}</span>
           </div>
 
-          <!-- Acciones solo necesarias para soporte -->
+          <!-- Acciones -->
           <div class="flex justify-end mt-auto space-x-3">
-            <!-- Botón Aceptar solo si el estado es "Asignado" -->
             <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
               class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
               <i class="fas fa-check mr-1"></i> Aceptar
             </button>
 
             <!-- Botón para ver detalles -->
-            <button @click="$emit('view', ticket)"
-              class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
-              <i class="mr-1 fas fa-eye"></i>
-            </button>
-            <!-- Botón para editar ticket -->
-            <button @click="$emit('edit', ticket)"
-              class="text-green-500 hover:text-green-700 transition-colors duration-200">
-              <i class="mr-1 fas fa-edit"></i>
+            <button @click="verDetalles(ticket)" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+              <i class="mr-1 fas fa-eye"></i> Ver
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Vista de Tabla -->
-    <div v-else-if="isTableView && tickets.length > 0" class="overflow-x-auto">
-      <table class="min-w-full bg-white border">
-        <thead>
-          <tr>
-            <th class="px-6 py-3 border-b-2 text-left">Título</th>
-            <th class="px-6 py-3 border-b-2 text-left">Estado</th>
-            <th class="px-6 py-3 border-b-2 text-left">Prioridad</th>
-            <th class="px-6 py-3 border-b-2 text-left">Categoría</th>
-            <th class="px-6 py-3 border-b-2 text-left">Fecha de Creación</th>
-            <th class="px-6 py-3 border-b-2 text-left">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="ticket in tickets" :key="ticket.id">
-            <td class="px-6 py-4 border-b">{{ ticket.tic_titulo }}</td>
-            <td class="px-6 py-4 border-b">{{ ticket.tic_estado }}</td>
-            <td class="px-6 py-4 border-b">{{ ticket.prioridad }}</td>
-            <td class="px-6 py-4 border-b">{{ ticket.categoria }}</td>
-            <td class="px-6 py-4 border-b">{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
-            <td class="px-6 py-4 border-b space-x-2">
-              <!-- Botón Aceptar solo si el estado es "Asignado" -->
-              <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
-                class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
-                <i class="fas fa-check mr-1"></i> Aceptar
-              </button>
+    <!-- Modal de Detalles Embebido Directamente -->
+    <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30">
+      <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg">
+        <div class="p-4 border-2 border-gray-400 rounded-lg">
+          <h2 class="mb-4 text-xl font-bold text-gray-600">
+            Detalles del Ticket
+          </h2>
+          <table class="w-full border-collapse">
+            <thead>
+              <tr>
+                <th class="py-2 pr-10 text-left text-gray-600 border-b-2 border-gray-400">Campo</th>
+                <th class="py-2 text-left text-gray-600 border-b-2 border-gray-400">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(field, index) in formFieldsVer" :key="index" class="border-b border-gray-400">
+                <td class="py-2 pr-10 font-semibold text-left text-gray-500">{{ field.label }}</td>
+                <td class="py-2 text-left text-gray-600">{{ ticketSeleccionado[field.name] || "No disponible" }}</td>
+              </tr>
+            </tbody>
+          </table>
 
-              <!-- Botón para ver detalles -->
-              <button @click="$emit('view', ticket)"
-                class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
-                <i class="fas fa-eye"></i>
-              </button>
-
-              <!-- Botón para editar ticket -->
-              <button @click="$emit('edit', ticket)"
-                class="text-green-500 hover:text-green-700 transition-colors duration-200">
-                <i class="fas fa-edit"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Mostrar mensaje si no hay tickets asignados -->
-    <div v-else class="py-3 text-xs text-center text-gray-500 sm:text-sm">
-      <p>No se encontraron resultados.</p>
+          <div class="flex justify-end mt-4">
+            <button @click="cerrarModal" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -149,21 +122,30 @@ export default {
   setup() {
     const tickets = ref([]);
     const isTableView = ref(false);
+    const mostrarModal = ref(false);
+    const ticketSeleccionado = ref(null);
+
+    const formFieldsVer = ref([
+      { label: 'Título', name: 'tic_titulo' },
+      { label: 'Descripción', name: 'tic_descripcion' },
+      { label: 'Prioridad', name: 'prioridad' },
+      { label: 'Categoría', name: 'categoria' },
+      { label: 'Estado', name: 'tic_estado' },
+      { label: 'Fecha de Creación', name: 'created_at' },
+    ]);
 
     const toggleView = () => {
       isTableView.value = !isTableView.value;
     };
 
-    // Obtener los tickets asignados al soporte al montar el componente
     onMounted(async () => {
       try {
         const response = await fetch('support-optener');
         const data = await response.json();
-
-        // Mapear los datos
         tickets.value = data.map((ticket) => ({
           id: ticket.id,
           tic_titulo: ticket.tic_titulo,
+          tic_descripcion: ticket.tic_descripcion,
           tic_estado: ticket.tic_estado,
           prioridad: ticket.prioridad ? ticket.prioridad.pri_nombre : 'N/A',
           categoria: ticket.categoria ? ticket.categoria.cat_nombre : 'N/A',
@@ -173,6 +155,15 @@ export default {
         console.error('Error al obtener los tickets:', error);
       }
     });
+
+    const verDetalles = (ticket) => {
+      ticketSeleccionado.value = { ...ticket };  // Asignar el ticket seleccionado
+      mostrarModal.value = true;  // Mostrar el modal
+    };
+
+    const cerrarModal = () => {
+      mostrarModal.value = false;  // Cerrar el modal
+    };
 
     const aceptarTicket = async (ticket) => {
       try {
@@ -202,7 +193,7 @@ export default {
       }
     };
 
-    return { tickets, isTableView, toggleView, aceptarTicket };
+    return { tickets, isTableView, toggleView, verDetalles, cerrarModal, mostrarModal, ticketSeleccionado, formFieldsVer, aceptarTicket };
   },
 };
 </script>
