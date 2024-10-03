@@ -23,7 +23,7 @@
           'bg-orange-600': ticket.tic_estado === 'Abierto',
           'bg-gray-600': ticket.tic_estado === 'Asignado',
           'bg-blue-600': ticket.tic_estado === 'En progreso',
-          'bg-green-600': ticket.tic_estado === 'Finalizado',
+          'bg-green-600': ticket.tic_estado === 'Resuelto',
           'bg-red-600': ticket.tic_estado === 'Cerrado',
           'bg-yellow-600': ticket.tic_estado === 'Reabierto',
         }"></span>
@@ -33,7 +33,7 @@
             'border-orange-600': ticket.tic_estado === 'Abierto',
             'border-gray-600': ticket.tic_estado === 'Asignado',
             'border-blue-600': ticket.tic_estado === 'En progreso',
-            'border-green-600': ticket.tic_estado === 'Finalizado',
+            'border-green-600': ticket.tic_estado === 'Resuelto',
             'border-red-600': ticket.tic_estado === 'Cerrado',
             'border-yellow-600': ticket.tic_estado === 'Reabierto',
           }">
@@ -43,7 +43,7 @@
               'bg-orange-600 text-white': ticket.tic_estado === 'Abierto',
               'bg-gray-600 text-white': ticket.tic_estado === 'Asignado',
               'bg-blue-600 text-white': ticket.tic_estado === 'En progreso',
-              'bg-green-600 text-white': ticket.tic_estado === 'Finalizado',
+              'bg-green-600 text-white': ticket.tic_estado === 'Resuelto',
               'bg-red-600 text-white': ticket.tic_estado === 'Cerrado',
               'bg-yellow-600 text-white': ticket.tic_estado === 'Reabierto',
             }">
@@ -109,7 +109,7 @@
                 'text-orange-600': ticket.tic_estado === 'Abierto',
                 'text-gray-600': ticket.tic_estado === 'Asignado',
                 'text-blue-600': ticket.tic_estado === 'En progreso',
-                'text-green-600': ticket.tic_estado === 'Finalizado',
+                'text-green-600': ticket.tic_estado === 'Resuelto',
                 'text-red-600': ticket.tic_estado === 'Cerrado',
                 'text-yellow-600': ticket.tic_estado === 'Reabierto',
               }">{{ ticket.tic_estado }}</span>

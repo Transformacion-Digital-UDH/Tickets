@@ -61,7 +61,7 @@ class SoporteTicketController extends Controller
         $ticket = Ticket::findOrFail($id); // Buscar el ticket por ID
 
         // Cambiar el estado del ticket a "Finalizado"
-        $ticket->update(['tic_estado' => 'Finalizado']);
+        $ticket->update(['tic_estado' => 'Resuelto']);
 
         return response()->json([
             'status' => true,
