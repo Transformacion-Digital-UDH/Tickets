@@ -18,7 +18,7 @@
         <i class="fas fa-check icon"></i>
       </div>
       <div class="content">
-        <h3>Finalizados</h3>
+        <h3>Resueltos</h3>
         <p class="number">{{ finalizedTickets }}</p>
         <p class="status">+5 desde la última actualización</p>
       </div>
@@ -88,7 +88,7 @@ export default {
 
         // Filtrar tickets según su estado
         assignedTickets.value = data.filter(ticket => ticket.tic_estado === 'Asignado').length;
-        finalizedTickets.value = data.filter(ticket => ticket.tic_estado === 'Finalizado').length;
+        finalizedTickets.value = data.filter(ticket => ticket.tic_estado === 'Resuelto').length;
         inProgressTickets.value = data.filter(ticket => ticket.tic_estado === 'En progreso').length;
         closedTickets.value = data.filter(ticket => ticket.tic_estado === 'Cerrado').length;
 
