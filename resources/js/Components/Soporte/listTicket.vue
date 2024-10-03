@@ -79,6 +79,49 @@
       </div>
     </div>
 
+    <!-- Vista de Tabla -->
+    <div v-if="isTableView && tickets.length > 0" class="overflow-x-auto">
+      <table class="min-w-full text-sm text-left text-gray-600 border border-gray-300">
+        <thead class="bg-gray-100 text-gray-800">
+          <tr>
+            <th class="px-4 py-2 border">Título</th>
+            <th class="px-4 py-2 border">Prioridad</th>
+            <th class="px-4 py-2 border">Categoría</th>
+            <th class="px-4 py-2 border">Estado</th>
+            <th class="px-4 py-2 border">Creado el</th>
+            <th class="px-4 py-2 border">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="ticket in tickets" :key="ticket.id" class="bg-white hover:bg-gray-100">
+            <td class="px-4 py-2 border">{{ ticket.tic_titulo }}</td>
+            <td class="px-4 py-2 border">{{ ticket.prioridad }}</td>
+            <td class="px-4 py-2 border">{{ ticket.categoria }}</td>
+            <td class="px-4 py-2 border">
+              <span :class="{
+                'text-orange-600': ticket.tic_estado === 'Abierto',
+                'text-gray-600': ticket.tic_estado === 'Asignado',
+                'text-blue-600': ticket.tic_estado === 'En progreso',
+                'text-green-600': ticket.tic_estado === 'Resuelto',
+                'text-red-600': ticket.tic_estado === 'Cerrado',
+                'text-yellow-600': ticket.tic_estado === 'Reabierto',
+              }">{{ ticket.tic_estado }}</span>
+            </td>
+            <td class="px-4 py-2 border">{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
+            <td class="px-4 py-2 border flex space-x-3">
+              <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
+                class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
+                <i class="fas fa-check mr-1"></i> Aceptar
+              </button>
+              <button @click="verDetalles(ticket)" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+                <i class="mr-1 fas fa-eye"></i> Ver
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Modal de Detalles Embebido Directamente -->
     <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30">
       <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg">
