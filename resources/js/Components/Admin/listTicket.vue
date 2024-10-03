@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import filterTicketState from "@/Components/filterTicketState.vue";
 import CardTickets from "@/Components/CardTickets.vue";
 import ModalCrear from "@/Components/ModalCrear.vue";
 import ModalAsignar from "@/Components/ModalAsignar.vue";
@@ -36,7 +37,6 @@ const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const estadoFilters = ref([]);
-const showEstadoDropdown = ref(false);
 
 const handleResize = () => {
     isMobile.value = window.innerWidth <= 768;
@@ -83,6 +83,10 @@ const filtrarTickets = computed(() => {
     });
 });
 
+const updateEstadoFilters = (newFilters) => {
+    estadoFilters.value = newFilters;
+};
+
 const fetchTickets = async () => {
     try {
         const response = await axios.get("/tickets");
@@ -108,6 +112,8 @@ const fetchTickets = async () => {
             aul_numero: ticket.aula ? ticket.aula.aul_numero : "",
             tic_estado: ticket.tic_estado,
             tic_activo: ticket.tic_activo,
+            created_at: ticket.created_at,
+            updated_at:ticket.updated_at,
         }));
     } catch (error) {
         console.error("Error al cargar los tickets:", error);
@@ -447,10 +453,6 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const toggleEstadoDropdown = () => {
-    showEstadoDropdown.value = !showEstadoDropdown.value;
-};
-
 const fetchAllData = async () => {
     try {
         await Promise.all([
@@ -559,85 +561,10 @@ const getEstadoLabelClass = (estado) => {
                 />
             </div>
         </div>
-        <div class="relative text-right mb-2 mr-1">
-                <i
-                    class="fas fa-sliders-h cursor-pointer text-gray-500"
-                    @click="toggleEstadoDropdown"
-                ></i>
-                <div
-                    v-if="showEstadoDropdown"
-                    class="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-300 shadow-md rounded-md p-2"
-                >
-                    <div class="grid grid-cols-1 gap-2">
-                        <label class="inline-flex items-center">
-                            <input
-                                type="checkbox"
-                                v-model="estadoFilters"
-                                value="Abierto"
-                                class="form-checkbox h-5 w-5 text-[#2EBAA1] focus:ring-[#2EBAA1] checked:border-[#2EBAA1]"
-                            />
-                            <span class="ml-2 text-gray-700 text-sm"
-                                >Abierto</span
-                            >
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input
-                                type="checkbox"
-                                v-model="estadoFilters"
-                                value="Asignado"
-                                class="form-checkbox h-5 w-5 text-[#2EBAA1] focus:ring-[#2EBAA1] checked:border-[#2EBAA1]"
-                            />
-                            <span class="ml-2 text-gray-700 text-sm"
-                                >Asignado</span
-                            >
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input
-                                type="checkbox"
-                                v-model="estadoFilters"
-                                value="En progreso"
-                                class="form-checkbox h-5 w-5 text-[#2EBAA1] focus:ring-[#2EBAA1] checked:border-[#2EBAA1]"
-                            />
-                            <span class="ml-2 text-gray-700 text-sm"
-                                >En progreso</span
-                            >
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input
-                                type="checkbox"
-                                v-model="estadoFilters"
-                                value="Resuelto"
-                                class="form-checkbox h-5 w-5 text-[#2EBAA1] focus:ring-[#2EBAA1] checked:border-[#2EBAA1]"
-                            />
-                            <span class="ml-2 text-gray-700 text-sm"
-                                >Resuelto</span
-                            >
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input
-                                type="checkbox"
-                                v-model="estadoFilters"
-                                value="Cerrado"
-                                class="form-checkbox h-5 w-5 text-[#2EBAA1] focus:ring-[#2EBAA1] checked:border-[#2EBAA1]"
-                            />
-                            <span class="ml-2 text-gray-700 text-sm"
-                                >Cerrado</span
-                            >
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input
-                                type="checkbox"
-                                v-model="estadoFilters"
-                                value="Reabierto"
-                                class="form-checkbox h-5 w-5 text-[#2EBAA1] focus:ring-[#2EBAA1] checked:border-[#2EBAA1]"
-                            />
-                            <span class="ml-2 text-gray-700 text-sm"
-                                >Reabierto</span
-                            >
-                        </label>
-                    </div>
-                </div>
-            </div>
+        <filterTicketState
+            :estadoFilters="estadoFilters"
+            @update-filters="updateEstadoFilters"
+        />
 
         <div v-if="isCardView">
             <CardTickets

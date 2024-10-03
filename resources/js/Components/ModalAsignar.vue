@@ -112,7 +112,7 @@ const asignarSoporte = async () => {
             });
             emit("crear", response.data);
         } else {
-            toast.success(`Soporte actualizado exitosamente!`, {
+            toast.success(`Soporte reasignado exitosamente!`, {
                 autoClose: 3000,
                 position: "bottom-right",
                 style: { width: "400px" },

@@ -28,7 +28,7 @@ onMounted(() => {
 
 <template>
     <div
-        class="grid grid-cols-1 gap-4 p-4 dashboard-container md:grid-cols-2 lg:grid-cols-3"
+        class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 p-3"
     >
         <div class="card">
             <div class="icon-container">
@@ -79,12 +79,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.dashboard-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
 .card {
     background-color: #757776;
     border-radius: 15px;
@@ -132,5 +126,34 @@ h3 {
     font-size: 14px;
     color: #d1ffd7;
     margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+    h3 {
+        font-size: 16px;
+    }
+    .number {
+        font-size: 24px;
+    }
+    .status {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 12px;
+        align-items: center;
+        text-align: center;
+    }
+    .icon-container {
+        margin-bottom: 10px;
+    }
+    .number {
+        font-size: 20px;
+    }
+    .status {
+        font-size: 12px;
+    }
 }
 </style>

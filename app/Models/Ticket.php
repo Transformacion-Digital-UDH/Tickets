@@ -20,6 +20,8 @@ class Ticket extends Model
         'tic_archivo',
         'tic_estado',
         'tic_activo',
+        'created_at',
+        'updated_at',
     ];
 
     public function pabellon()
