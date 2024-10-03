@@ -71,7 +71,8 @@
             </button>
 
             <!-- Botón para ver detalles -->
-            <button @click="verDetalles(ticket)" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+            <button @click="verDetalles(ticket)"
+              class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
               <i class="mr-1 fas fa-eye"></i> Ver
             </button>
           </div>
@@ -113,7 +114,8 @@
                 class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
                 <i class="fas fa-check mr-1"></i> Aceptar
               </button>
-              <button @click="verDetalles(ticket)" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+              <button @click="verDetalles(ticket)"
+                class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
                 <i class="mr-1 fas fa-eye"></i> Ver
               </button>
             </td>
@@ -156,7 +158,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 
 export default {
   props: {
@@ -181,7 +183,7 @@ export default {
       isTableView.value = !isTableView.value;
     };
 
-    onMounted(async () => {
+    const recargarTickets = async () => {
       try {
         const response = await fetch('support-optener');
         const data = await response.json();
@@ -195,9 +197,11 @@ export default {
           created_at: ticket.created_at,
         }));
       } catch (error) {
-        console.error('Error al obtener los tickets:', error);
+        console.error('Error al recargar los tickets:', error);
       }
-    });
+    };
+
+    onMounted(recargarTickets);
 
     const verDetalles = (ticket) => {
       ticketSeleccionado.value = { ...ticket };  // Asignar el ticket seleccionado
@@ -214,8 +218,8 @@ export default {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-          }
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          },
         });
 
         if (!response.ok) {
@@ -223,11 +227,10 @@ export default {
         }
 
         const data = await response.json();
+
         if (data.status) {
-          const index = tickets.value.findIndex((t) => t.id === ticket.id);
-          if (index !== -1) {
-            tickets.value[index] = data.ticket;
-          }
+          await recargarTickets(); // Recargar todos los tickets después de aceptar uno
+          await nextTick(); // Asegurar que Vue procesa el renderizado
         } else {
           console.error(data.msg);
         }
@@ -236,7 +239,17 @@ export default {
       }
     };
 
-    return { tickets, isTableView, toggleView, verDetalles, cerrarModal, mostrarModal, ticketSeleccionado, formFieldsVer, aceptarTicket };
+    return {
+      tickets,
+      isTableView,
+      toggleView,
+      verDetalles,
+      cerrarModal,
+      mostrarModal,
+      ticketSeleccionado,
+      formFieldsVer,
+      aceptarTicket,
+    };
   },
 };
 </script>
