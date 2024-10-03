@@ -202,6 +202,23 @@ const editarItem = async () => {
             }
         }
 
+        if (field.label === "Correo") {
+            if (!fieldValue) {
+                errores.value[field.name] = [
+                    `El campo ${field.label} es requerido`,
+                ];
+                isValid = false;
+            } else {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(fieldValue)) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe ser un correo válido.`,
+                    ];
+                    isValid = false;
+                }
+            }
+        }
+
         if (field.type === "boolean") {
             formData.value[field.name] = formData.value[field.name] ? 1 : 0;
         }
@@ -268,7 +285,7 @@ const cerrarModal = () => emit("cerrar");
         class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30"
     >
         <div
-            class="w-full h-full md:h-auto md:max-w-2xl p-6 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] md:max-h-[100vh]"
+            class="w-full md:h-auto md:max-w-2xl p-6 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] md:max-h-[100vh]"
         >
             <div class="border-2 border-[#2EBAA1] p-4 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-[#2EBAA1]">
@@ -325,12 +342,32 @@ const cerrarModal = () => emit("cerrar");
 
                         <template
                             v-else-if="
-                                field.type === 'text' || field.type === 'number'
+                                field.type === 'email'
                             "
                         >
                             <input
                                 :id="`form-${field.name}`"
-                                :type="field.type"
+                                :type=field.type
+                                v-model="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            />
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                            >
+                                {{ errores[field.name][0] }}
+                            </span>
+                        </template>
+
+                        <template
+                            v-else-if="
+                                field.type === 'text' || field.label.toLowerCase().includes('teléfono')
+                            "
+                        >
+                            <input
+                                :id="`form-${field.name}`"
+                                type='text'
                                 v-model="formData[field.name]"
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"

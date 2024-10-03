@@ -67,7 +67,7 @@ export default {
             >
                 {{ index + 1 }}
             </div>
-            <h2 class="mt-2 mb-2 text-lg font-bold text-gray-800">
+            <h2 class="text-lg font-bold text-gray-800 uppercase truncate mt-2">
                 {{ getItemDisplayKeys(item).name }}
             </h2>
             <p
