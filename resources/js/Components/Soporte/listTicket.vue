@@ -19,6 +19,7 @@
     <div v-if="!isTableView && tickets.length > 0"
       class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       <div v-for="ticket in tickets" :key="ticket.id" class="relative w-full">
+        <!-- Colores para los estados del ticket -->
         <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
           'bg-orange-600': ticket.tic_estado === 'Abierto',
           'bg-gray-600': ticket.tic_estado === 'Asignado',
@@ -57,9 +58,10 @@
             <hr class="my-2 border-gray-200" />
           </div>
 
+          <!-- Información del ticket -->
           <div class="flex flex-col space-y-2 text-sm text-gray-600">
-            <span><strong>Prioridad:</strong> {{ ticket.prioridad?.nombre || 'N/A' }}</span>
-            <span><strong>Categoría:</strong> {{ ticket.categoria?.nombre || 'N/A' }}</span>
+            <span><strong>Prioridad:</strong> {{ ticket.prioridad }}</span>
+            <span><strong>Categoría:</strong> {{ ticket.categoria }}</span>
             <span><strong>Creado el:</strong> {{ new Date(ticket.created_at).toLocaleDateString() }}</span>
           </div>
 
@@ -103,8 +105,8 @@
           <tr v-for="ticket in tickets" :key="ticket.id">
             <td class="px-6 py-4 border-b">{{ ticket.tic_titulo }}</td>
             <td class="px-6 py-4 border-b">{{ ticket.tic_estado }}</td>
-            <td class="px-6 py-4 border-b">{{ ticket.prioridad?.nombre || 'N/A' }}</td>
-            <td class="px-6 py-4 border-b">{{ ticket.categoria?.nombre || 'N/A' }}</td>
+            <td class="px-6 py-4 border-b">{{ ticket.prioridad }}</td>
+            <td class="px-6 py-4 border-b">{{ ticket.categoria }}</td>
             <td class="px-6 py-4 border-b">{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
             <td class="px-6 py-4 border-b space-x-2">
               <!-- Botón Aceptar solo si el estado es "Asignado" -->
@@ -146,7 +148,7 @@ export default {
   },
   setup() {
     const tickets = ref([]);
-    const isTableView = ref(false); // Estado para alternar la vista
+    const isTableView = ref(false);
 
     const toggleView = () => {
       isTableView.value = !isTableView.value;
@@ -157,13 +159,21 @@ export default {
       try {
         const response = await fetch('support-optener');
         const data = await response.json();
-        tickets.value = data;
+
+        // Mapear los datos
+        tickets.value = data.map((ticket) => ({
+          id: ticket.id,
+          tic_titulo: ticket.tic_titulo,
+          tic_estado: ticket.tic_estado,
+          prioridad: ticket.prioridad ? ticket.prioridad.pri_nombre : 'N/A',
+          categoria: ticket.categoria ? ticket.categoria.cat_nombre : 'N/A',
+          created_at: ticket.created_at,
+        }));
       } catch (error) {
         console.error('Error al obtener los tickets:', error);
       }
     });
 
-    // Método para aceptar un ticket (cambiar estado a "En progreso")
     const aceptarTicket = async (ticket) => {
       try {
         const response = await fetch(`/soporte/tickets/aceptar/${ticket.id}`, {
@@ -179,9 +189,7 @@ export default {
         }
 
         const data = await response.json();
-
         if (data.status) {
-          // Actualizar el ticket en la lista de tickets
           const index = tickets.value.findIndex((t) => t.id === ticket.id);
           if (index !== -1) {
             tickets.value[index] = data.ticket;
@@ -193,7 +201,6 @@ export default {
         console.error('Error al aceptar el ticket:', error);
       }
     };
-
 
     return { tickets, isTableView, toggleView, aceptarTicket };
   },

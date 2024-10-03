@@ -44,18 +44,17 @@ class SoporteTicketController extends Controller
     {
         $userId = auth()->id(); // Obtener el ID del usuario autenticado (soporte)
 
-        // Utilizar la relación asignados para obtener los tickets
+        // Utilizar la relación asignados para obtener los tickets y cargar relaciones con Eager Loading
         $tickets = Ticket::whereHas('asignados', function ($query) use ($userId) {
             $query->where('sop_id', $userId);
-        })->with([
-                    'asignados' => function ($query) use ($userId) {
-                        $query->where('sop_id', $userId);
-                    }
-                ])->distinct()->get();
+        })->with(['prioridad', 'categoria', 'user']) // Asegurarse de cargar relaciones
+            ->distinct()
+            ->get();
 
-        // Muestra los tickets filtrados
+        // Muestra los tickets filtrados con las relaciones cargadas
         return response()->json($tickets); // Retornar los tickets en formato JSON
     }
+
 
     // Método para finalizar un ticket
     public function finalizarTicket(Request $request, $id)
