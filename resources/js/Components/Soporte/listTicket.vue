@@ -23,7 +23,7 @@
           'bg-orange-600': ticket.tic_estado === 'Abierto',
           'bg-gray-600': ticket.tic_estado === 'Asignado',
           'bg-blue-600': ticket.tic_estado === 'En progreso',
-          'bg-green-600': ticket.tic_estado === 'Resuelto',
+          'bg-green-600': ticket.tic_estado === 'Finalizado',
           'bg-red-600': ticket.tic_estado === 'Cerrado',
           'bg-yellow-600': ticket.tic_estado === 'Reabierto',
         }"></span>
@@ -33,7 +33,7 @@
             'border-orange-600': ticket.tic_estado === 'Abierto',
             'border-gray-600': ticket.tic_estado === 'Asignado',
             'border-blue-600': ticket.tic_estado === 'En progreso',
-            'border-green-600': ticket.tic_estado === 'Resuelto',
+            'border-green-600': ticket.tic_estado === 'Finalizado',
             'border-red-600': ticket.tic_estado === 'Cerrado',
             'border-yellow-600': ticket.tic_estado === 'Reabierto',
           }">
@@ -43,7 +43,7 @@
               'bg-orange-600 text-white': ticket.tic_estado === 'Abierto',
               'bg-gray-600 text-white': ticket.tic_estado === 'Asignado',
               'bg-blue-600 text-white': ticket.tic_estado === 'En progreso',
-              'bg-green-600 text-white': ticket.tic_estado === 'Resuelto',
+              'bg-green-600 text-white': ticket.tic_estado === 'Finalizado',
               'bg-red-600 text-white': ticket.tic_estado === 'Cerrado',
               'bg-yellow-600 text-white': ticket.tic_estado === 'Reabierto',
             }">
@@ -68,6 +68,12 @@
             <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
               class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
               <i class="fas fa-check mr-1"></i> Aceptar
+            </button>
+
+            <!-- Botón de finalizar -->
+            <button v-if="ticket.tic_estado === 'En progreso'" @click="finalizarTicket(ticket)"
+              class="text-green-500 hover:text-green-700 transition-colors duration-200">
+              <i class="fas fa-check-circle mr-1"></i> Finalizar
             </button>
 
             <!-- Botón para ver detalles -->
@@ -103,7 +109,7 @@
                 'text-orange-600': ticket.tic_estado === 'Abierto',
                 'text-gray-600': ticket.tic_estado === 'Asignado',
                 'text-blue-600': ticket.tic_estado === 'En progreso',
-                'text-green-600': ticket.tic_estado === 'Resuelto',
+                'text-green-600': ticket.tic_estado === 'Finalizado',
                 'text-red-600': ticket.tic_estado === 'Cerrado',
                 'text-yellow-600': ticket.tic_estado === 'Reabierto',
               }">{{ ticket.tic_estado }}</span>
@@ -113,6 +119,10 @@
               <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
                 class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
                 <i class="fas fa-check mr-1"></i> Aceptar
+              </button>
+              <button v-if="ticket.tic_estado === 'En progreso'" @click="finalizarTicket(ticket)"
+                class="text-green-500 hover:text-green-700 transition-colors duration-200">
+                <i class="fas fa-check-circle mr-1"></i> Finalizar
               </button>
               <button @click="verDetalles(ticket)"
                 class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
@@ -239,6 +249,33 @@ export default {
       }
     };
 
+    const finalizarTicket = async (ticket) => {
+      try {
+        const response = await fetch(`/soporte/tickets/finalizar/${ticket.id}`, {
+          method: 'POST', // Usa POST según tu configuración de rutas
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al finalizar el ticket');
+        }
+
+        const data = await response.json();
+
+        if (data.status) {
+          await recargarTickets(); // Recargar todos los tickets después de finalizar uno
+          await nextTick(); // Asegurar que Vue procesa el renderizado
+        } else {
+          console.error(data.msg);
+        }
+      } catch (error) {
+        console.error('Error al finalizar el ticket:', error);
+      }
+    };
+
     return {
       tickets,
       isTableView,
@@ -249,6 +286,7 @@ export default {
       ticketSeleccionado,
       formFieldsVer,
       aceptarTicket,
+      finalizarTicket, // Agregar el nuevo método aquí
     };
   },
 };

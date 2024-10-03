@@ -1,11 +1,11 @@
 <?php
+
 namespace App\Http\Controllers\Soporte;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
-use App\Models\Asignado;
 use Illuminate\Http\Request;
-use Inertia\Inertia; // Asegúrate de importar Inertia
+use Inertia\Inertia;
 
 class SoporteTicketController extends Controller
 {
@@ -44,17 +44,16 @@ class SoporteTicketController extends Controller
     {
         $userId = auth()->id(); // Obtener el ID del usuario autenticado (soporte)
 
-        // Utilizar la relación asignados para obtener los tickets y cargar relaciones con Eager Loading
+        // Obtener los tickets asignados al soporte
         $tickets = Ticket::whereHas('asignados', function ($query) use ($userId) {
             $query->where('sop_id', $userId);
         })->with(['prioridad', 'categoria', 'user']) // Asegurarse de cargar relaciones
             ->distinct()
             ->get();
 
-        // Muestra los tickets filtrados con las relaciones cargadas
-        return response()->json($tickets); // Retornar los tickets en formato JSON
+        // Retornar los tickets en formato JSON
+        return response()->json($tickets);
     }
-
 
     // Método para finalizar un ticket
     public function finalizarTicket(Request $request, $id)
