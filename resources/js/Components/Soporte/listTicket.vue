@@ -197,15 +197,19 @@ export default {
       try {
         const response = await fetch('support-optener');
         const data = await response.json();
-        tickets.value = data.map((ticket) => ({
-          id: ticket.id,
-          tic_titulo: ticket.tic_titulo,
-          tic_descripcion: ticket.tic_descripcion,
-          tic_estado: ticket.tic_estado,
-          prioridad: ticket.prioridad ? ticket.prioridad.pri_nombre : 'N/A',
-          categoria: ticket.categoria ? ticket.categoria.cat_nombre : 'N/A',
-          created_at: ticket.created_at,
-        }));
+
+        // Ordenar los tickets por la fecha de creación en orden descendente (más recientes primero)
+        tickets.value = data
+          .map((ticket) => ({
+            id: ticket.id,
+            tic_titulo: ticket.tic_titulo,
+            tic_descripcion: ticket.tic_descripcion,
+            tic_estado: ticket.tic_estado,
+            prioridad: ticket.prioridad ? ticket.prioridad.pri_nombre : 'N/A',
+            categoria: ticket.categoria ? ticket.categoria.cat_nombre : 'N/A',
+            created_at: ticket.created_at,
+          }))
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // Orden descendente por fecha
       } catch (error) {
         console.error('Error al recargar los tickets:', error);
       }
@@ -286,7 +290,7 @@ export default {
       ticketSeleccionado,
       formFieldsVer,
       aceptarTicket,
-      finalizarTicket, // Agregar el nuevo método aquí
+      finalizarTicket,
     };
   },
 };
