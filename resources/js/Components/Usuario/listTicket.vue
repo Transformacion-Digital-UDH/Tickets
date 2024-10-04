@@ -19,6 +19,7 @@ const formFieldsVer = ref([]);
 const tickets = ref({
     open: [],
     inProgress: [],
+    result: [],
     closed: [],
 });
 const itemSeleccionado = ref(null);
@@ -71,6 +72,8 @@ const loadTickets = async (page = 1) => {
                 ? "Abierto"
                 : activeTab.value === "in-progress"
                 ? "En progreso"
+                : activeTab.value === "result"
+                ? "Resuelto"
                 : "Cerrado";
 
         const response = await axios.get(
@@ -90,6 +93,8 @@ const loadTickets = async (page = 1) => {
             tickets.value.open = ticketData;
         } else if (activeTab.value === "in-progress") {
             tickets.value.inProgress = ticketData;
+        } else if (activeTab.value === "result") {
+            tickets.value.result = ticketData;
         } else if (activeTab.value === "closed") {
             tickets.value.closed = ticketData;
         }
@@ -374,6 +379,17 @@ const cerrarEliminarModal = () => {
                 <button
                     :class="[
                         'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                        activeTab === 'result'
+                            ? 'bg-[#2EBAA1] text-white'
+                            : 'bg-white text-[#2EBAA1]',
+                    ]"
+                    @click="showTickets('result')"
+                >
+                    Mis Tickets Resueltos
+                </button>
+                <button
+                    :class="[
+                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
                         activeTab === 'closed'
                             ? 'bg-[#2EBAA1] text-white'
                             : 'bg-white text-[#2EBAA1]',
@@ -627,9 +643,92 @@ const cerrarEliminarModal = () => {
                     </div>
                 </div>
 
-                <div class="block sm:hidden" v-if="activeTab === 'in-progress'">
+                <div class="hidden sm:block" v-if="activeTab === 'result'">
+                    <table
+                        class="min-w-full divide-y divide-gray-200 table-auto"
+                    >
+                        <thead class="bg-white">
+                            <tr>
+                                <th
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
+                                >
+                                    N°
+                                </th>
+                                <th
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
+                                >
+                                    Título
+                                </th>
+                                <th
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
+                                >
+                                    Descripción
+                                </th>
+                                <th
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
+                                >
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="(ticket, index) in tickets.result"
+                                :key="ticket.id"
+                                class="transition-colors duration-200 border-b hover:bg-gray-100"
+                            >
+                                <td
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
+                                >
+                                    {{ ticket.row_number }}
+                                </td>
+                                <td
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
+                                >
+                                    {{ ticket.tic_titulo }}
+                                </td>
+                                <td
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
+                                >
+                                    {{ ticket.tic_descripcion }}
+                                </td>
+                                <td
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
+                                >
+                                    <button
+                                        @click="viewTicket(ticket)"
+                                        class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
+                                        title="Ver detalles"
+                                    >
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-4 flex justify-center">
+                        <button
+                            v-for="page in Array.from(
+                                { length: totalPages },
+                                (_, i) => i + 1
+                            )"
+                            :key="page"
+                            :class="[
+                                currentPage === page
+                                    ? 'bg-[#2EBAA1] text-white'
+                                    : 'bg-white text-[#2EBAA1]',
+                                'mx-2 px-3 py-1 rounded-lg',
+                            ]"
+                            @click="changePage(page)"
+                        >
+                            {{ page }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="block sm:hidden" v-if="activeTab === 'result'">
                     <div
-                        v-for="(ticket, index) in tickets.inProgress"
+                        v-for="(ticket, index) in tickets.result"
                         :key="ticket.id"
                         class="relative border rounded-lg p-4 mb-4 shadow-sm"
                     >
