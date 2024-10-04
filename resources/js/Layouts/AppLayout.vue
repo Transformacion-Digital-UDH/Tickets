@@ -390,33 +390,6 @@ defineProps({ title: String });
                                 >Tickets</span
                             >
                         </NavLink>
-
-                        
-                        <NavLink
-                            :href="route('pabellon')"
-                            :active="route().current('pabellon')"
-                            :class="linkClasses(route().current('pabellon'))"
-                        >
-                            <font-awesome-icon
-                                icon="building"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Pabellones</span
-                            >
-                        </NavLink>
-
-                        <NavLink
-                            :href="route('aula')"
-                            :active="route().current('aula')"
-                            :class="linkClasses(route().current('aula'))"
-                        >
-                            <font-awesome-icon
-                                icon="chalkboard"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2">Aulas</span>
-                        </NavLink>
                     </div>
                 </div>
             </nav>
