@@ -45,7 +45,7 @@
 
     <!-- Botón para cambiar la vista (ahora con íconos) -->
     <div class="text-right mb-4">
-      <button @click="toggleView" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-300">
+      <button @click="toggleView" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition-colors duration-300">
         <i :class="isTableView ? 'fas fa-th-large' : 'fas fa-table'"></i>
       </button>
     </div>
