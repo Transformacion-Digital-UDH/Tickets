@@ -41,6 +41,7 @@ const props = defineProps({
 const emit = defineEmits(["cerrar", "update"]);
 
 const formData = ref({});
+const formDataOriginal = ref({});
 const errores = ref({});
 const isMobile = ref(false);
 const loading = ref(false);
@@ -64,8 +65,10 @@ onBeforeUnmount(() => {
 
 const initializeFormData = (item) => {
     formData.value = {};
+    formDataOriginal.value = {};
     props.formFields.forEach((field) => {
         formData.value[field.name] = item?.[field.name] || "";
+        formDataOriginal.value[field.name] = item?.[field.name] || "";
 
         if (field.type === "file" && item?.[field.name]) {
             selectedFileName.value[field.name] = item[field.name];
@@ -75,7 +78,6 @@ const initializeFormData = (item) => {
             };
         }
     });
-    clickInicial.value = true;
 };
 
 const updateSelectOptions = (fieldName, options) => {
@@ -85,40 +87,15 @@ const updateSelectOptions = (fieldName, options) => {
     }
 };
 
-watch(
-    () => props.prioridads,
-    (newOptions) => updateSelectOptions("pri_id", newOptions),
-    { immediate: true }
-);
-
-watch(
-    () => props.usuarios,
-    (newOptions) => updateSelectOptions("use_id", newOptions),
-    { immediate: true }
-);
-
-watch(
-    () => props.sedes,
-    (newOptions) => updateSelectOptions("sed_id", newOptions),
-    { immediate: true }
-);
-
-watch(
-    () => props.categorias,
-    (newOptions) => updateSelectOptions("cat_id", newOptions),
-    { immediate: true }
-);
-
-watch(
-    () => props.pabellons,
-    (newOptions) => updateSelectOptions("pab_id", newOptions),
-    { immediate: true }
-);
-
-watch(
-    () => props.aulas,
-    (newOptions) => updateSelectOptions("aul_id", newOptions),
-    { immediate: true }
+["prioridads", "usuarios", "sedes", "categorias", "pabellons", "aulas"].forEach(
+    (prop) => {
+        watch(
+            () => props[prop],
+            (newOptions) =>
+                updateSelectOptions(`${prop.slice(0, -1)}_id`, newOptions),
+            { immediate: true }
+        );
+    }
 );
 
 watch(
@@ -154,14 +131,62 @@ const handleFileChange = (event, fieldName) => {
     }
 };
 
+const updateFile = async () => {
+    const data = new FormData();
+    let fileUpdated = false;
+    props.formFields.forEach((field) => {
+        if (
+            field.type === "file" &&
+            formData.value[field.name] instanceof File
+        ) {
+            data.append(field.name, formData.value[field.name]);
+            fileUpdated = true;
+        }
+    });
+
+    if (!fileUpdated) return;
+
+    try {
+        const response = await axios.post(
+            `${props.endpoint}/${props.item.id}/upload`,
+            data,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+            }
+        );
+
+        toast.success(`Imagen actualizada correctamente`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-green-500 p-2",
+        });
+
+        emit("update", response.data);
+
+        cerrarModal();
+    } catch (error) {
+        toast.error(`Error al actualizar la imagen`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
+    }
+};
+
 const editarItem = async () => {
     loading.value = true;
     successMessage.value = "";
     errores.value = {};
     let isValid = true;
 
-    const data = new FormData();
-
+    const data = {};
     props.formFields.forEach((field) => {
         const fieldValue = formData.value[field.name];
 
@@ -219,14 +244,8 @@ const editarItem = async () => {
             }
         }
 
-        if (field.type === "boolean") {
-            formData.value[field.name] = formData.value[field.name] ? 1 : 0;
-        }
-
-        if (field.type === "file" && formData.value[field.name]) {
-            data.append(field.name, formData.value[field.name]);
-        } else if (field.type !== "file") {
-            data.append(field.name, formData.value[field.name]);
+        if (field.type !== "file") {
+            data[field.name] = formData.value[field.name] || "";
         }
     });
 
@@ -274,6 +293,45 @@ const editarItem = async () => {
         });
     } finally {
         loading.value = false;
+    }
+};
+
+const actualizarItemCompleto = async () => {
+    let isFileUpdated = false;
+    let isFormUpdated = false;
+
+    props.formFields.forEach((field) => {
+        if (
+            field.type === "file" &&
+            formData.value[field.name] instanceof File
+        ) {
+            isFileUpdated = true;
+        }
+    });
+
+    props.formFields.forEach((field) => {
+        if (
+            formDataOriginal.value[field.name] !== formData.value[field.name] &&
+            field.type !== "file"
+        ) {
+            isFormUpdated = true;
+        }
+    });
+
+    if (isFileUpdated && isFormUpdated) {
+        await editarItem();
+        await updateFile();
+    } else if (isFormUpdated) {
+        await editarItem();
+    } else if (isFileUpdated) {
+        await updateFile();
+    } else {
+        toast.info(`No se ha detectado ningún cambio`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-blue-500 p-2",
+        });
     }
 };
 
@@ -340,14 +398,10 @@ const cerrarModal = () => emit("cerrar");
                             </span>
                         </template>
 
-                        <template
-                            v-else-if="
-                                field.type === 'email'
-                            "
-                        >
+                        <template v-else-if="field.type === 'email'">
                             <input
                                 :id="`form-${field.name}`"
-                                :type=field.type
+                                :type="field.type"
                                 v-model="formData[field.name]"
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
@@ -362,12 +416,13 @@ const cerrarModal = () => emit("cerrar");
 
                         <template
                             v-else-if="
-                                field.type === 'text' || field.label.toLowerCase().includes('teléfono')
+                                field.type === 'text' ||
+                                field.label.toLowerCase().includes('teléfono')
                             "
                         >
                             <input
                                 :id="`form-${field.name}`"
-                                type='text'
+                                type="text"
                                 v-model="formData[field.name]"
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
                                 class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
@@ -415,7 +470,10 @@ const cerrarModal = () => emit("cerrar");
 
                                 <div class="mt-2">
                                     <div
-                                        v-if="selectedFileName[field.name] && !isMobile"
+                                        v-if="
+                                            selectedFileName[field.name] &&
+                                            !isMobile
+                                        "
                                         class="text-sm text-gray-500"
                                     >
                                         Archivo seleccionado:
@@ -495,7 +553,7 @@ const cerrarModal = () => emit("cerrar");
 
                 <div class="flex justify-end mt-6 space-x-4">
                     <ButtonCrearActualizar
-                        @click="editarItem"
+                        @click="actualizarItemCompleto"
                         :loading="loading"
                         :itemName="'Actualizar'"
                     />
