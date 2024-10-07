@@ -1,18 +1,46 @@
 <template>
   <div class="p-4">
-    <h1 class="text-xl font-bold text-center mb-4">Tickets Asignados</h1>
+    <h1 class="text-xl font-bold text-left mb-4">Tickets Asignados</h1>
 
-    <!-- Barra de búsqueda -->
-    <div class="relative w-full mb-4">
-      <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <i class="text-gray-400 fas fa-search"></i>
-      </span>
-      <input
-        type="text"
-        v-model="buscarQuery"
-        placeholder="Buscar..."
-        class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-      />
+    <!-- Barra de búsqueda y Filtros -->
+    <div class="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between mb-4">
+      <!-- Barra de búsqueda -->
+      <div class="relative w-full sm:w-auto">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <i class="text-gray-400 fas fa-search"></i>
+        </span>
+        <input
+          type="text"
+          v-model="buscarQuery"
+          placeholder="Buscar..."
+          class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
+        />
+      </div>
+
+      <!-- Filtro por Estado con Dropdown y Checkboxes -->
+      <div class="relative w-full sm:w-auto">
+        <button @click="toggleDropdown" class="flex items-center px-4 py-2 bg-white border rounded-md shadow-md ">
+          <i class="fas fa-sliders-h cursor-pointer text-gray-500 mr"></i>
+        </button>
+
+        <!-- Dropdown de checkboxes -->
+        <div
+          v-if="dropdownOpen"
+          class="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-10"
+        >
+          <div class="p-2">
+            <label v-for="estado in estadosDisponibles" :key="estado" class="flex items-center space-x-2 py-1">
+              <input
+                type="checkbox"
+                v-model="filtroEstado"
+                :value="estado"
+                class="form-checkbox h-4 w-4 text-blue-600"
+              />
+              <span>{{ estado }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Botón para cambiar la vista (ahora con íconos) -->
@@ -220,10 +248,18 @@ export default {
   },
   setup() {
     const tickets = ref([]);
+    const prioridades = ref([]); // Para las prioridades
+    const categorias = ref([]); // Para las categorías
     const isTableView = ref(false);
     const mostrarModal = ref(false);
     const ticketSeleccionado = ref(null);
-    const buscarQuery = ref(""); // Agregamos la propiedad buscarQuery para la barra de búsqueda
+    const buscarQuery = ref(""); // Barra de búsqueda
+    const filtroEstado = ref([]); // Filtro por estado (array para checkboxes)
+    const filtroPrioridad = ref(""); // Filtro por prioridad
+    const filtroCategoria = ref(""); // Filtro por categoría
+    const dropdownOpen = ref(false); // Estado del dropdown
+
+    const estadosDisponibles = ['Abierto', 'Asignado', 'En progreso', 'Resuelto', 'Cerrado', 'Reabierto'];
 
     const formFieldsVer = ref([
       { label: 'Título', name: 'tic_titulo' },
@@ -238,9 +274,14 @@ export default {
       isTableView.value = !isTableView.value;
     };
 
+    const toggleDropdown = () => {
+      dropdownOpen.value = !dropdownOpen.value;
+    };
+
     const filtrarTickets = computed(() => {
       let filteredTickets = tickets.value;
 
+      // Filtro por búsqueda
       if (buscarQuery.value) {
         const query = buscarQuery.value.toLowerCase();
         filteredTickets = filteredTickets.filter(ticket => {
@@ -253,6 +294,21 @@ export default {
         });
       }
 
+      // Filtro por estados seleccionados (checkboxes)
+      if (filtroEstado.value.length) {
+        filteredTickets = filteredTickets.filter(ticket => filtroEstado.value.includes(ticket.tic_estado));
+      }
+
+      // Filtro por prioridad
+      if (filtroPrioridad.value) {
+        filteredTickets = filteredTickets.filter(ticket => ticket.prioridad === filtroPrioridad.value);
+      }
+
+      // Filtro por categoría
+      if (filtroCategoria.value) {
+        filteredTickets = filteredTickets.filter(ticket => ticket.categoria === filtroCategoria.value);
+      }
+
       return filteredTickets;
     });
 
@@ -260,6 +316,10 @@ export default {
       try {
         const response = await fetch('support-optener');
         const data = await response.json();
+
+        // Extraemos las prioridades y categorías de los tickets
+        prioridades.value = [...new Set(data.map(ticket => ticket.prioridad))];
+        categorias.value = [...new Set(data.map(ticket => ticket.categoria))];
 
         tickets.value = data
           .map((ticket) => ({
@@ -363,6 +423,8 @@ export default {
 
     return {
       tickets,
+      prioridades,
+      categorias,
       isTableView,
       toggleView,
       verDetalles,
@@ -373,8 +435,14 @@ export default {
       aceptarTicket,
       finalizarTicket,
       buscarQuery, // Retornamos buscarQuery
-      filtrarTickets, // Retornamos filtrarTickets
-      getEstadoLabelClass, // Retornamos la función para obtener clases de estado
+      filtroEstado, // Filtro por estado (array para checkboxes)
+      filtroPrioridad,
+      filtroCategoria,
+      filtrarTickets,
+      getEstadoLabelClass,
+      toggleDropdown,
+      dropdownOpen, // Estado del dropdown
+      estadosDisponibles, // Lista de estados disponibles
     };
   },
 };
