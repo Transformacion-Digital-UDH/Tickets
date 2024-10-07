@@ -156,6 +156,46 @@ class TicketController extends Controller
         }
     }
 
+    public function updateEstado(Request $request, $id)
+    {
+        try {
+            $ticket = Ticket::findOrFail($id);
+
+            $validator = Validator::make($request->all(), [
+                'tic_estado' => 'required|string|in:Abierto,En progreso,Cerrado,Finalizado',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'Errores de validación',
+                    'errors' => $validator->errors()->toArray(),
+                ], 422);
+            }
+
+            $ticket->update([
+                'tic_estado' => $request->input('tic_estado'),
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'Estado del ticket actualizado correctamente',
+                'ticket' => $ticket,
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Ticket no encontrado',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Error al actualizar el estado del ticket: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function upload(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
