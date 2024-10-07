@@ -113,7 +113,7 @@ const fetchTickets = async () => {
             tic_estado: ticket.tic_estado,
             tic_activo: ticket.tic_activo,
             created_at: ticket.created_at,
-            updated_at:ticket.updated_at,
+            updated_at: ticket.updated_at,
         }));
     } catch (error) {
         console.error("Error al cargar los tickets:", error);
@@ -454,6 +454,35 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
+const cerrarTicket = async (ticket) => {
+    try {
+        const response = await axios.put(
+            `/tickets/${ticket.id}/updateEstado`,
+            { tic_estado: "Cerrado" },
+            {
+                headers: {
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+            }
+        );
+        if (response.status === 200) {
+            toast.success("Ticket cerrado correctamente", {
+                position: "bottom-right",
+                autoClose: 3000,
+            });
+            await fetchTickets();
+        }
+    } catch (error) {
+        console.error("Error al cerrar el ticket:", error.response?.data);
+        toast.error("Error al cerrar el ticket", {
+            position: "bottom-right",
+            autoClose: 3000,
+        });
+    }
+};
+
 const fetchAllData = async () => {
     try {
         await Promise.all([
@@ -570,6 +599,7 @@ const getEstadoLabelClass = (estado) => {
         <div v-if="isCardView">
             <CardTickets
                 :tickets="filtrarTickets"
+                @close="cerrarTicket"
                 @asign="handleAsign"
                 @view="handleView"
                 @edit="handleEdit"
@@ -665,6 +695,13 @@ const getEstadoLabelClass = (estado) => {
                             <td
                                 class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
                             >
+                                <button
+                                    @click="cerrarTicket(ticket)"
+                                    class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 flex items-center space-x-2"
+                                    title="Cerrar"
+                                >
+                                    <i class="fas fa-times"></i>
+                                </button>
                                 <button
                                     v-if="
                                         ticket.tic_estado === 'Abierto' ||

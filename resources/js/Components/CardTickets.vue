@@ -1,4 +1,8 @@
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
+
+const isMobile = ref(false);
+
 const props = defineProps({
     tickets: {
         type: Array,
@@ -7,7 +11,20 @@ const props = defineProps({
     success: String,
 });
 
-const emit = defineEmits(["asign", "view", "edit", "eliminar"]);
+const handleResize = () => {
+    isMobile.value = window.innerWidth <= 1244;
+};
+
+onMounted(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener("resize", handleResize);
+});
+
+const emit = defineEmits(["close", "asign", "view", "edit", "eliminar"]);
 </script>
 
 <template>
@@ -88,14 +105,31 @@ const emit = defineEmits(["asign", "view", "edit", "eliminar"]);
                         </span>
                         <span>
                             <strong>Creado el:</strong>
-                            {{ new Date(ticket.created_at).toLocaleDateString() }}
+                            {{
+                                new Date(ticket.created_at).toLocaleDateString()
+                            }}
                         </span>
                         <span>
                             <strong>Actualizado el:</strong>
-                            {{ new Date(ticket.updated_at).toLocaleDateString() }}
+                            {{
+                                new Date(ticket.updated_at).toLocaleDateString()
+                            }}
                         </span>
                     </div>
                     <div class="flex mt-4 space-x-1 justify-end">
+                        <button
+                            v-if="
+                                ticket.tic_estado === 'Abierto' ||
+                                ticket.tic_estado === 'Asignado' ||
+                                ticket.tic_estado === 'Reabierto'
+                            "
+                            @click="$emit('close', ticket)"
+                            class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 flex items-center space-x-2"
+                            title="Cerrar"
+                        >
+                            <i class="fas fa-times"></i>
+                            <p v-if="!isMobile">Cerrar</p>
+                        </button>
                         <button
                             v-if="
                                 ticket.tic_estado === 'Abierto' ||
