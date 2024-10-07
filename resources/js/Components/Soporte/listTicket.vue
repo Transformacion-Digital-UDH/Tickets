@@ -2,11 +2,23 @@
   <div class="p-4">
     <h1 class="text-xl font-bold text-center mb-4">Tickets Asignados</h1>
 
-    <!-- Botón para cambiar la vista -->
+    <!-- Barra de búsqueda -->
+    <div class="relative w-full mb-4">
+      <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <i class="text-gray-400 fas fa-search"></i>
+      </span>
+      <input
+        type="text"
+        v-model="buscarQuery"
+        placeholder="Buscar..."
+        class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
+      />
+    </div>
+
+    <!-- Botón para cambiar la vista (ahora con íconos) -->
     <div class="text-right mb-4">
-      <button @click="toggleView"
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-300">
-        {{ isTableView ? 'Vista de Tarjetas' : 'Vista de Tabla' }}
+      <button @click="toggleView" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-300">
+        <i :class="isTableView ? 'fas fa-th-large' : 'fas fa-table'"></i>
       </button>
     </div>
 
@@ -16,9 +28,9 @@
     </div>
 
     <!-- Vista de Tarjetas -->
-    <div v-if="!isTableView && tickets.length > 0"
+    <div v-if="!isTableView && filtrarTickets.length > 0"
       class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-      <div v-for="ticket in tickets" :key="ticket.id" class="relative w-full">
+      <div v-for="ticket in filtrarTickets" :key="ticket.id" class="relative w-full">
         <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
           'bg-orange-600': ticket.tic_estado === 'Abierto',
           'bg-gray-600': ticket.tic_estado === 'Asignado',
@@ -87,35 +99,53 @@
     </div>
 
     <!-- Vista de Tabla -->
-    <div v-if="isTableView && tickets.length > 0" class="overflow-x-auto">
-      <table class="min-w-full text-sm text-left text-gray-600 border border-gray-300">
-        <thead class="bg-gray-100 text-gray-800">
+    <div v-if="isTableView && filtrarTickets.length > 0" class="overflow-x-auto bg-white rounded-lg shadow-md">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-white">
           <tr>
-            <th class="px-4 py-2 border">Título</th>
-            <th class="px-4 py-2 border">Prioridad</th>
-            <th class="px-4 py-2 border">Categoría</th>
-            <th class="px-4 py-2 border">Estado</th>
-            <th class="px-4 py-2 border">Creado el</th>
-            <th class="px-4 py-2 border">Acciones</th>
+            <th class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              N°
+            </th>
+            <th class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              Categoría
+            </th>
+            <th class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              Título
+            </th>
+            <th class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              Prioridad
+            </th>
+            <th class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              Estado
+            </th>
+            <th class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              Acciones
+            </th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="ticket in tickets" :key="ticket.id" class="bg-white hover:bg-gray-100">
-            <td class="px-4 py-2 border">{{ ticket.tic_titulo }}</td>
-            <td class="px-4 py-2 border">{{ ticket.prioridad }}</td>
-            <td class="px-4 py-2 border">{{ ticket.categoria }}</td>
-            <td class="px-4 py-2 border">
-              <span :class="{
-                'text-orange-600': ticket.tic_estado === 'Abierto',
-                'text-gray-600': ticket.tic_estado === 'Asignado',
-                'text-blue-600': ticket.tic_estado === 'En progreso',
-                'text-green-600': ticket.tic_estado === 'Resuelto',
-                'text-red-600': ticket.tic_estado === 'Cerrado',
-                'text-yellow-600': ticket.tic_estado === 'Reabierto',
-              }">{{ ticket.tic_estado }}</span>
+        <tbody class="divide-y divide-gray-200">
+          <tr v-for="(ticket, index) in filtrarTickets" :key="ticket.id" class="transition-colors duration-200 border-b hover:bg-gray-100">
+            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              {{ index + 1 }}
             </td>
-            <td class="px-4 py-2 border">{{ new Date(ticket.created_at).toLocaleDateString() }}</td>
-            <td class="px-4 py-2 border flex space-x-3">
+            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              {{ ticket.categoria }}
+            </td>
+            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              {{ ticket.tic_titulo }}
+            </td>
+            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              {{ ticket.prioridad }}
+            </td>
+            <td class="px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm md:text-base">
+              <span :class="[
+                  'px-2 py-1 text-xs font-semibold rounded-full sm:text-xs md:text-sm',
+                  getEstadoLabelClass(ticket.tic_estado)
+                ]">
+                {{ ticket.tic_estado }}
+              </span>
+            </td>
+            <td class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0">
               <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
                 class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
                 <i class="fas fa-check mr-1"></i> Aceptar
@@ -126,8 +156,13 @@
               </button>
               <button @click="verDetalles(ticket)"
                 class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
-                <i class="mr-1 fas fa-eye"></i> Ver
+                <i class="fas fa-eye mr-1"></i> Ver
               </button>
+            </td>
+          </tr>
+          <tr v-if="filtrarTickets.length === 0">
+            <td colspan="7" class="px-4 py-3 text-xs text-center text-gray-500 sm:text-sm">
+              No se encontraron resultados.
             </td>
           </tr>
         </tbody>
@@ -168,7 +203,7 @@
 </template>
 
 <script>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 
 export default {
   props: {
@@ -179,6 +214,7 @@ export default {
     const isTableView = ref(false);
     const mostrarModal = ref(false);
     const ticketSeleccionado = ref(null);
+    const buscarQuery = ref(""); // Agregamos la propiedad buscarQuery para la barra de búsqueda
 
     const formFieldsVer = ref([
       { label: 'Título', name: 'tic_titulo' },
@@ -193,12 +229,29 @@ export default {
       isTableView.value = !isTableView.value;
     };
 
+    const filtrarTickets = computed(() => {
+      let filteredTickets = tickets.value;
+
+      if (buscarQuery.value) {
+        const query = buscarQuery.value.toLowerCase();
+        filteredTickets = filteredTickets.filter(ticket => {
+          return (
+            (ticket.tic_titulo && ticket.tic_titulo.toLowerCase().includes(query)) ||
+            (ticket.prioridad && ticket.prioridad.toLowerCase().includes(query)) ||
+            (ticket.categoria && ticket.categoria.toLowerCase().includes(query)) ||
+            (ticket.tic_estado && ticket.tic_estado.toLowerCase().includes(query))
+          );
+        });
+      }
+
+      return filteredTickets;
+    });
+
     const recargarTickets = async () => {
       try {
         const response = await fetch('support-optener');
         const data = await response.json();
 
-        // Ordenar los tickets por la fecha de creación en orden descendente (más recientes primero)
         tickets.value = data
           .map((ticket) => ({
             id: ticket.id,
@@ -280,6 +333,25 @@ export default {
       }
     };
 
+    const getEstadoLabelClass = (estado) => {
+      switch (estado) {
+        case "Abierto":
+          return "bg-orange-100 text-orange-800";
+        case "Asignado":
+          return "bg-gray-100 text-gray-800";
+        case "En progreso":
+          return "bg-blue-100 text-blue-800";
+        case "Resuelto":
+          return "bg-green-100 text-green-800";
+        case "Cerrado":
+          return "bg-red-100 text-red-800";
+        case "Reabierto":
+          return "bg-yellow-100 text-yellow-800";
+        default:
+          return "bg-purple-100 text-purple-800";
+      }
+    };
+
     return {
       tickets,
       isTableView,
@@ -291,6 +363,9 @@ export default {
       formFieldsVer,
       aceptarTicket,
       finalizarTicket,
+      buscarQuery, // Retornamos buscarQuery
+      filtrarTickets, // Retornamos filtrarTickets
+      getEstadoLabelClass, // Retornamos la función para obtener clases de estado
     };
   },
 };
