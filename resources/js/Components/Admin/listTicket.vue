@@ -374,6 +374,7 @@ formFieldsVer.value = [
     { name: "aul_numero", label: "Aula", type: "text" },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_estado", label: "Estado", type: "text" },
+    { name: "tic_archivo", label: "Imágenes", type: "file" },
 ];
 
 const eliminarItem = async () => {

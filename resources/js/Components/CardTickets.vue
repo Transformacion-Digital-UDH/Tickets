@@ -17,7 +17,7 @@ const emit = defineEmits(["asign", "view", "edit", "eliminar"]);
         </div>
         <div
             v-if="tickets.length > 0"
-            class="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-3"
+            class="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-5"
         >
             <div
                 v-for="ticket in tickets"
