@@ -138,7 +138,7 @@
               {{ ticket.prioridad }}
             </td>
             <td class="px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm md:text-base">
-              <span :class="[
+              <span :class="[ 
                   'px-2 py-1 text-xs font-semibold rounded-full sm:text-xs md:text-sm',
                   getEstadoLabelClass(ticket.tic_estado)
                 ]">
@@ -186,7 +186,16 @@
             <tbody>
               <tr v-for="(field, index) in formFieldsVer" :key="index" class="border-b border-gray-400">
                 <td class="py-2 pr-10 font-semibold text-left text-gray-500">{{ field.label }}</td>
-                <td class="py-2 text-left text-gray-600">{{ ticketSeleccionado[field.name] || "No disponible" }}</td>
+                <td class="py-2 text-left text-gray-600">
+                  <!-- Mostrar la fecha con formato de hora, minutos y segundos -->
+                  <span v-if="field.name === 'created_at'">
+                    {{ new Date(ticketSeleccionado.created_at).toLocaleString('es-ES', { 
+                        year: 'numeric', month: '2-digit', day: '2-digit', 
+                        hour: '2-digit', minute: '2-digit', second: '2-digit' 
+                    }) }}
+                  </span>
+                  <span v-else>{{ ticketSeleccionado[field.name] || "No disponible" }}</span>
+                </td>
               </tr>
             </tbody>
           </table>
