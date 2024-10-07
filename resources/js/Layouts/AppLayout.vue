@@ -390,6 +390,17 @@ defineProps({ title: String });
                                 >Tickets</span
                             >
                         </NavLink>
+
+                        <NavLink
+                            :href="route('support-historial')"
+                            :active="route().current('support-historial')"
+                            :class="linkClasses(route().current('support-historial'))"
+                        >
+                        <font-awesome-icon icon="tags" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2"
+                                >Historial</span
+                            >
+                        </NavLink>
                     </div>
                 </div>
             </nav>
