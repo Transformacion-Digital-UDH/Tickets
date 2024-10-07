@@ -16,6 +16,7 @@ Route::middleware(['auth', 'role:Usuario'])->group(function () {
         Route::get('/user-tickets/create', 'create')->name('create-tickets');
         Route::post('/user-tickets/store', 'store');
         Route::put('/user-tickets/{ticket}', 'update');
+        Route::post('/user-tickets/{ticket}/upload', 'upload');
         Route::delete('/user-tickets/{ticket}/eliminar', 'eliminar');
     });
 });

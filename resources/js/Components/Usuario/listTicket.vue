@@ -52,6 +52,7 @@ const mapTicketData = (ticket, index, totalTickets) => {
         id: ticket.id,
         tic_titulo: ticket.tic_titulo,
         tic_descripcion: ticket.tic_descripcion,
+        tic_archivo: ticket.tic_archivo,
         pri_id: ticket.pri_id,
         pri_nombre: ticket.prioridad?.pri_nombre || "No disponible",
         cat_id: ticket.cat_id,
@@ -256,6 +257,12 @@ formFields.value = [
     },
     { name: "aul_id", label: "Aula", type: "select", options: aulas.value },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
+    {
+        name: "tic_archivo",
+        label: "Imágenes",
+        type: "file",
+        required: false,
+    },
 ];
 
 formFieldsVer.value = [
@@ -266,6 +273,7 @@ formFieldsVer.value = [
     { name: "aul_numero", label: "Aula", type: "text" },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_estado", label: "Estado", type: "text" },
+    { name: "tic_archivo", label: "Imágenes", type: "file" },
 ];
 
 const fetchAllData = async () => {

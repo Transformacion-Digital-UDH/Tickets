@@ -5,14 +5,11 @@ import "vue3-toastify/dist/index.css";
 import confetti from "canvas-confetti";
 import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
 import ModalConfirm from "@/Components/ModalConfirm.vue";
+import axios from "axios";
 
 const emit = defineEmits(["crear", "cerrar"]);
 
-const propsPadre = defineProps({
-    formFields: {
-        type: Array,
-        default: () => [],
-    },
+const props = defineProps({
     endpoint: {
         type: String,
         required: true,
@@ -35,6 +32,32 @@ const pauseBetweenMessages = 2000;
 const loading = ref(false);
 const errores = ref({});
 const successMessage = ref("");
+const selectedFileName = ref("");
+const selectedFilePreview = ref("");
+const formData = ref({
+    tic_titulo: "",
+    tic_descripcion: "",
+    pri_id: "",
+    cat_id: "",
+    pab_id: "",
+    aul_id: "",
+    tic_archivo: null,
+});
+
+const prioridades = ref([]);
+const categorias = ref([]);
+const pabellones = ref([]);
+const aulas = ref([]);
+const showModal = ref(false);
+
+const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        selectedFileName.value = file.name;
+        selectedFilePreview.value = URL.createObjectURL(file);
+        formData.value.tic_archivo = file;
+    }
+};
 
 const typeMessage = () => {
     const current = messages[messageIndex];
@@ -55,25 +78,11 @@ const typeMessage = () => {
     setTimeout(typeMessage, isDeleting ? deletingSpeed : typingSpeed);
 };
 
-const formData = ref({
-    tic_titulo: "",
-    tic_descripcion: "",
-    pri_id: "",
-    cat_id: "",
-    pab_id: "",
-    aul_id: "",
-});
-
-const prioridades = ref([]);
-const categorias = ref([]);
-const pabellones = ref([]);
-const aulas = ref([]);
-const showModal = ref(false);
-
 const resetForm = () => {
     formData.value = {
         tic_titulo: "",
         tic_descripcion: "",
+        tic_archivo: null,
         pri_id: "",
         cat_id: "",
         pab_id: "",
@@ -148,6 +157,16 @@ const handleConfirm = async () => {
     successMessage.value = "";
     errores.value = {};
 
+    const data = new FormData();
+
+    Object.keys(formData.value).forEach((key) => {
+        if (key === "tic_archivo" && formData.value[key]) {
+            data.append(key, formData.value[key]);
+        } else {
+            data.append(key, formData.value[key] || "");
+        }
+    });
+
     if (!formData.value.tic_titulo) {
         errores.value.tic_titulo = "El título es obligatorio.";
     }
@@ -173,8 +192,9 @@ const handleConfirm = async () => {
     }
 
     try {
-        const response = await axios.post(propsPadre.endpoint, formData.value, {
+        const response = await axios.post(props.endpoint, data, {
             headers: {
+                "Content-Type": "multipart/form-data",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
@@ -193,7 +213,7 @@ const handleConfirm = async () => {
             style: {
                 width: "400px",
             },
-            className: "border-l-4 border-green-500 p-2",
+            className: "border-l-4 border-red-500 p-2",
         });
     } finally {
         loading.value = false;
@@ -289,11 +309,7 @@ onMounted(() => {
                     </h3>
                     <select
                         v-model="formData.pri_id"
-                        :class="{
-                            'w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50': true,
-                            'text-[#2EBAA1]': !formData.pri_id,
-                            'text-black': formData.pri_id,
-                        }"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md"
                     >
                         <option value="" disabled selected>
                             Seleccione su prioridad
@@ -317,11 +333,7 @@ onMounted(() => {
                     </h3>
                     <select
                         v-model="formData.cat_id"
-                        :class="{
-                            'w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50': true,
-                            'text-[#2EBAA1]': !formData.cat_id,
-                            'text-black': formData.cat_id,
-                        }"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md"
                     >
                         <option value="" disabled selected>
                             Seleccione su categoría
@@ -345,11 +357,7 @@ onMounted(() => {
                     </h3>
                     <select
                         v-model="formData.pab_id"
-                        :class="{
-                            'w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50': true,
-                            'text-[#2EBAA1]': !formData.pab_id,
-                            'text-black': formData.pab_id,
-                        }"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md"
                     >
                         <option value="" disabled selected>
                             Seleccione su pabellón
@@ -373,11 +381,7 @@ onMounted(() => {
                     </h3>
                     <select
                         v-model="formData.aul_id"
-                        :class="{
-                            'w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50': true,
-                            'text-[#2EBAA1]': !formData.aul_id,
-                            'text-black': formData.aul_id,
-                        }"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md"
                     >
                         <option value="" disabled selected>
                             Seleccione su aula
@@ -409,6 +413,37 @@ onMounted(() => {
                 <span class="text-red-500 text-sm">{{
                     errores.tic_descripcion
                 }}</span>
+            </div>
+            <div class="file-upload-wrapper">
+                <label
+                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                >
+                    Seleccionar archivo
+                    <input
+                        type="file"
+                        @change="handleFileChange"
+                        class="hidden"
+                    />
+                </label>
+                <div class="mt-2">
+                    <div v-if="selectedFileName" class="text-sm text-gray-500">
+                        Archivo seleccionado: {{ selectedFileName }}
+                    </div>
+
+                    <div v-if="selectedFilePreview" class="mt-4">
+                        <img
+                            :src="selectedFilePreview"
+                            alt="Vista previa del archivo"
+                            class="object-cover w-full h-50"
+                        />
+                    </div>
+                </div>
+                <span
+                    v-if="errores['tic_archivo']"
+                    class="text-red-500 text-sm"
+                >
+                    {{ errores["tic_archivo"] }}
+                </span>
             </div>
             <div class="flex justify-end mt-6 space-x-4">
                 <ButtonCrearActualizar

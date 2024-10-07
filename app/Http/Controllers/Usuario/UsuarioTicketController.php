@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -60,15 +61,22 @@ class UsuarioTicketController extends Controller
         $validatedData = $request->validate([
             'tic_titulo' => 'required|string|max:255',
             'tic_descripcion' => 'required|string',
+            'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'pri_id' => 'required|exists:prioridads,id',
             'cat_id' => 'required|exists:categorias,id',
             'pab_id' => 'required|exists:pabellons,id',
             'aul_id' => 'required|exists:aulas,id',
         ]);
 
+        $filePath = null;
+        if ($request->hasFile('tic_archivo')) {
+            $filePath = $request->file('tic_archivo')->store('ticket_images', 'public');
+        }
+
         $ticket = Ticket::create([
             'tic_titulo' => $validatedData['tic_titulo'],
             'tic_descripcion' => $validatedData['tic_descripcion'],
+            'tic_archivo' => $filePath,
             'pri_id' => $validatedData['pri_id'],
             'use_id' => Auth::id(),
             'cat_id' => $validatedData['cat_id'],
@@ -123,6 +131,28 @@ class UsuarioTicketController extends Controller
                 'msg' => 'Error al actualizar al ticket: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function upload(Request $request, $id)
+    {
+        $ticket = Ticket::findOrFail($id);
+
+        if ($request->hasFile('tic_archivo')) {
+            if ($ticket->tic_archivo) {
+                Storage::disk('public')->delete($ticket->tic_archivo);
+            }
+
+            $filePath = $request->file('tic_archivo')->store('ticket_images', 'public');
+            $ticket->tic_archivo = $filePath;
+            $ticket->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'msg' => 'Archivo actualizado correctamente',
+            'ticket' => $ticket,
+            'image_url' => Storage::url($ticket->tic_archivo),
+        ]);
     }
 
     public function eliminar($id)
