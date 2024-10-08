@@ -116,6 +116,7 @@ const emit = defineEmits(["close", "asign", "view", "edit", "eliminar"]);
                             }}
                         </span>
                     </div>
+
                     <div class="flex mt-4 space-x-1 justify-end">
                         <button
                             v-if="
@@ -124,11 +125,10 @@ const emit = defineEmits(["close", "asign", "view", "edit", "eliminar"]);
                                 ticket.tic_estado === 'Reabierto'
                             "
                             @click="$emit('close', ticket)"
-                            class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 flex items-center space-x-2"
-                            title="Cerrar"
+                            class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-orange-300 to-orange-500 hover:from-orange-400 hover:to-orange-600 absolute bottom-0 left-0 mb-6 ml-6"
+                            title="Cerrar Ticket"
                         >
-                            <i class="fas fa-times"></i>
-                            <p v-if="!isMobile">Cerrar</p>
+                            <i class="fas fa-times-circle"></i>
                         </button>
                         <button
                             v-if="

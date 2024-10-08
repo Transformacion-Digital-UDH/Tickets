@@ -60,26 +60,26 @@ class UsuarioController extends Controller
             'password' => 'required|string|min:8',
             'activo' => 'boolean',
         ]);
-    
+
         // Buscar el rol de 'Soporte'
         $soporte_rol = Rol::where('rol_nombre', 'Soporte')->first();
-    
+
         // Verificar si el rol fue encontrado
         if (!$soporte_rol) {
             return response()->json(['message' => 'Rol Soporte no encontrado'], 404);
         }
-    
+
         // Encriptar la contraseña
         $validarDatos['password'] = bcrypt($validarDatos['password']);
         $validarDatos['rol_id'] = $soporte_rol->id; // Asignar el rol_id
-    
+
         try {
             // Crear el nuevo usuario
             $soporte = User::create($validarDatos);
-    
+
             // Asignar el rol de 'Soporte' al nuevo usuario
             $soporte->assignRole('Soporte');
-    
+
             return response()->json([
                 'message' => 'Soporte técnico creado exitosamente',
                 'soporte' => $soporte,
@@ -141,7 +141,12 @@ class UsuarioController extends Controller
                 ], 422);
             }
 
-            $data = $request->only(['name', 'email', 'celular', 'sed_id', 'activo']);
+            $data = $request->only(['name', 'email', 'celular', 'sed_id']);
+
+            if ($request->has('activo')) {
+                $data['activo'] = filter_var($request->input('activo'), FILTER_VALIDATE_BOOLEAN);
+            }
+
             if ($request->filled('password')) {
                 $data['password'] = bcrypt($request->password);
             }
@@ -188,7 +193,12 @@ class UsuarioController extends Controller
                 ], 422);
             }
 
-            $data = $request->only(['name', 'email', 'celular', 'sed_id', 'activo']);
+            $data = $request->only(['name', 'email', 'celular', 'sed_id']);
+
+            if ($request->has('activo')) {
+                $data['activo'] = filter_var($request->input('activo'), FILTER_VALIDATE_BOOLEAN);
+            }
+
             if ($request->filled('password')) {
                 $data['password'] = bcrypt($request->password);
             }

@@ -44,6 +44,10 @@ class PabellonController extends Controller
             'pab_activo' => 'nullable|boolean',
         ]);
 
+        if ($request->has('pab_activo')) {
+            $validarDatos['pab_activo'] = filter_var($request->input('pab_activo'), FILTER_VALIDATE_BOOLEAN);
+        }
+
         $pabellon->update($validarDatos);
 
         return response()->json(['message' => 'Pabellón actualizado correctamente', 'pabellon' => $pabellon]);

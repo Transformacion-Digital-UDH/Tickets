@@ -39,6 +39,10 @@ class CategoriaController extends Controller
             'cat_activo' => 'nullable|boolean',
         ]);
 
+        if ($request->has('cat_activo')) {
+            $validarDatos['cat_activo'] = filter_var($request->input('cat_activo'), FILTER_VALIDATE_BOOLEAN);
+        }
+
         $categoria->update($validarDatos);
 
         return response()->json(['message' => 'Categoría actualizada correctamente', 'categoria' => $categoria]);
