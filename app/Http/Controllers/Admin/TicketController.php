@@ -167,7 +167,7 @@ class TicketController extends Controller
             $ticket = Ticket::findOrFail($id);
 
             $validator = Validator::make($request->all(), [
-                'tic_estado' => 'required|string|in:Abierto,En progreso,Cerrado,Finalizado',
+                'tic_estado' => 'required|string|in:Abierto,En progreso,Cerrado,Finalizado,Reabierto',
             ]);
 
             if ($validator->fails()) {

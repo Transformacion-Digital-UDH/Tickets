@@ -24,7 +24,7 @@ onBeforeUnmount(() => {
     window.removeEventListener("resize", handleResize);
 });
 
-const emit = defineEmits(["close", "asign", "view", "edit", "eliminar"]);
+const emit = defineEmits(["open", "close", "asign", "view", "edit", "eliminar"]);
 </script>
 
 <template>
@@ -119,16 +119,24 @@ const emit = defineEmits(["close", "asign", "view", "edit", "eliminar"]);
 
                     <div class="flex mt-4 space-x-1 justify-end">
                         <button
+                            v-if="ticket.tic_estado === 'Cerrado'"
+                            @click="$emit('open', ticket)"
+                            class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-green-300 to-green-500 hover:from-green-400 hover:to-green-600 absolute bottom-0 left-0 mb-6 ml-6"
+                            title="Reabrir Ticket"
+                        >
+                            <i class="fa-solid fa-lock-open"></i>
+                        </button>
+                        <button
                             v-if="
                                 ticket.tic_estado === 'Abierto' ||
                                 ticket.tic_estado === 'Asignado' ||
                                 ticket.tic_estado === 'Reabierto'
                             "
                             @click="$emit('close', ticket)"
-                            class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-orange-300 to-orange-500 hover:from-orange-400 hover:to-orange-600 absolute bottom-0 left-0 mb-6 ml-6"
+                            class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 absolute bottom-0 left-0 mb-6 ml-6"
                             title="Cerrar Ticket"
                         >
-                            <i class="fas fa-times-circle"></i>
+                            <i class="fa-solid fa-lock"></i>
                         </button>
                         <button
                             v-if="
@@ -138,7 +146,7 @@ const emit = defineEmits(["close", "asign", "view", "edit", "eliminar"]);
                             "
                             @click="$emit('asign', ticket)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-blue-300 to-blue-500 hover:from-blue-400 hover:to-blue-600"
-                            title="Asignar"
+                            title="Asignar Soporte"
                         >
                             <i class="mr-1 fas fa-user-plus"></i>
                         </button>
