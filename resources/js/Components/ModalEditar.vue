@@ -46,7 +46,7 @@ const errores = ref({});
 const isMobile = ref(false);
 const loading = ref(false);
 const successMessage = ref("");
-const clickInicial = ref(false);
+const clickInicial = ref(true);
 const selectedFileName = ref({});
 const selectedFilePreviews = ref({});
 
@@ -521,7 +521,7 @@ const cerrarModal = () => emit("cerrar");
                                 />
                                 <label
                                     :for="`form-${field.name}`"
-                                    class="flex items-center justify-center w-10 h-5 transition-colors duration-300 bg-gray-300 rounded-full cursor-pointer"
+                                    class="flex items-center justify-center w-10 h-6 transition-colors duration-300 bg-gray-300 rounded-full cursor-pointer"
                                     :class="{
                                         'bg-green-400': formData[field.name],
                                         'bg-red-400': !formData[field.name],

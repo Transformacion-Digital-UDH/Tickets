@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Sede;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class SedeController extends Controller
@@ -25,11 +25,11 @@ class SedeController extends Controller
     public function traer()
     {
         $sedes = Sede::all();
-    
+
         if (Auth::user()->hasAnyRole(['Soporte', 'Usuario'])) {
             return response()->json(['sedes' => []], 200);
         }
-    
+
         return response()->json($sedes, 200);
     }
 
@@ -56,6 +56,10 @@ class SedeController extends Controller
             'sed_telefono' => 'required|numeric|digits:9',
             'sed_activo' => 'nullable|boolean',
         ]);
+
+        if ($request->has('sed_activo')) {
+            $validarDatos['sed_activo'] = filter_var($request->input('sed_activo'), FILTER_VALIDATE_BOOLEAN);
+        }
 
         $sede->update($validarDatos);
 

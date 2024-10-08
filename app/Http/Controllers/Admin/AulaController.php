@@ -47,6 +47,10 @@ class AulaController extends Controller
             'aul_activo' => 'nullable|boolean',
         ]);
 
+        if ($request->has('aul_activo')) {
+            $validarDatos['aul_activo'] = filter_var($request->input('aul_activo'), FILTER_VALIDATE_BOOLEAN);
+        }
+
         $aula->update($validarDatos);
 
         return response()->json(['message' => 'Aula actualizado correctamente', 'aula' => $aula]);

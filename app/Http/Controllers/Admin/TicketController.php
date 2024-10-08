@@ -121,7 +121,6 @@ class TicketController extends Controller
                 'pri_id' => 'required|exists:prioridads,id',
                 'pab_id' => 'required|exists:pabellons,id',
                 'aul_id' => 'required|exists:aulas,id',
-                'tic_estado' => 'nullable|string|in:Abierto,En progreso,Cerrado,Finalizado',
                 'tic_activo' => 'nullable|boolean',
             ]);
 
@@ -133,10 +132,16 @@ class TicketController extends Controller
                 ], 422);
             }
 
-            $ticket->update($request->only([
-                'tic_titulo', 'tic_descripcion', 'use_id', 'cat_id', 'pri_id',
-                'pab_id', 'aul_id', 'tic_estado', 'tic_activo',
-            ]));
+            $ticket->update([
+                'tic_titulo' => $request->input('tic_titulo'),
+                'tic_descripcion' => $request->input('tic_descripcion'),
+                'use_id' => $request->input('use_id'),
+                'cat_id' => $request->input('cat_id'),
+                'pri_id' => $request->input('pri_id'),
+                'pab_id' => $request->input('pab_id'),
+                'aul_id' => $request->input('aul_id'),
+                'tic_activo' => filter_var($request->input('tic_activo'), FILTER_VALIDATE_BOOLEAN),
+            ]);
 
             return response()->json([
                 'status' => true,
@@ -202,7 +207,9 @@ class TicketController extends Controller
 
         if ($request->hasFile('tic_archivo')) {
             if ($ticket->tic_archivo) {
-                Storage::disk('public')->delete($ticket->tic_archivo);
+                if (Storage::disk('public')->exists($ticket->tic_archivo)) {
+                    Storage::disk('public')->delete($ticket->tic_archivo);
+                }
             }
 
             $filePath = $request->file('tic_archivo')->store('ticket_images', 'public');

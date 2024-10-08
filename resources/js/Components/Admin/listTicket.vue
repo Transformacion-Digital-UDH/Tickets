@@ -9,6 +9,7 @@ import ModalAsignar from "@/Components/ModalAsignar.vue";
 import ModalVer from "@/Components/ModalVer.vue";
 import ModalEditar from "@/Components/ModalEditar.vue";
 import ModalEliminar from "@/Components/ModalEliminar.vue";
+import ModalCerrar from "@/Components/ModalCerrar.vue";
 import ButtonNuevo from "@/Components/ButtonNuevo.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -35,6 +36,7 @@ const mostrarModalAsignar = ref(false);
 const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
+const mostrarModalCerrar = ref(false);
 const itemSeleccionado = ref(null);
 const estadoFilters = ref([]);
 
@@ -377,6 +379,38 @@ formFieldsVer.value = [
     { name: "tic_archivo", label: "Imágenes", type: "file" },
 ];
 
+const cerrarTicket = async (ticket) => {
+    if (ticket) {
+        try {
+            const response = await axios.put(
+                `/tickets/${ticket.id}/updateEstado`,
+                { tic_estado: "Cerrado" },
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                    },
+                }
+            );
+            if (response.status === 200) {
+                toast.success("Ticket cerrado correctamente", {
+                    position: "bottom-right",
+                    autoClose: 3000,
+                });
+                await fetchTickets();
+                mostrarModalCerrar.value = false;
+            }
+        } catch (error) {
+            console.error("Error al cerrar el ticket:", error.response?.data);
+            toast.error("Error al cerrar el ticket", {
+                position: "bottom-right",
+                autoClose: 3000,
+            });
+        }
+    }
+};
+
 const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
@@ -454,33 +488,13 @@ const cerrarEliminarModal = () => {
     mostrarModalEliminar.value = false;
 };
 
-const cerrarTicket = async (ticket) => {
-    try {
-        const response = await axios.put(
-            `/tickets/${ticket.id}/updateEstado`,
-            { tic_estado: "Cerrado" },
-            {
-                headers: {
-                    "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute("content"),
-                },
-            }
-        );
-        if (response.status === 200) {
-            toast.success("Ticket cerrado correctamente", {
-                position: "bottom-right",
-                autoClose: 3000,
-            });
-            await fetchTickets();
-        }
-    } catch (error) {
-        console.error("Error al cerrar el ticket:", error.response?.data);
-        toast.error("Error al cerrar el ticket", {
-            position: "bottom-right",
-            autoClose: 3000,
-        });
-    }
+const abrirCerrarModal = (ticket) => {
+    itemSeleccionado.value = ticket;
+    mostrarModalCerrar.value = true;
+};
+
+const cerrarCerrarModal = () => {
+    mostrarModalCerrar.value = false;
 };
 
 const fetchAllData = async () => {
@@ -513,6 +527,10 @@ const handleEdit = (ticket) => {
 
 const handleEliminar = (ticket) => {
     abrirEliminarModal(ticket);
+};
+
+const handleCerrar = (ticket) => {
+    abrirCerrarModal(ticket);
 };
 
 onMounted(() => {
@@ -599,7 +617,7 @@ const getEstadoLabelClass = (estado) => {
         <div v-if="isCardView">
             <CardTickets
                 :tickets="filtrarTickets"
-                @close="cerrarTicket"
+                @close="handleCerrar"
                 @asign="handleAsign"
                 @view="handleView"
                 @edit="handleEdit"
@@ -696,11 +714,16 @@ const getEstadoLabelClass = (estado) => {
                                 class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
                             >
                                 <button
-                                    @click="cerrarTicket(ticket)"
-                                    class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 flex items-center space-x-2"
-                                    title="Cerrar"
+                                    v-if="
+                                        ticket.tic_estado === 'Abierto' ||
+                                        ticket.tic_estado === 'Asignado' ||
+                                        ticket.tic_estado === 'Reabierto'
+                                    "
+                                    @click="handleCerrar(ticket)"
+                                    class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-orange-300 to-orange-500 hover:from-orange-400 hover:to-orange-600 flex items-center space-x-2"
+                                    title="Cerrar Ticket"
                                 >
-                                    <i class="fas fa-times"></i>
+                                    <i class="fas fa-times-circle"></i>
                                 </button>
                                 <button
                                     v-if="
@@ -809,6 +832,15 @@ const getEstadoLabelClass = (estado) => {
             fieldName="tic_titulo"
             @cancelar="cerrarEliminarModal"
             @confirmar="eliminarItem"
+        />
+
+        <ModalCerrar
+            v-if="mostrarModalCerrar"
+            :item="itemSeleccionado"
+            itemName="Ticket"
+            fieldName="tic_titulo"
+            @cancelar="cerrarCerrarModal"
+            @close="cerrarTicket(itemSeleccionado)"
         />
     </div>
 </template>
