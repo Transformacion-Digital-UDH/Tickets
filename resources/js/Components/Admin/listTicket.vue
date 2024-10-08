@@ -10,6 +10,7 @@ import ModalVer from "@/Components/ModalVer.vue";
 import ModalEditar from "@/Components/ModalEditar.vue";
 import ModalEliminar from "@/Components/ModalEliminar.vue";
 import ModalCerrar from "@/Components/ModalCerrar.vue";
+import ModalAbrir from "@/Components/ModalAbrir.vue";
 import ButtonNuevo from "@/Components/ButtonNuevo.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -37,6 +38,7 @@ const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const mostrarModalCerrar = ref(false);
+const mostrarModalAbrir = ref(false);
 const itemSeleccionado = ref(null);
 const estadoFilters = ref([]);
 
@@ -411,6 +413,38 @@ const cerrarTicket = async (ticket) => {
     }
 };
 
+const abrirTicket = async (ticket) => {
+    if (ticket) {
+        try {
+            const response = await axios.put(
+                `/tickets/${ticket.id}/updateEstado`,
+                { tic_estado: "Reabierto" },
+                {
+                    headers: {
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                    },
+                }
+            );
+            if (response.status === 200) {
+                toast.success("Ticket reabierto correctamente", {
+                    position: "bottom-right",
+                    autoClose: 3000,
+                });
+                await fetchTickets();
+                mostrarModalAbrir.value = false;
+            }
+        } catch (error) {
+            console.error("Error al reabrir el ticket:", error.response?.data);
+            toast.error("Error al reabrir el ticket", {
+                position: "bottom-right",
+                autoClose: 3000,
+            });
+        }
+    }
+};
+
 const eliminarItem = async () => {
     if (itemSeleccionado.value) {
         try {
@@ -497,6 +531,15 @@ const cerrarCerrarModal = () => {
     mostrarModalCerrar.value = false;
 };
 
+const abrirAbrirModal = (ticket) => {
+    itemSeleccionado.value = ticket;
+    mostrarModalAbrir.value = true;
+};
+
+const cerrarAbrirModal = () => {
+    mostrarModalAbrir.value = false;
+};
+
 const fetchAllData = async () => {
     try {
         await Promise.all([
@@ -531,6 +574,10 @@ const handleEliminar = (ticket) => {
 
 const handleCerrar = (ticket) => {
     abrirCerrarModal(ticket);
+};
+
+const handleAbrir = (ticket) => {
+    abrirAbrirModal(ticket);
 };
 
 onMounted(() => {
@@ -617,6 +664,7 @@ const getEstadoLabelClass = (estado) => {
         <div v-if="isCardView">
             <CardTickets
                 :tickets="filtrarTickets"
+                @open="handleAbrir"
                 @close="handleCerrar"
                 @asign="handleAsign"
                 @view="handleView"
@@ -714,16 +762,24 @@ const getEstadoLabelClass = (estado) => {
                                 class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
                             >
                                 <button
+                                    v-if="ticket.tic_estado === 'Cerrado'"
+                                    @click="handleAbrir(ticket)"
+                                    class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-green-300 to-green-500 hover:from-green-400 hover:to-green-600 flex items-center space-x-2"
+                                    title="Reabrir Ticket"
+                                >
+                                    <i class="fa-solid fa-lock-open"></i>
+                                </button>
+                                <button
                                     v-if="
                                         ticket.tic_estado === 'Abierto' ||
                                         ticket.tic_estado === 'Asignado' ||
                                         ticket.tic_estado === 'Reabierto'
                                     "
                                     @click="handleCerrar(ticket)"
-                                    class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-orange-300 to-orange-500 hover:from-orange-400 hover:to-orange-600 flex items-center space-x-2"
+                                    class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 flex items-center space-x-2"
                                     title="Cerrar Ticket"
                                 >
-                                    <i class="fas fa-times-circle"></i>
+                                    <i class="fa-solid fa-lock"></i>
                                 </button>
                                 <button
                                     v-if="
@@ -733,7 +789,7 @@ const getEstadoLabelClass = (estado) => {
                                     "
                                     @click="handleAsign(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-blue-300 to-blue-500 hover:from-blue-400 hover:to-blue-600"
-                                    title="Asignar"
+                                    title="Asignar Soporte"
                                 >
                                     <i class="fas fa-user-plus"></i>
                                 </button>
@@ -841,6 +897,15 @@ const getEstadoLabelClass = (estado) => {
             fieldName="tic_titulo"
             @cancelar="cerrarCerrarModal"
             @close="cerrarTicket(itemSeleccionado)"
+        />
+
+        <ModalAbrir
+            v-if="mostrarModalAbrir"
+            :item="itemSeleccionado"
+            itemName="Ticket"
+            fieldName="tic_titulo"
+            @cancelar="cerrarAbrirModal"
+            @open="abrirTicket(itemSeleccionado)"
         />
     </div>
 </template>
