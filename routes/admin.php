@@ -21,6 +21,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         Route::get('/sede', 'index')->name('sede');
         Route::get('/elegirsede', 'elegirsede')->name('elegirsede');
         Route::get('/sedes', 'traer');
+        Route::get('/sedespaginated', 'traerPaginated');
         Route::post('/sedes', 'store');
         Route::put('/sedes/{sede}', 'update');
         Route::delete('/sedes/{sede}/eliminar', 'eliminar');
@@ -31,11 +32,13 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         /** SOPORTE TÉCNICO **/
         Route::get('/soporte', 'soporte')->name('soporte');
         Route::get('/soportes', 'traerSoporte');
+        Route::get('/soportespaginated', 'traerSoportePaginated');
         Route::post('/soportes', 'storeSoporte');
         Route::put('/soportes/{soporte}', 'updateSoporte');
         Route::delete('/soportes/{soporte}/eliminar', 'eliminarSoporte');
         /** DOCENTE **/
         Route::get('/usuario', 'usuario')->name('usuario');
+        Route::get('/usuariospaginated', 'traerUsuarioPaginated');
         Route::get('/usuarios', 'traerUsuario');
         Route::post('/usuarios', 'storeUsuario');
         Route::put('/usuarios/{usuario}', 'updateUsuario');
@@ -44,6 +47,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
     Route::controller(CategoriaController::class)->group(function () {
         Route::get('/categoria', 'index')->name('categoria');
+        Route::get('/categoriaspaginated', 'traerPaginated');
         Route::post('/categorias', 'store');
         Route::put('/categorias/{categoria}', 'update');
         Route::delete('/categorias/{categoria}/eliminar', 'eliminar');
@@ -51,6 +55,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
     Route::controller(PabellonController::class)->group(function () {
         Route::get('/pabellon', 'index')->name('pabellon');
+        Route::get('/pabellonespaginated', 'traerPaginated');
         Route::post('/pabellones', 'store');
         Route::put('/pabellones/{pabellon}', 'update');
         Route::delete('/pabellones/{pabellon}/eliminar', 'eliminar');
@@ -58,6 +63,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
     Route::controller(AulaController::class)->group(function () {
         Route::get('/aula', 'index')->name('aula');
+        Route::get('/aulaspaginated', 'traerPaginated');
         Route::post('/aulas', 'store');
         Route::put('/aulas/{aula}', 'update');
         Route::delete('/aulas/{aula}/eliminar', 'eliminar');
@@ -65,6 +71,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
     Route::controller(TicketController::class)->group(function () {
         Route::get('/ticket', 'index')->name('ticket');
+        Route::get('/ticketspaginated', 'traerPaginated');
         Route::get('/tickets', 'traer');
         Route::post('/tickets', 'store');
         Route::post('/tickets/{id}/asignar', 'asignarSoporte');

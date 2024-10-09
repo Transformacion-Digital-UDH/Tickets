@@ -20,6 +20,24 @@ class UsuarioController extends Controller
         ]);
     }
 
+    public function traerSoportePaginated()
+    {
+        $totalSoportes = User::count();
+
+        $soportes = User::with('rol', 'sede')
+            ->whereHas('rol', function ($query) {
+                $query->where('rol_nombre', 'Soporte');
+            })
+            ->orderBy('created_at', 'desc')->paginate(10);
+
+        $soportes->getCollection()->transform(function ($soporte, $key) use ($totalSoportes, $soportes) {
+            $soporte->row_number = $totalSoportes - (($soportes->currentPage() - 1) * $soportes->perPage() + $key);
+            return $soporte;
+        });
+
+        return response()->json($soportes, 200);
+    }
+
     public function traerSoporte()
     {
         $soportes = User::with('rol', 'sede')
@@ -36,6 +54,24 @@ class UsuarioController extends Controller
         return Inertia::render("Admin/Usuario", [
             'success' => session('success'),
         ]);
+    }
+
+    public function traerUsuarioPaginated()
+    {
+        $totalUsuarios = User::count();
+
+        $usuarios = User::with('rol', 'sede')
+            ->whereHas('rol', function ($query) {
+                $query->where('rol_nombre', 'Usuario');
+            })
+            ->orderBy('created_at', 'desc')->paginate(5);
+
+        $usuarios->getCollection()->transform(function ($usuario, $key) use ($totalUsuarios, $usuarios) {
+            $usuario->row_number = $totalUsuarios - (($usuarios->currentPage() - 1) * $usuarios->perPage() + $key);
+            return $usuario;
+        });
+
+        return response()->json($usuarios, 200);
     }
 
     public function traerUsuario()

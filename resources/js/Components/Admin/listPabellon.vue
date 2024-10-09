@@ -21,6 +21,9 @@ const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const archivadoActivo = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalPages = ref(1);
 
 const headers = ["N°", "Pabellon", "Sede", "Estado"];
 
@@ -45,29 +48,51 @@ const filtrarPabellones = computed(() => {
     if (buscarQuery.value) {
         const query = buscarQuery.value.toLowerCase();
         filteredPabellones = filteredPabellones.filter((pabellon) => {
-            return (
-                pabellon.pab_nombre.toLowerCase().includes(query)
-            );
+            return pabellon.pab_nombre.toLowerCase().includes(query);
         });
     }
 
     if (archivadoActivo.value) {
-        return filteredPabellones.filter((pabellon) => pabellon.pab_activo === 0);
+        return filteredPabellones.filter(
+            (pabellon) => pabellon.pab_activo === 0
+        );
     } else {
-        return filteredPabellones.filter((pabellon) => pabellon.pab_activo === 1);
+        return filteredPabellones.filter(
+            (pabellon) => pabellon.pab_activo === 1
+        );
     }
 });
 
-const fetchPabellones = async () => {
+const mapPabellonData = (pabellon, index, totalPabellones) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: pabellon.id,
+        pab_nombre: pabellon.pab_nombre,
+        sed_id: pabellon.sed_id,
+        sed_nombre: pabellon.sede.sed_nombre,
+        pab_activo: pabellon.pab_activo,
+        row_number: totalPabellones - (startIndex + index),
+    };
+};
+
+const changePage = (pageNumber) => {
+    currentPage.value = pageNumber;
+    fetchPabellones(pageNumber);
+};
+
+const fetchPabellones = async (page = 1) => {
     try {
-        const response = await axios.get("/pabellones");
-        pabellons.value = response.data.map((pabellon) => ({
-            id: pabellon.id,
-            pab_nombre: pabellon.pab_nombre,
-            sed_id: pabellon.sed_id,
-            sed_nombre: pabellon.sede.sed_nombre,
-            pab_activo: pabellon.pab_activo,
-        }));
+        const response = await axios.get(`/pabellonespaginated?page=${page}`);
+
+        const totalPabellones = response.data.total;
+        const pabellonData = response.data.data.map((pabellon, index) =>
+            mapPabellonData(pabellon, index, totalPabellones)
+        );
+
+        pabellons.value = pabellonData;
+        currentPage.value = response.data.current_page;
+        itemsPerPage.value = response.data.per_page;
+        totalPages.value = response.data.last_page;
     } catch (error) {
         toast.error("Error al cargar los pabellones", {
             autoClose: 5000,
@@ -256,11 +281,14 @@ onMounted(() => {
 
         <Table
             :headers="headers"
-            entityType="pabellon"
             :items="filtrarPabellones"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            entityType="pabellon"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @eliminar="abrirEliminarModal"
+            @changePage="changePage"
         />
 
         <ModalCrear

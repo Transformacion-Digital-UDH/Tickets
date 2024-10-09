@@ -18,6 +18,14 @@ export default {
             type: String,
             required: true,
         },
+        currentPage: {
+            type: Number,
+            required: true,
+        },
+        totalPages: {
+            type: Number,
+            required: true,
+        },
     },
     data() {
         return {
@@ -141,14 +149,14 @@ export default {
                 </thead>
                 <tbody>
                     <tr
-                        v-for="(item, index) in items"
+                        v-for="item in items"
                         :key="item.id"
                         class="transition-colors duration-200 border-b hover:bg-gray-100"
                     >
                         <td
                             class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
                         >
-                            {{ index + 1 }}
+                            {{ item.row_number }}
                         </td>
                         <td
                             v-for="key in filteredItemKeys(item)"
@@ -212,6 +220,24 @@ export default {
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="mt-4 flex justify-center">
+            <button
+                v-for="page in Array.from(
+                    { length: totalPages },
+                    (_, i) => i + 1
+                )"
+                :key="page"
+                :class="[
+                    currentPage === page
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-[#2EBAA1]',
+                    'mx-2 px-3 py-1 rounded-lg',
+                ]"
+                @click="$emit('changePage', page)"
+            >
+                {{ page }}
+            </button>
         </div>
     </div>
 </template>

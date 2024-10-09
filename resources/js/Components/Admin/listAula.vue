@@ -21,6 +21,9 @@ const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const archivadoActivo = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalPages = ref(1);
 
 const headers = ["N°", "Aula", "Pabellon", "Estado"];
 
@@ -45,9 +48,7 @@ const filtrarAulas = computed(() => {
     if (buscarQuery.value) {
         const query = buscarQuery.value.toLowerCase();
         filteredAulas = filteredAulas.filter((aula) => {
-            return (
-                aula.aul_numero.toLowerCase().includes(query)
-            );
+            return aula.aul_numero.toLowerCase().includes(query);
         });
     }
 
@@ -58,16 +59,36 @@ const filtrarAulas = computed(() => {
     }
 });
 
-const fetchAulas = async () => {
+const mapAulaData = (aula, index, totalAulas) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: aula.id,
+        aul_numero: aula.aul_numero,
+        pab_id: aula.pab_id,
+        pab_nombre: aula.pabellon.pab_nombre,
+        aul_activo: aula.aul_activo,
+        row_number: totalAulas - (startIndex + index),
+    };
+};
+
+const changePage = (pageNumber) => {
+    currentPage.value = pageNumber;
+    fetchAulas(pageNumber);
+};
+
+const fetchAulas = async (page = 1) => {
     try {
-        const response = await axios.get("/aulas");
-        aulas.value = response.data.map((aula) => ({
-            id: aula.id,
-            aul_numero: aula.aul_numero,
-            pab_id: aula.pab_id,
-            pab_nombre: aula.pabellon.pab_nombre,
-            aul_activo: aula.aul_activo,
-        }));
+        const response = await axios.get(`/aulaspaginated?page=${page}`);
+
+        const totalAulas = response.data.total;
+        const aulaData = response.data.data.map((aula, index) =>
+            mapAulaData(aula, index, totalAulas)
+        );
+
+        aulas.value = aulaData;
+        currentPage.value = response.data.current_page;
+        itemsPerPage.value = response.data.per_page;
+        totalPages.value = response.data.last_page;
     } catch (error) {
         toast.error("Error al cargar las aulas", {
             autoClose: 5000,
@@ -254,11 +275,14 @@ onMounted(() => {
 
         <Table
             :headers="headers"
-            entityType="aula"
             :items="filtrarAulas"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            entityType="aula"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @eliminar="abrirEliminarModal"
+            @changePage="changePage"
         />
 
         <ModalCrear

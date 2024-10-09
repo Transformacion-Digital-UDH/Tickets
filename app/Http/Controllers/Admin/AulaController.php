@@ -18,11 +18,26 @@ class AulaController extends Controller
         ]);
     }
 
+    public function traerPaginated()
+    {
+        $totalAulas = Aula::count();
+        
+        $aulas = Aula::with('pabellon')->orderBy('created_at', 'desc')->paginate(5);
+
+        $aulas->getCollection()->transform(function ($aula, $key) use ($totalAulas, $aulas) {
+            $aula->row_number = $totalAulas - (($aulas->currentPage() - 1) * $aulas->perPage() + $key);
+            return $aula;
+        });
+
+        return response()->json($aulas);
+    }
+
     public function traer()
     {
         $aulas = Aula::with('pabellon')->get();
         return response()->json($aulas);
     }
+
     public function store(Request $request)
     {
         $validarDatos = $request->validate([

@@ -18,6 +18,9 @@ const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const archivadoActivo = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalPages = ref(1);
 
 const headers = ["N°", "Nombre", "Estado"];
 
@@ -42,27 +45,49 @@ const filtrarCategorias = computed(() => {
     if (buscarQuery.value) {
         const query = buscarQuery.value.toLowerCase();
         filteredCategorias = filteredCategorias.filter((categoria) => {
-            return (
-                categoria.cat_nombre.toLowerCase().includes(query)
-            );
+            return categoria.cat_nombre.toLowerCase().includes(query);
         });
     }
 
     if (archivadoActivo.value) {
-        return filteredCategorias.filter((categoria) => categoria.cat_activo === 0);
+        return filteredCategorias.filter(
+            (categoria) => categoria.cat_activo === 0
+        );
     } else {
-        return filteredCategorias.filter((categoria) => categoria.cat_activo === 1);
+        return filteredCategorias.filter(
+            (categoria) => categoria.cat_activo === 1
+        );
     }
 });
 
-const fetchCategorias = async () => {
+const mapCategoriaData = (categoria, index, totalCategorias) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: categoria.id,
+        cat_nombre: categoria.cat_nombre,
+        cat_activo: categoria.cat_activo,
+        row_number: totalCategorias - (startIndex + index),
+    };
+};
+
+const changePage = (pageNumber) => {
+    currentPage.value = pageNumber;
+    fetchCategorias(pageNumber);
+};
+
+const fetchCategorias = async (page = 1) => {
     try {
-        const response = await axios.get("/categorias");
-        categorias.value = response.data.map((categoria) => ({
-            id: categoria.id,
-            cat_nombre: categoria.cat_nombre,
-            cat_activo: categoria.cat_activo,
-        }));
+        const response = await axios.get(`/categoriaspaginated?page=${page}`);
+
+        const totalCategorias = response.data.total;
+        const categoriaData = response.data.data.map((categoria, index) =>
+            mapCategoriaData(categoria, index, totalCategorias)
+        );
+
+        categorias.value = categoriaData;
+        currentPage.value = response.data.current_page;
+        itemsPerPage.value = response.data.per_page;
+        totalPages.value = response.data.last_page;
     } catch (error) {
         toast.error("Error al cargar los categorías", {
             autoClose: 5000,
@@ -200,11 +225,14 @@ onMounted(() => fetchCategorias(), getArchivedFilterFromLocalStorage());
 
         <Table
             :headers="headers"
-            entityType="categoria"
             :items="filtrarCategorias"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            entityType="categoria"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @eliminar="abrirEliminarModal"
+            @changePage="changePage"
         />
 
         <ModalCrear

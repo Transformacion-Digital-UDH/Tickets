@@ -18,6 +18,20 @@ class PabellonController extends Controller
         ]);
     }
 
+    public function traerPaginated()
+    {
+        $totalPabellones = Pabellon::count();
+
+        $pabellones = Pabellon::with('sede')->orderBy('created_at', 'desc')->paginate(5);
+
+        $pabellones->getCollection()->transform(function ($pabellon, $key) use ($totalPabellones, $pabellones) {
+            $pabellon->row_number = $totalPabellones - (($pabellones->currentPage() - 1) * $pabellones->perPage() + $key);
+            return $pabellon;
+        });
+
+        return response()->json($pabellones);
+    }
+
     public function traer()
     {
         $pabellones = Pabellon::with('sede')->get();

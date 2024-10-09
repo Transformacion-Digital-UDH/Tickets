@@ -22,6 +22,24 @@ class SedeController extends Controller
         ]);
     }
 
+    public function traerPaginated()
+    {
+        $totalSedes = Sede::count();
+
+        if (Auth::user()->hasAnyRole(['Soporte', 'Usuario'])) {
+            return response()->json(['sedes' => []], 200);
+        }
+
+        $sedes = Sede::where('sed_activo', true)->orderBy('created_at', 'desc')->paginate(5);
+
+        $sedes->getCollection()->transform(function ($sede, $key) use ($totalSedes, $sedes) {
+            $sede->row_number = $totalSedes - (($sedes->currentPage() - 1) * $sedes->perPage() + $key);
+            return $sede;
+        });
+
+        return response()->json($sedes, 200);
+    }
+
     public function traer()
     {
         $sedes = Sede::all();

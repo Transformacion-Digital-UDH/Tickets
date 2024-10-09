@@ -18,6 +18,9 @@ const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const archivadoActivo = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalPages = ref(1);
 
 const headers = ["N°", "Nombre", "Ciudad", "Estado"];
 
@@ -63,17 +66,37 @@ const filtrarSedes = computed(() => {
     }
 });
 
-const fetchSedes = async () => {
+const mapSedeData = (sede, index, totalSedes) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: sede.id,
+        sed_nombre: sede.sed_nombre,
+        sed_direccion: sede.sed_direccion,
+        sed_ciudad: sede.sed_ciudad,
+        sed_telefono: validatePhoneNumber(sede.sed_telefono),
+        sed_activo: sede.sed_activo,
+        row_number: totalSedes - (startIndex + index),
+    };
+};
+
+const changePage = (pageNumber) => {
+    currentPage.value = pageNumber;
+    fetchSedes(pageNumber);
+};
+
+const fetchSedes = async (page = 1) => {
     try {
-        const response = await axios.get("/sedes");
-        sedes.value = response.data.map((sede) => ({
-            id: sede.id,
-            sed_nombre: sede.sed_nombre,
-            sed_direccion: sede.sed_direccion,
-            sed_ciudad: sede.sed_ciudad,
-            sed_telefono: validatePhoneNumber(sede.sed_telefono),
-            sed_activo: sede.sed_activo,
-        }));
+        const response = await axios.get(`/sedespaginated?page=${page}`);
+
+        const totalSedes = response.data.total;
+        const sedeData = response.data.data.map((sede, index) =>
+            mapSedeData(sede, index, totalSedes)
+        );
+
+        sedes.value = sedeData;
+        currentPage.value = response.data.current_page;
+        itemsPerPage.value = response.data.per_page;
+        totalPages.value = response.data.last_page;
     } catch (error) {
         toast.error("Error al cargar las sedes", {
             autoClose: 5000,
@@ -216,10 +239,13 @@ onMounted(() => fetchSedes(), getArchivedFilterFromLocalStorage());
         <Table
             :headers="headers"
             :items="filtrarSedes"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
             entityType="sede"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @eliminar="abrirEliminarModal"
+            @changePage="changePage"
         />
 
         <ModalCrear

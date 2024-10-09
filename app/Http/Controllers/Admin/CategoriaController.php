@@ -15,6 +15,20 @@ class CategoriaController extends Controller
         ]);
     }
 
+    public function traerPaginated()
+    {
+        $totalCategorias = Categoria::count();
+
+        $categorias = Categoria::orderBy('created_at', 'desc')->paginate(5);
+
+        $categorias->getCollection()->transform(function ($categoria, $key) use ($totalCategorias, $categorias) {
+            $categoria->row_number = $totalCategorias - (($categorias->currentPage() - 1) * $categorias->perPage() + $key);
+            return $categoria;
+        });
+
+        return response()->json($categorias, 200);
+    }
+
     public function traer()
     {
         $categorias = Categoria::all();

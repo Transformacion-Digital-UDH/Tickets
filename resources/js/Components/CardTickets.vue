@@ -8,6 +8,14 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    currentPage: {
+        type: Number,
+        required: true,
+    },
+    totalPages: {
+        type: Number,
+        required: true,
+    },
     success: String,
 });
 
@@ -24,7 +32,15 @@ onBeforeUnmount(() => {
     window.removeEventListener("resize", handleResize);
 });
 
-const emit = defineEmits(["open", "close", "asign", "view", "edit", "eliminar"]);
+const emit = defineEmits([
+    "open",
+    "close",
+    "asign",
+    "view",
+    "edit",
+    "eliminar",
+    "changePage",
+]);
 </script>
 
 <template>
@@ -174,6 +190,24 @@ const emit = defineEmits(["open", "close", "asign", "view", "edit", "eliminar"])
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="mt-4 flex justify-center" v-if="totalPages > 1">
+            <button
+                v-for="page in Array.from(
+                    { length: totalPages },
+                    (_, i) => i + 1
+                )"
+                :key="page"
+                :class="[
+                    currentPage === page
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-[#2EBAA1]',
+                    'mx-2 px-3 py-1 rounded-lg',
+                ]"
+                @click="$emit('changePage', page)"
+            >
+                {{ page }}
+            </button>
         </div>
 
         <div
