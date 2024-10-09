@@ -20,7 +20,7 @@ class AulaController extends Controller
 
     public function traerPaginated()
     {
-        $totalAulas = Aula::count();
+        $totalAulas = Aula::where('aul_activo', true)->count();
         
         $aulas = Aula::with('pabellon')->orderBy('created_at', 'desc')->paginate(5);
 

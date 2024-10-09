@@ -560,8 +560,11 @@ const alertaEliminar = () => {
     });
 };
 
-const cerrarCrearModal = () => {
+const cerrarCrearModal = async () => {
     mostrarModalCrear.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
 };
 
 const abrirAsignarModal = (ticket) => {
@@ -569,8 +572,11 @@ const abrirAsignarModal = (ticket) => {
     mostrarModalAsignar.value = true;
 };
 
-const cerrarAsignarModal = () => {
+const cerrarAsignarModal = async () => {
     mostrarModalAsignar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
 };
 
 const abrirDetallesModal = (ticket) => {
@@ -578,17 +584,28 @@ const abrirDetallesModal = (ticket) => {
     mostrarModalDetalles.value = true;
 };
 
-const cerrarDetallesModal = () => {
+const cerrarDetallesModal = async () => {
     mostrarModalDetalles.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
 };
 
-const abrirEditarModal = (ticket) => {
+const abrirEditarModal = async (ticket) => {
     itemSeleccionado.value = ticket;
+    await fetchPrioridades();
+    await fetchUsuarios();
+    await fetchCategorias();
+    await fetchPabellones();
+    await fetchAulas();
     mostrarModalEditar.value = true;
 };
 
-const cerrarEditarModal = () => {
+const cerrarEditarModal = async () => {
     mostrarModalEditar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
 };
 
 const abrirEliminarModal = (ticket) => {
@@ -596,8 +613,11 @@ const abrirEliminarModal = (ticket) => {
     mostrarModalEliminar.value = true;
 };
 
-const cerrarEliminarModal = () => {
+const cerrarEliminarModal = async () => {
     mostrarModalEliminar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
 };
 
 const abrirCerrarModal = (ticket) => {
@@ -605,8 +625,11 @@ const abrirCerrarModal = (ticket) => {
     mostrarModalCerrar.value = true;
 };
 
-const cerrarCerrarModal = () => {
+const cerrarCerrarModal = async () => {
     mostrarModalCerrar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
 };
 
 const abrirAbrirModal = (ticket) => {
@@ -614,8 +637,11 @@ const abrirAbrirModal = (ticket) => {
     mostrarModalAbrir.value = true;
 };
 
-const cerrarAbrirModal = () => {
+const cerrarAbrirModal = async () => {
     mostrarModalAbrir.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
 };
 
 const fetchAllData = async () => {

@@ -147,8 +147,9 @@ const eliminarItem = async () => {
     }
 };
 
-const cerrarCrearModal = () => {
+const cerrarCrearModal = async () => {
     mostrarModalCrear.value = false;
+    await fetchSedes();
 };
 
 const abrirDetallesModal = (sede) => {
@@ -156,8 +157,10 @@ const abrirDetallesModal = (sede) => {
     mostrarModalDetalles.value = true;
 };
 
-const cerrarDetallesModal = () => {
+const cerrarDetallesModal = async () => {
     mostrarModalDetalles.value = false;
+    localStorage.setItem("currentPage", 1);
+    await fetchSedes(currentPage.value);
 };
 
 const abrirEditarModal = (sede) => {
@@ -165,8 +168,11 @@ const abrirEditarModal = (sede) => {
     mostrarModalEditar.value = true;
 };
 
-const cerrarEditarModal = () => {
+const cerrarEditarModal = async () => {
     mostrarModalEditar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchSedes(currentPage.value);
 };
 
 const abrirEliminarModal = (sede) => {
@@ -174,8 +180,11 @@ const abrirEliminarModal = (sede) => {
     mostrarModalEliminar.value = true;
 };
 
-const cerrarEliminarModal = () => {
+const cerrarEliminarModal = async () => {
     mostrarModalEliminar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchSedes(currentPage.value);
 };
 
 const alertaEliminar = () => {

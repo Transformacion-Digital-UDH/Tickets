@@ -130,30 +130,6 @@ const fetchUsuarios = async (page = 1) => {
     }
 };
 
-// const fetchUsuarios = async () => {
-//     try {
-//         const response = await axios.get("/usuarios");
-//         usuarios.value = response.data.map((usuario) => ({
-//             id: usuario.id,
-//             name: usuario.name,
-//             email: usuario.email,
-//             celular: validatePhoneNumber(usuario.celular),
-//             sed_id: usuario.sed_id,
-//             sed_nombre: usuario.sede ? usuario.sede.sed_nombre : "",
-//             activo: usuario.activo,
-//         }));
-//     } catch (error) {
-//         toast.error("Error al cargar los usuarios", {
-//             autoClose: 5000,
-//             position: "bottom-right",
-//             style: {
-//                 width: "400px",
-//             },
-//             className: "border-l-4 border-red-500 p-4",
-//         });
-//     }
-// };
-
 const fetchSedes = async () => {
     try {
         const response = await axios.get("/sedes");
@@ -250,8 +226,9 @@ const eliminarItem = async () => {
     }
 };
 
-const cerrarCrearModal = () => {
+const cerrarCrearModal = async () => {
     mostrarModalCrear.value = false;
+    await fetchUsuarios();
 };
 
 const abrirDetallesModal = (usuario) => {
@@ -259,17 +236,23 @@ const abrirDetallesModal = (usuario) => {
     mostrarModalDetalles.value = true;
 };
 
-const cerrarDetallesModal = () => {
+const cerrarDetallesModal = async () => {
     mostrarModalDetalles.value = false;
+    localStorage.setItem("currentPage", 1);
+    await fetchUsuarios(currentPage.value);
 };
 
-const abrirEditarModal = (usuario) => {
+const abrirEditarModal = async (usuario) => {
     itemSeleccionado.value = usuario;
+    await fetchSedes();
     mostrarModalEditar.value = true;
 };
 
-const cerrarEditarModal = () => {
+const cerrarEditarModal = async () => {
     mostrarModalEditar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchUsuarios(currentPage.value);
 };
 
 const abrirEliminarModal = (usuario) => {
@@ -277,8 +260,11 @@ const abrirEliminarModal = (usuario) => {
     mostrarModalEliminar.value = true;
 };
 
-const cerrarEliminarModal = () => {
+const cerrarEliminarModal = async () => {
     mostrarModalEliminar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchUsuarios(currentPage.value);
 };
 
 const alertaEliminar = () => {

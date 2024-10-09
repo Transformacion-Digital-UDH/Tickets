@@ -77,6 +77,7 @@ const mapPabellonData = (pabellon, index, totalPabellones) => {
 
 const changePage = (pageNumber) => {
     currentPage.value = pageNumber;
+    localStorage.setItem("currentPage", pageNumber);
     fetchPabellones(pageNumber);
 };
 
@@ -186,8 +187,11 @@ const eliminarItem = async () => {
     }
 };
 
-const cerrarCrearModal = () => {
+const cerrarCrearModal = async () => {
     mostrarModalCrear.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchPabellones(currentPage.value);
 };
 
 const abrirDetallesModal = (pabellon) => {
@@ -195,17 +199,23 @@ const abrirDetallesModal = (pabellon) => {
     mostrarModalDetalles.value = true;
 };
 
-const cerrarDetallesModal = () => {
+const cerrarDetallesModal = async () => {
     mostrarModalDetalles.value = false;
+    localStorage.setItem("currentPage", 1);
+    await fetchPabellones(currentPage.value);
 };
 
-const abrirEditarModal = (pabellon) => {
+const abrirEditarModal = async (pabellon) => {
     itemSeleccionado.value = pabellon;
+    await fetchSedes();
     mostrarModalEditar.value = true;
 };
 
-const cerrarEditarModal = () => {
+const cerrarEditarModal = async () => {
     mostrarModalEditar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchPabellones(currentPage.value);
 };
 
 const abrirEliminarModal = (pabellon) => {
@@ -213,8 +223,11 @@ const abrirEliminarModal = (pabellon) => {
     mostrarModalEliminar.value = true;
 };
 
-const cerrarEliminarModal = () => {
+const cerrarEliminarModal = async () => {
     mostrarModalEliminar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchPabellones(currentPage.value);
 };
 
 const alertaEliminar = () => {
