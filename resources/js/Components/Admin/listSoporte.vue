@@ -21,8 +21,24 @@ const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const passwordGenerada = ref("");
+const archivadoActivo = ref(false);
 
 const headers = ["N°", "Nombre", "Sede", "Estado"];
+
+const toggleArchivedFilter = () => {
+    archivadoActivo.value = !archivadoActivo.value;
+    localStorage.setItem("archivadoActivo", archivadoActivo.value);
+};
+
+const resetArchivedFilter = () => {
+    archivadoActivo.value = false;
+    localStorage.setItem("archivadoActivo", archivadoActivo.value);
+};
+
+const getArchivedFilterFromLocalStorage = () => {
+    const storedValue = localStorage.getItem("archivadoActivo");
+    archivadoActivo.value = storedValue === "true";
+};
 
 const generarPassword = () => {
     const caracteres =
@@ -44,18 +60,24 @@ const validatePhoneNumber = (telefono) => {
 };
 
 const filtrarSoportes = computed(() => {
-    return soportes.value.filter(
-        (soporte) =>
-            soporte.name
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            soporte.email
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            soporte.celular
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase())
-    );
+    let filteredSoportes = soportes.value;
+
+    if (buscarQuery.value) {
+        const query = buscarQuery.value.toLowerCase();
+        filteredSoportes = filteredSoportes.filter((soporte) => {
+            return (
+                soporte.name.toLowerCase().includes(query) ||
+                soporte.email.toLowerCase().includes(query) ||
+                soporte.celular.toLowerCase().includes(query)
+            );
+        });
+    }
+
+    if (archivadoActivo.value) {
+        return filteredSoportes.filter((soporte) => soporte.activo === 0);
+    } else {
+        return filteredSoportes.filter((soporte) => soporte.activo === 1);
+    }
 });
 
 const fetchSoportes = async () => {
@@ -222,6 +244,7 @@ const alertaEliminar = () => {
 onMounted(() => {
     fetchSoportes();
     fetchSedes();
+    getArchivedFilterFromLocalStorage();
 });
 </script>
 
@@ -233,7 +256,9 @@ onMounted(() => {
         <div
             class="flex flex-col items-center justify-between mb-4 sm:flex-row"
         >
-            <div class="relative w-full mb-2 sm:w-auto sm:mb-0">
+            <div
+                class="relative w-full mb-2 sm:w-auto sm:mb-0 flex items-center"
+            >
                 <span
                     class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
                 >
@@ -245,6 +270,23 @@ onMounted(() => {
                     placeholder="Buscar..."
                     class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
                 />
+                <button
+                    @click="toggleArchivedFilter"
+                    class="ml-2 flex items-center px-2 py-1 rounded-md hover:bg-opacity-80 font-semibold"
+                    :class="
+                        archivadoActivo
+                            ? 'bg-red-500 text-white'
+                            : 'bg-[#2EBAA1] text-white'
+                    "
+                >
+                    <i class="fas fa-filter mr-1"></i>
+                    <span>{{ archivadoActivo ? "Archivado" : "Activo" }}</span>
+                    <i
+                        class="fas fa-times ml-2"
+                        v-if="archivadoActivo"
+                        @click.stop="resetArchivedFilter"
+                    ></i>
+                </button>
             </div>
             <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>

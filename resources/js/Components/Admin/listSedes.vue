@@ -17,8 +17,24 @@ const mostrarModalDetalles = ref(false);
 const mostrarModalEditar = ref(false);
 const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
+const archivadoActivo = ref(false);
 
 const headers = ["N°", "Nombre", "Ciudad", "Estado"];
+
+const toggleArchivedFilter = () => {
+    archivadoActivo.value = !archivadoActivo.value;
+    localStorage.setItem("archivadoActivo", archivadoActivo.value);
+};
+
+const resetArchivedFilter = () => {
+    archivadoActivo.value = false;
+    localStorage.setItem("archivadoActivo", archivadoActivo.value);
+};
+
+const getArchivedFilterFromLocalStorage = () => {
+    const storedValue = localStorage.getItem("archivadoActivo");
+    archivadoActivo.value = storedValue === "true";
+};
 
 const validatePhoneNumber = (telefono) => {
     const phone = telefono.toString();
@@ -26,21 +42,25 @@ const validatePhoneNumber = (telefono) => {
 };
 
 const filtrarSedes = computed(() => {
-    return sedes.value.filter(
-        (sede) =>
-            sede.sed_nombre
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            sede.sed_ciudad
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            sede.sed_direccion
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase()) ||
-            sede.sed_telefono
-                .toLowerCase()
-                .includes(buscarQuery.value.toLowerCase())
-    );
+    let filteredSedes = sedes.value;
+
+    if (buscarQuery.value) {
+        const query = buscarQuery.value.toLowerCase();
+        filteredSedes = filteredSedes.filter((sede) => {
+            return (
+                sede.sed_nombre.toLowerCase().includes(query) ||
+                sede.sed_ciudad.toLowerCase().includes(query) ||
+                sede.sed_direccion.toLowerCase().includes(query) ||
+                sede.sed_telefono.toLowerCase().includes(query)
+            );
+        });
+    }
+
+    if (archivadoActivo.value) {
+        return filteredSedes.filter((sede) => sede.sed_activo === 0);
+    } else {
+        return filteredSedes.filter((sede) => sede.sed_activo === 1);
+    }
 });
 
 const fetchSedes = async () => {
@@ -89,14 +109,17 @@ const eliminarItem = async () => {
             mostrarModalEliminar.value = false;
             alertaEliminar();
         } catch (error) {
-            toast.error("No puedes eliminar esta sede, por el momento solo desactivelo", {
-                autoClose: 5000,
-                position: "bottom-right",
-                style: {
-                    width: "400px",
-                },
-                className: "border-l-4 border-red-500 p-4",
-            });
+            toast.error(
+                "No puedes eliminar esta sede, por el momento solo desactivelo",
+                {
+                    autoClose: 5000,
+                    position: "bottom-right",
+                    style: {
+                        width: "400px",
+                    },
+                    className: "border-l-4 border-red-500 p-4",
+                }
+            );
         }
     }
 };
@@ -142,9 +165,9 @@ const alertaEliminar = () => {
         },
         className: "border-l-4 border-green-500 p-4",
     });
-}
+};
 
-onMounted(() => fetchSedes());
+onMounted(() => fetchSedes(), getArchivedFilterFromLocalStorage());
 </script>
 
 <template>
@@ -152,31 +175,89 @@ onMounted(() => fetchSedes());
         <h1 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
             Lista de Sedes
         </h1>
-        <div class="flex flex-col items-center justify-between mb-4 sm:flex-row">
-            <div class="relative w-full mb-2 sm:w-auto sm:mb-0">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div
+            class="flex flex-col items-center justify-between mb-4 sm:flex-row"
+        >
+            <div
+                class="relative w-full mb-2 sm:w-auto sm:mb-0 flex items-center"
+            >
+                <span
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                >
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
-                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
+                <input
+                    type="text"
+                    v-model="buscarQuery"
+                    placeholder="Buscar..."
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
+                />
+                <button
+                    @click="toggleArchivedFilter"
+                    class="ml-2 flex items-center px-2 py-1 rounded-md hover:bg-opacity-80 font-semibold"
+                    :class="
+                        archivadoActivo
+                            ? 'bg-red-500 text-white'
+                            : 'bg-[#2EBAA1] text-white'
+                    "
+                >
+                    <i class="fas fa-filter mr-1"></i>
+                    <span>{{ archivadoActivo ? "Archivado" : "Activo" }}</span>
+                    <i
+                        class="fas fa-times ml-2"
+                        v-if="archivadoActivo"
+                        @click.stop="resetArchivedFilter"
+                    ></i>
+                </button>
             </div>
             <ButtonNuevo @click="mostrarModalCrear = true" />
         </div>
 
-        <Table :headers="headers" :items="filtrarSedes" entityType="sede" @view="abrirDetallesModal"
-            @edit="abrirEditarModal" @eliminar="abrirEliminarModal" />
+        <Table
+            :headers="headers"
+            :items="filtrarSedes"
+            entityType="sede"
+            @view="abrirDetallesModal"
+            @edit="abrirEditarModal"
+            @eliminar="abrirEliminarModal"
+        />
 
-        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" itemName="Sede" endpoint="/sedes"
-            @cerrar="cerrarCrearModal" @crear="fetchSedes" />
+        <ModalCrear
+            v-if="mostrarModalCrear"
+            :formFields="formFields"
+            itemName="Sede"
+            endpoint="/sedes"
+            @cerrar="cerrarCrearModal"
+            @crear="fetchSedes"
+        />
 
-        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Sede" :formFieldsVer="formFieldsVer"
-            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
+        <ModalVer
+            v-if="mostrarModalDetalles"
+            :item="itemSeleccionado"
+            itemName="Sede"
+            :formFieldsVer="formFieldsVer"
+            :mostrarModalDetalles="mostrarModalDetalles"
+            @close="cerrarDetallesModal"
+        />
 
-        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Sede" :formFields="formFields"
-            :mostrarModalEditar="mostrarModalEditar" endpoint="/sedes" @cerrar="cerrarEditarModal"
-            @update="fetchSedes" />
+        <ModalEditar
+            v-if="mostrarModalEditar"
+            :item="itemSeleccionado"
+            itemName="Sede"
+            :formFields="formFields"
+            :mostrarModalEditar="mostrarModalEditar"
+            endpoint="/sedes"
+            @cerrar="cerrarEditarModal"
+            @update="fetchSedes"
+        />
 
-        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Sede" fieldName="sed_nombre"
-            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
+        <ModalEliminar
+            v-if="mostrarModalEliminar"
+            :item="itemSeleccionado"
+            itemName="Sede"
+            fieldName="sed_nombre"
+            @cancelar="cerrarEliminarModal"
+            @confirmar="eliminarItem"
+        />
     </div>
 </template>
