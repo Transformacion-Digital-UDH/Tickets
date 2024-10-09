@@ -22,6 +22,9 @@ const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const passwordGenerada = ref("");
 const archivadoActivo = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalPages = ref(1);
 
 const headers = ["N°", "Nombre", "Sede", "Estado"];
 
@@ -80,18 +83,38 @@ const filtrarSoportes = computed(() => {
     }
 });
 
-const fetchSoportes = async () => {
+const mapSoporteData = (soporte, index, totalSoportes) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: soporte.id,
+        name: soporte.name,
+        email: soporte.email,
+        celular: validatePhoneNumber(soporte.celular),
+        sed_id: soporte.sed_id,
+        sed_nombre: soporte.sede.sed_nombre,
+        activo: soporte.activo,
+        row_number: totalSoportes - (startIndex + index),
+    };
+};
+
+const changePage = (pageNumber) => {
+    currentPage.value = pageNumber;
+    fetchSoportes(pageNumber);
+};
+
+const fetchSoportes = async (page = 1) => {
     try {
-        const response = await axios.get("/soportes");
-        soportes.value = response.data.map((soporte) => ({
-            id: soporte.id,
-            name: soporte.name,
-            email: soporte.email,
-            celular: validatePhoneNumber(soporte.celular),
-            sed_id: soporte.sed_id,
-            sed_nombre: soporte.sede.sed_nombre,
-            activo: soporte.activo,
-        }));
+        const response = await axios.get(`/soportespaginated?page=${page}`);
+
+        const totalSoportes = response.data.total;
+        const soporteData = response.data.data.map((soporte, index) =>
+            mapSoporteData(soporte, index, totalSoportes)
+        );
+
+        soportes.value = soporteData;
+        currentPage.value = response.data.current_page;
+        itemsPerPage.value = response.data.per_page;
+        totalPages.value = response.data.last_page;
     } catch (error) {
         toast.error("Error al cargar los soportes técnicos", {
             autoClose: 5000,
@@ -294,10 +317,13 @@ onMounted(() => {
         <Table
             :headers="headers"
             :items="filtrarSoportes"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
             entityType="user"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @eliminar="abrirEliminarModal"
+            @changePage="changePage"
         />
 
         <ModalCrear

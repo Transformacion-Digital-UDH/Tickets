@@ -9,10 +9,7 @@ const selectedFileName = ref({});
 const selectedFilePreviews = ref({});
 
 const props = defineProps({
-    formFields: {
-        type: Array,
-        default: () => [],
-    },
+    formFields: Array,
     endpoint: {
         type: String,
         required: true,
@@ -51,6 +48,7 @@ const errores = ref([]);
 const loading = ref(false);
 const isMobile = ref(false);
 const successMessage = ref("");
+const formDataOriginal = ref({});
 
 const handleResize = () => {
     isMobile.value = window.innerWidth <= 768;
@@ -196,11 +194,43 @@ const handleFileChange = (event, fieldName) => {
     }
 };
 
+const uploadFile = async (ticketId) => {
+    const formDataTicket = new FormData();
+    formDataTicket.append("tic_archivo", formData.value["tic_archivo"]);
+
+    try {
+        const response = await axios.post(
+            `${props.endpoint}/${ticketId}/upload`,
+            formDataTicket,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        toast.error(`Error al subir la imagen`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
+        throw error;
+    }
+};
+
 const submitForm = async () => {
     loading.value = true;
     successMessage.value = "";
-    errores.value = [];
+    errores.value = {};
     let isValid = true;
+
+    const data = {};
+
     props.formFields.forEach((field) => {
         const fieldValue = formData.value[field.name];
 
@@ -209,6 +239,8 @@ const submitForm = async () => {
                 `El campo ${field.label} es requerido`,
             ];
             isValid = false;
+        } else {
+            data[field.name] = fieldValue;
         }
 
         if (field.label.toLowerCase().includes("teléfono")) {
@@ -218,14 +250,12 @@ const submitForm = async () => {
                 ];
                 isValid = false;
             } else {
-                const phoneValue = String(fieldValue);
+                let phoneValue = String(fieldValue).trim();
 
                 if (phoneValue.startsWith("+51")) {
                     formData.value[field.name] = phoneValue
                         .replace("+51", "")
                         .trim();
-                } else {
-                    formData.value[field.name] = phoneValue.trim();
                 }
 
                 const regex = /^[0-9]+$/;
@@ -236,16 +266,18 @@ const submitForm = async () => {
                     isValid = false;
                 }
 
-                if (formData.value[field.name].length !== 9) {
+                if (phoneValue.length !== 9) {
                     errores.value[field.name] = [
                         `El campo ${field.label} debe tener exactamente 9 dígitos.`,
                     ];
                     isValid = false;
+                } else {
+                    formData.value[field.name] = phoneValue;
                 }
             }
         }
 
-        if (field.label === "Correo") {
+        if (field.label.toLowerCase().includes("correo")) {
             if (!fieldValue) {
                 errores.value[field.name] = [
                     `El campo ${field.label} es requerido`,
@@ -268,49 +300,54 @@ const submitForm = async () => {
         return;
     }
 
-    const data = new FormData();
-    props.formFields.forEach((field) => {
-        if (field.type === "file") {
-            if (formData.value[field.name]) {
-                data.append(field.name, formData.value[field.name]);
-            }
-        } else {
-            data.append(field.name, formData.value[field.name] || "");
-        }
-    });
-
     try {
         const response = await axios.post(props.endpoint, data, {
             headers: {
-                "Content-Type": "multipart/form-data",
+                "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
             },
         });
+
         toast.success(`${props.itemName} creado correctamente`, {
             autoClose: 3000,
             position: "bottom-right",
             style: { width: "400px" },
             className: "border-l-4 border-green-500 p-2",
         });
-        emit("crear", response.data);
-        successMessage.value = "Creación exitosa!";
-        emit("cerrar");
+
+        return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 422) {
-            errores.value = error.response.data.errors;
-        } else {
-            console.error("Error:", error);
-        }
         toast.error(`Error al crear ${props.itemName}`, {
             autoClose: 3000,
             position: "bottom-right",
             style: { width: "400px" },
             className: "border-l-4 border-red-500 p-2",
         });
+        if (error.response && error.response.status === 422) {
+            errores.value = error.response.data.errors;
+        } else {
+            console.error("Error:", error);
+        }
+        throw error;
     } finally {
         loading.value = false;
+    }
+};
+
+const crearItemCompleto = async () => {
+    try {
+        const ticket = await submitForm();
+
+        if (formData.value["tic_archivo"] instanceof File) {
+            await uploadFile(ticket.id);
+        }
+
+        emit("crear", ticket);
+        cerrarModal();
+    } catch (error) {
+        console.error("Error en la creación del item:", error);
     }
 };
 
@@ -526,7 +563,7 @@ const cerrarModal = () => emit("cerrar");
 
                 <div class="flex justify-end mt-6 space-x-4">
                     <ButtonCrearActualizar
-                        @click="submitForm"
+                        @click="crearItemCompleto"
                         :loading="loading"
                         :itemName="'Crear'"
                     />

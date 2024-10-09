@@ -22,6 +22,9 @@ const mostrarModalEliminar = ref(false);
 const itemSeleccionado = ref(null);
 const passwordGenerada = ref("");
 const archivadoActivo = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalPages = ref(1);
 
 const headers = ["N°", "Nombre", "Sede", "Estado"];
 
@@ -83,18 +86,38 @@ const filtrarUsuarios = computed(() => {
     }
 });
 
-const fetchUsuarios = async () => {
+const mapUsuarioData = (usuario, index, totalUsuarios) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: usuario.id,
+        name: usuario.name,
+        email: usuario.email,
+        celular: validatePhoneNumber(usuario.celular),
+        sed_id: usuario.sed_id,
+        sed_nombre: usuario.sede ? usuario.sede.sed_nombre : "",
+        activo: usuario.activo,
+        row_number: totalUsuarios - (startIndex + index),
+    };
+};
+
+const changePage = (pageNumber) => {
+    currentPage.value = pageNumber;
+    fetchUsuarios(pageNumber);
+};
+
+const fetchUsuarios = async (page = 1) => {
     try {
-        const response = await axios.get("/usuarios");
-        usuarios.value = response.data.map((usuario) => ({
-            id: usuario.id,
-            name: usuario.name,
-            email: usuario.email,
-            celular: validatePhoneNumber(usuario.celular),
-            sed_id: usuario.sed_id,
-            sed_nombre: usuario.sede ? usuario.sede.sed_nombre : "",
-            activo: usuario.activo,
-        }));
+        const response = await axios.get(`/usuariospaginated?page=${page}`);
+
+        const totalUsuarios = response.data.total;
+        const usuarioData = response.data.data.map((usuario, index) =>
+            mapUsuarioData(usuario, index, totalUsuarios)
+        );
+
+        usuarios.value = usuarioData;
+        currentPage.value = response.data.current_page;
+        itemsPerPage.value = response.data.per_page;
+        totalPages.value = response.data.last_page;
     } catch (error) {
         toast.error("Error al cargar los usuarios", {
             autoClose: 5000,
@@ -106,6 +129,30 @@ const fetchUsuarios = async () => {
         });
     }
 };
+
+// const fetchUsuarios = async () => {
+//     try {
+//         const response = await axios.get("/usuarios");
+//         usuarios.value = response.data.map((usuario) => ({
+//             id: usuario.id,
+//             name: usuario.name,
+//             email: usuario.email,
+//             celular: validatePhoneNumber(usuario.celular),
+//             sed_id: usuario.sed_id,
+//             sed_nombre: usuario.sede ? usuario.sede.sed_nombre : "",
+//             activo: usuario.activo,
+//         }));
+//     } catch (error) {
+//         toast.error("Error al cargar los usuarios", {
+//             autoClose: 5000,
+//             position: "bottom-right",
+//             style: {
+//                 width: "400px",
+//             },
+//             className: "border-l-4 border-red-500 p-4",
+//         });
+//     }
+// };
 
 const fetchSedes = async () => {
     try {
@@ -299,10 +346,13 @@ onMounted(() => {
         <Table
             :headers="headers"
             :items="filtrarUsuarios"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
             entityType="user"
             @view="abrirDetallesModal"
             @edit="abrirEditarModal"
             @eliminar="abrirEliminarModal"
+            @changePage="changePage"
         />
 
         <ModalCrear

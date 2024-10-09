@@ -439,7 +439,7 @@ const cerrarEliminarModal = () => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(ticket, index) in tickets.open"
+                                v-for="(ticket) in tickets.open"
                                 :key="ticket.id"
                                 class="transition-colors duration-200 border-b hover:bg-gray-100"
                             >
@@ -508,7 +508,7 @@ const cerrarEliminarModal = () => {
 
                 <div class="block sm:hidden" v-if="activeTab === 'open'">
                     <div
-                        v-for="(ticket, index) in tickets.open"
+                        v-for="(ticket) in tickets.open"
                         :key="ticket.id"
                         class="relative border rounded-lg p-4 mb-4 shadow-sm"
                     >
@@ -681,7 +681,7 @@ const cerrarEliminarModal = () => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(ticket, index) in tickets.result"
+                                v-for="(ticket) in tickets.result"
                                 :key="ticket.id"
                                 class="transition-colors duration-200 border-b hover:bg-gray-100"
                             >
@@ -736,7 +736,7 @@ const cerrarEliminarModal = () => {
 
                 <div class="block sm:hidden" v-if="activeTab === 'result'">
                     <div
-                        v-for="(ticket, index) in tickets.result"
+                        v-for="(ticket) in tickets.result"
                         :key="ticket.id"
                         class="relative border rounded-lg p-4 mb-4 shadow-sm"
                     >
@@ -813,7 +813,7 @@ const cerrarEliminarModal = () => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(ticket, index) in tickets.closed"
+                                v-for="(ticket) in tickets.closed"
                                 :key="ticket.id"
                                 class="transition-colors duration-200 border-b hover:bg-gray-100"
                             >
@@ -867,7 +867,7 @@ const cerrarEliminarModal = () => {
                 </div>
                 <div class="block sm:hidden" v-if="activeTab === 'closed'">
                     <div
-                        v-for="(ticket, index) in tickets.closed"
+                        v-for="(ticket) in tickets.closed"
                         :key="ticket.id"
                         class="relative border rounded-lg p-4 mb-4 shadow-sm"
                     >

@@ -47,6 +47,9 @@ const mostrarModalCerrar = ref(false);
 const mostrarModalAbrir = ref(false);
 const itemSeleccionado = ref(null);
 const estadoFilters = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+const totalPages = ref(1);
 
 const toggleViewMode = (isCard) => {
     isCardView.value = isCard;
@@ -143,36 +146,59 @@ const updateEstadoFilters = (newFilters) => {
     estadoFilters.value = newFilters;
 };
 
-const fetchTickets = async () => {
+const mapTicketData = (ticket, index, totalTickets) => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    return {
+        id: ticket.id,
+        tic_titulo: ticket.tic_titulo,
+        tic_descripcion: ticket.tic_descripcion,
+        tic_archivo: ticket.tic_archivo,
+        pri_id: ticket.pri_id,
+        pri_nombre: ticket.prioridad ? ticket.prioridad.pri_nombre : "",
+        use_id: ticket.use_id,
+        name: ticket.user ? ticket.user.name : "",
+        sop_id: ticket.soporte_actual ? ticket.soporte_actual.sop_id : null,
+        soporte_nombre:
+            ticket.soporte_actual && ticket.soporte_actual.soporte
+                ? ticket.soporte_actual.soporte.name
+                : "No asignado",
+        cat_id: ticket.cat_id,
+        cat_nombre: ticket.categoria ? ticket.categoria.cat_nombre : "",
+        pab_id: ticket.pab_id,
+        pab_nombre: ticket.pabellon ? ticket.pabellon.pab_nombre : "",
+        aul_id: ticket.aul_id,
+        aul_numero: ticket.aula ? ticket.aula.aul_numero : "",
+        tic_estado: ticket.tic_estado,
+        tic_activo: ticket.tic_activo,
+        created_at: ticket.created_at,
+        updated_at: ticket.updated_at,
+        row_number: totalTickets - (startIndex + index),
+    };
+};
+
+const changePage = (pageNumber) => {
+    currentPage.value = pageNumber;
+    fetchTickets(pageNumber);
+};
+
+const fetchTickets = async (page = 1) => {
     try {
-        const response = await axios.get("/tickets");
-        tickets.value = response.data.map((ticket) => ({
-            id: ticket.id,
-            tic_titulo: ticket.tic_titulo,
-            tic_descripcion: ticket.tic_descripcion,
-            tic_archivo: ticket.tic_archivo,
-            pri_id: ticket.pri_id,
-            pri_nombre: ticket.prioridad ? ticket.prioridad.pri_nombre : "",
-            use_id: ticket.use_id,
-            name: ticket.user ? ticket.user.name : "",
-            sop_id: ticket.soporte_actual ? ticket.soporte_actual.sop_id : null,
-            soporte_nombre:
-                ticket.soporte_actual && ticket.soporte_actual.soporte
-                    ? ticket.soporte_actual.soporte.name
-                    : "No asignado",
-            cat_id: ticket.cat_id,
-            cat_nombre: ticket.categoria ? ticket.categoria.cat_nombre : "",
-            pab_id: ticket.pab_id,
-            pab_nombre: ticket.pabellon ? ticket.pabellon.pab_nombre : "",
-            aul_id: ticket.aul_id,
-            aul_numero: ticket.aula ? ticket.aula.aul_numero : "",
-            tic_estado: ticket.tic_estado,
-            tic_activo: ticket.tic_activo,
-            created_at: ticket.created_at,
-            updated_at: ticket.updated_at,
-        }));
+        const response = await axios.get(`/ticketspaginated?page=${page}`);
+
+        const totalTickets = response.data.total;
+        const ticketData = response.data.data.map((ticket, index) =>
+            mapTicketData(ticket, index, totalTickets)
+        );
+
+        tickets.value = ticketData;
+        currentPage.value = response.data.current_page;
+        itemsPerPage.value = response.data.per_page;
+        totalPages.value = response.data.last_page;
     } catch (error) {
-        console.error("Error al cargar los tickets:", error);
+        console.error(
+            "Error al cargar los tickets:",
+            error?.response?.data?.message || error.message
+        );
     }
 };
 
@@ -731,12 +757,15 @@ const getEstadoLabelClass = (estado) => {
         <div v-if="isCardView">
             <CardTickets
                 :tickets="filtrarTickets"
+                :currentPage="currentPage"
+                :totalPages="totalPages"
                 @open="handleAbrir"
                 @close="handleCerrar"
                 @asign="handleAsign"
                 @view="handleView"
                 @edit="handleEdit"
                 @eliminar="handleEliminar"
+                @changePage="changePage"
             />
         </div>
 
@@ -784,14 +813,14 @@ const getEstadoLabelClass = (estado) => {
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         <tr
-                            v-for="(ticket, index) in filtrarTickets"
+                            v-for="ticket in filtrarTickets"
                             :key="ticket.id"
                             class="transition-colors duration-200 border-b hover:bg-gray-100"
                         >
                             <td
                                 class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
                             >
-                                {{ index + 1 }}
+                                {{ ticket.row_number }}
                             </td>
                             <td
                                 class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
@@ -893,6 +922,24 @@ const getEstadoLabelClass = (estado) => {
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <div class="mt-4 flex justify-center">
+                <button
+                    v-for="page in Array.from(
+                        { length: totalPages },
+                        (_, i) => i + 1
+                    )"
+                    :key="page"
+                    :class="[
+                        currentPage === page
+                            ? 'bg-[#2EBAA1] text-white'
+                            : 'bg-white text-[#2EBAA1]',
+                        'mx-2 px-3 py-1 rounded-lg',
+                    ]"
+                    @click="changePage(page)"
+                >
+                    {{ page }}
+                </button>
             </div>
         </div>
 
