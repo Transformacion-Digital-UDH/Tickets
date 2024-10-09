@@ -218,8 +218,9 @@ const eliminarItem = async () => {
     }
 };
 
-const cerrarCrearModal = () => {
+const cerrarCrearModal = async () => {
     mostrarModalCrear.value = false;
+    await fetchSoportes();
 };
 
 const abrirDetallesModal = (soporte) => {
@@ -227,20 +228,26 @@ const abrirDetallesModal = (soporte) => {
     mostrarModalDetalles.value = true;
 };
 
-const cerrarDetallesModal = () => {
+const cerrarDetallesModal = async () => {
     mostrarModalDetalles.value = false;
+    localStorage.setItem("currentPage", 1);
+    await fetchSoportes(currentPage.value);
 };
 
-const abrirEditarModal = (soporte) => {
+const abrirEditarModal = async (soporte) => {
     if (sedes.value.length === 0) {
         fetchSedes();
     }
+    await fetchSedes();
     itemSeleccionado.value = soporte;
     mostrarModalEditar.value = true;
 };
 
-const cerrarEditarModal = () => {
+const cerrarEditarModal = async () => {
     mostrarModalEditar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchSoportes(currentPage.value);
 };
 
 const abrirEliminarModal = (soporte) => {
@@ -248,8 +255,11 @@ const abrirEliminarModal = (soporte) => {
     mostrarModalEliminar.value = true;
 };
 
-const cerrarEliminarModal = () => {
+const cerrarEliminarModal = async () => {
     mostrarModalEliminar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchSoportes(currentPage.value);
 };
 
 const alertaEliminar = () => {

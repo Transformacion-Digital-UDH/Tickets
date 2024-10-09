@@ -72,6 +72,7 @@ const mapCategoriaData = (categoria, index, totalCategorias) => {
 
 const changePage = (pageNumber) => {
     currentPage.value = pageNumber;
+    localStorage.setItem("currentPage", pageNumber);
     fetchCategorias(pageNumber);
 };
 
@@ -134,8 +135,11 @@ const eliminarItem = async () => {
     }
 };
 
-const cerrarCrearModal = () => {
+const cerrarCrearModal = async () => {
     mostrarModalCrear.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchCategorias(currentPage.value);
 };
 
 const abrirDetallesModal = (categoria) => {
@@ -143,8 +147,10 @@ const abrirDetallesModal = (categoria) => {
     mostrarModalDetalles.value = true;
 };
 
-const cerrarDetallesModal = () => {
+const cerrarDetallesModal = async () => {
     mostrarModalDetalles.value = false;
+    localStorage.setItem("currentPage", 1);
+    await fetchCategorias(currentPage.value);
 };
 
 const abrirEditarModal = (categoria) => {
@@ -152,8 +158,11 @@ const abrirEditarModal = (categoria) => {
     mostrarModalEditar.value = true;
 };
 
-const cerrarEditarModal = () => {
+const cerrarEditarModal = async () => {
     mostrarModalEditar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchCategorias(currentPage.value);
 };
 
 const abrirEliminarModal = (categoria) => {
@@ -161,8 +170,11 @@ const abrirEliminarModal = (categoria) => {
     mostrarModalEliminar.value = true;
 };
 
-const cerrarEliminarModal = () => {
+const cerrarEliminarModal = async () => {
     mostrarModalEliminar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchCategorias(currentPage.value);
 };
 
 const alertaEliminar = () => {

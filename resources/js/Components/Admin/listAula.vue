@@ -73,6 +73,7 @@ const mapAulaData = (aula, index, totalAulas) => {
 
 const changePage = (pageNumber) => {
     currentPage.value = pageNumber;
+    localStorage.setItem("currentPage", pageNumber);
     fetchAulas(pageNumber);
 };
 
@@ -180,8 +181,11 @@ const eliminarItem = async () => {
     }
 };
 
-const cerrarCrearModal = () => {
+const cerrarCrearModal = async () => {
     mostrarModalCrear.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchAulas(currentPage.value);
 };
 
 const abrirDetallesModal = (aula) => {
@@ -189,17 +193,23 @@ const abrirDetallesModal = (aula) => {
     mostrarModalDetalles.value = true;
 };
 
-const cerrarDetallesModal = () => {
+const cerrarDetallesModal = async () => {
     mostrarModalDetalles.value = false;
+    localStorage.setItem("currentPage", 1);
+    await fetchAulas(currentPage.value);
 };
 
-const abrirEditarModal = (aula) => {
+const abrirEditarModal = async (aula) => {
     itemSeleccionado.value = aula;
+    await fetchPabellones();
     mostrarModalEditar.value = true;
 };
 
-const cerrarEditarModal = () => {
+const cerrarEditarModal = async () => {
     mostrarModalEditar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchAulas(currentPage.value);
 };
 
 const abrirEliminarModal = (aula) => {
@@ -207,8 +217,11 @@ const abrirEliminarModal = (aula) => {
     mostrarModalEliminar.value = true;
 };
 
-const cerrarEliminarModal = () => {
+const cerrarEliminarModal = async () => {
     mostrarModalEliminar.value = false;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchAulas(currentPage.value);
 };
 
 const alertaEliminar = () => {

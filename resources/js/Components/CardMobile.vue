@@ -72,7 +72,7 @@ export default {
                 <div
                     class="absolute px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full top-1 right-1"
                 >
-                    {{ index + 1 }}
+                    {{ item.row_number }}
                 </div>
                 <h2
                     class="text-lg font-bold text-gray-800 uppercase truncate mt-2"
