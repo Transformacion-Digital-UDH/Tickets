@@ -415,6 +415,9 @@ onMounted(() => {
                 }}</span>
             </div>
             <div class="file-upload-wrapper">
+                <h3 class="block mb-1 mt-2 text-gray-500 flex">
+                    Imagen
+                </h3>
                 <label
                     class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
                 >

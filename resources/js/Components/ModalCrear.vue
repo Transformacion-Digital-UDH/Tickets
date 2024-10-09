@@ -345,11 +345,14 @@ const cerrarModal = () => emit("cerrar");
                                 field.type === 'file',
                         }"
                     >
-                        <label
-                            :for="field.name"
-                            class="block mb-2 text-gray-500"
-                            >{{ field.label }}:</label
-                        >
+                        <h3 class="block text-gray-500 flex">
+                            <label
+                                :for="field.name"
+                                class="block mb-2 text-gray-500"
+                                >{{ field.label }}</label
+                            >
+                            <p class="text-red-600">*</p>
+                        </h3>
 
                         <template v-if="field.type === 'select'">
                             <select
@@ -453,7 +456,10 @@ const cerrarModal = () => emit("cerrar");
 
                                 <div class="mt-2">
                                     <div
-                                        v-if="selectedFileName[field.name] && !isMobile"
+                                        v-if="
+                                            selectedFileName[field.name] &&
+                                            !isMobile
+                                        "
                                         class="text-sm text-gray-500"
                                     >
                                         Archivo seleccionado:

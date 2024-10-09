@@ -100,7 +100,7 @@ onMounted(() => {
             <div class="content">
                 <h3>Reabiertos</h3>
                 <p class="number">{{ reopenTickets }}</p>
-                <p class="status">{{ reopenTickets }} tickets cerrados</p>
+                <p class="status">{{ reopenTickets }} tickets reabiertos</p>
             </div>
         </div>
 

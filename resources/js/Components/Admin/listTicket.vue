@@ -14,10 +14,15 @@ import ModalAbrir from "@/Components/ModalAbrir.vue";
 import ButtonNuevo from "@/Components/ButtonNuevo.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faThLarge, faTable } from "@fortawesome/free-solid-svg-icons";
+import {
+    faThLarge,
+    faTable,
+    faFilter,
+    faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 
-library.add(faThLarge, faTable);
+library.add(faThLarge, faTable, faFilter, faTimes);
 
 const tickets = ref([]);
 const prioridades = ref([]);
@@ -26,6 +31,7 @@ const usuarios = ref([]);
 const categorias = ref([]);
 const pabellones = ref([]);
 const aulas = ref([]);
+const archivadoActivo = ref(false);
 const formFields = ref([]);
 const formFieldsAsignar = ref([]);
 const formFieldsVer = ref([]);
@@ -42,16 +48,52 @@ const mostrarModalAbrir = ref(false);
 const itemSeleccionado = ref(null);
 const estadoFilters = ref([]);
 
+const toggleViewMode = (isCard) => {
+    isCardView.value = isCard;
+    localStorage.setItem("isCardView", isCardView.value);
+};
+
+const getViewModeFromLocalStorage = () => {
+    const storedValue = localStorage.getItem("isCardView");
+
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+        isCardView.value = true;
+    } else {
+        isCardView.value = storedValue === "true";
+    }
+};
+
+const toggleArchivedFilter = () => {
+    archivadoActivo.value = !archivadoActivo.value;
+    localStorage.setItem("archivadoActivo", archivadoActivo.value);
+};
+
+const resetArchivedFilter = () => {
+    archivadoActivo.value = false;
+    localStorage.setItem("archivadoActivo", archivadoActivo.value);
+};
+
+const getArchivedFilterFromLocalStorage = () => {
+    const storedValue = localStorage.getItem("archivadoActivo");
+    archivadoActivo.value = storedValue === "true";
+};
+
 const handleResize = () => {
     isMobile.value = window.innerWidth <= 768;
     if (isMobile.value) {
         isCardView.value = true;
+    } else {
+        getViewModeFromLocalStorage();
     }
 };
 
 onMounted(() => {
     handleResize();
     window.addEventListener("resize", handleResize);
+    getArchivedFilterFromLocalStorage();
+    fetchAllData();
 });
 
 onBeforeUnmount(() => {
@@ -77,6 +119,16 @@ const filtrarTickets = computed(() => {
                     ticket.cat_nombre.toLowerCase().includes(query))
             );
         });
+    }
+
+    if (archivadoActivo.value) {
+        filteredTickets = filteredTickets.filter(
+            (ticket) => ticket.tic_activo === 0
+        );
+    } else {
+        filteredTickets = filteredTickets.filter(
+            (ticket) => ticket.tic_activo === 1
+        );
     }
 
     return filteredTickets.filter((ticket) => {
@@ -580,10 +632,6 @@ const handleAbrir = (ticket) => {
     abrirAbrirModal(ticket);
 };
 
-onMounted(() => {
-    fetchAllData();
-});
-
 const getEstadoLabelClass = (estado) => {
     switch (estado) {
         case "Abierto":
@@ -612,7 +660,9 @@ const getEstadoLabelClass = (estado) => {
         <div
             class="flex flex-col items-center justify-between mb-2 sm:flex-row"
         >
-            <div class="relative w-full mb-2 sm:w-auto sm:mb-0">
+            <div
+                class="relative w-full mb-2 sm:w-auto sm:mb-0 flex items-center"
+            >
                 <span
                     class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
                 >
@@ -624,11 +674,28 @@ const getEstadoLabelClass = (estado) => {
                     placeholder="Buscar..."
                     class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
                 />
+                <button
+                    @click="toggleArchivedFilter"
+                    class="ml-2 flex items-center px-2 py-1 rounded-md hover:bg-opacity-80 font-semibold"
+                    :class="
+                        archivadoActivo
+                            ? 'bg-red-500 text-white'
+                            : 'bg-[#2EBAA1] text-white'
+                    "
+                >
+                    <i class="fas fa-filter mr-1"></i>
+                    <span>{{ archivadoActivo ? "Archivado" : "Activo" }}</span>
+                    <i
+                        class="fas fa-times ml-2"
+                        v-if="archivadoActivo"
+                        @click.stop="resetArchivedFilter"
+                    ></i>
+                </button>
             </div>
             <div class="flex items-center space-x-1">
                 <font-awesome-icon
                     v-if="!isMobile"
-                    @click="isCardView = true"
+                    @click="toggleViewMode(true)"
                     :class="[
                         'cursor-pointer flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
                         isCardView
@@ -639,7 +706,7 @@ const getEstadoLabelClass = (estado) => {
                 />
                 <font-awesome-icon
                     v-if="!isMobile"
-                    @click="isCardView = false"
+                    @click="toggleViewMode(false)"
                     :class="[
                         'cursor-pointer flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
                         !isCardView
