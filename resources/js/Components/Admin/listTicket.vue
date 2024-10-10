@@ -620,26 +620,30 @@ const cerrarEliminarModal = async () => {
     await fetchTickets(currentPage.value);
 };
 
-const abrirCerrarModal = (ticket) => {
+const abrirCerrarModal = async (ticket) => {
     itemSeleccionado.value = ticket;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
     mostrarModalCerrar.value = true;
 };
 
 const cerrarCerrarModal = async () => {
     mostrarModalCerrar.value = false;
-    currentPage.value = 1;
     localStorage.setItem("currentPage", 1);
     await fetchTickets(currentPage.value);
 };
 
-const abrirAbrirModal = (ticket) => {
+const abrirAbrirModal = async (ticket) => {
     itemSeleccionado.value = ticket;
+    currentPage.value = 1;
+    localStorage.setItem("currentPage", 1);
+    await fetchTickets(currentPage.value);
     mostrarModalAbrir.value = true;
 };
 
 const cerrarAbrirModal = async () => {
     mostrarModalAbrir.value = false;
-    currentPage.value = 1;
     localStorage.setItem("currentPage", 1);
     await fetchTickets(currentPage.value);
 };
