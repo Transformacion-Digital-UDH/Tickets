@@ -9,7 +9,7 @@ export default {
         const tickets = ref([]);
         const prioridades = ref([]); // Para las prioridades
         const categorias = ref([]); // Para las categorías
-        const isTableView = ref(false);
+        const isTableView = ref(false); // Controla si se muestra la vista de tabla o tarjetas
         const mostrarModal = ref(false);
         const ticketSeleccionado = ref(null);
         const buscarQuery = ref(""); // Barra de búsqueda
@@ -19,6 +19,10 @@ export default {
         const dropdownOpen = ref(false); // Estado del dropdown
         const isImageModalOpen = ref(false);
         const selectedImageUrl = ref("");
+
+        // Variables para paginación
+        const currentPage = ref(1); // Página actual
+        const ticketsPerPage = ref(10); // Número de tickets por página (2 filas * 5 tickets por fila = 10 tickets)
 
         // Función para detectar si es dispositivo móvil
         const isMobile = ref(window.innerWidth < 768); // Definimos si es móvil según el ancho de la pantalla
@@ -87,6 +91,17 @@ export default {
         const toggleDropdown = () => {
             dropdownOpen.value = !dropdownOpen.value;
         };
+
+        // Método para obtener los tickets paginados
+        const paginatedTickets = computed(() => {
+            const startIndex = (currentPage.value - 1) * ticketsPerPage.value;
+            const endIndex = startIndex + ticketsPerPage.value;
+            return filtrarTickets.value.slice(startIndex, endIndex);
+        });
+
+        const totalPages = computed(() => {
+            return Math.ceil(filtrarTickets.value.length / ticketsPerPage.value);
+        });
 
         const filtrarTickets = computed(() => {
             let filteredTickets = tickets.value;
@@ -238,6 +253,11 @@ export default {
             }
         };
 
+        // Función para cambiar a la página seleccionada
+        const goToPage = (page) => {
+            currentPage.value = page;
+        };
+
         const getEstadoLabelClass = (estado) => {
             switch (estado) {
                 case "Abierto":
@@ -285,6 +305,11 @@ export default {
             dropdownOpen, // Estado del dropdown
             estadosDisponibles, // Lista de estados disponibles
             isMobile, // Retornamos para saber si es móvil
+            paginatedTickets, // Tickets paginados
+            currentPage, // Página actual
+            ticketsPerPage, // Tickets por página
+            totalPages, // Total de páginas
+            goToPage, // Cambiar de página
         };
     },
 };
@@ -340,9 +365,9 @@ export default {
         </div>
 
         <!-- Vista de Tarjetas -->
-        <div v-if="!isTableView && filtrarTickets.length > 0"
+        <div v-if="!isTableView && paginatedTickets.length > 0"
             class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-            <div v-for="ticket in filtrarTickets" :key="ticket.id" class="relative w-full">
+            <div v-for="ticket in paginatedTickets" :key="ticket.id" class="relative w-full">
                 <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
                     'bg-orange-600': ticket.tic_estado === 'Abierto',
                     'bg-gray-600': ticket.tic_estado === 'Asignado',
@@ -410,7 +435,7 @@ export default {
         </div>
 
         <!-- Vista de Tabla -->
-        <div v-if="isTableView && filtrarTickets.length > 0" class="overflow-x-auto bg-white rounded-lg shadow-md">
+        <div v-if="isTableView && paginatedTickets.length > 0" class="overflow-x-auto bg-white rounded-lg shadow-md">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-white">
                     <tr>
@@ -441,7 +466,7 @@ export default {
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    <tr v-for="(ticket, index) in filtrarTickets" :key="ticket.id"
+                    <tr v-for="(ticket, index) in paginatedTickets" :key="ticket.id"
                         class="transition-colors duration-200 border-b hover:bg-gray-100">
                         <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             {{ index + 1 }}
@@ -456,15 +481,11 @@ export default {
                             {{ ticket.prioridad }}
                         </td>
                         <td class="px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm md:text-base">
-                            <span :class="[
-                                'px-2 py-1 text-xs font-semibold rounded-full sm:text-xs md:text-sm',
-                                getEstadoLabelClass(ticket.tic_estado),
-                            ]">
+                            <span :class="[ 'px-2 py-1 text-xs font-semibold rounded-full sm:text-xs md:text-sm', getEstadoLabelClass(ticket.tic_estado), ]">
                                 {{ ticket.tic_estado }}
                             </span>
                         </td>
-                        <td
-                            class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0">
+                        <td class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0">
                             <button v-if="ticket.tic_estado === 'Asignado'" @click="aceptarTicket(ticket)"
                                 class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
                                 <i class="fas fa-check mr-1"></i> Aceptar
@@ -479,7 +500,7 @@ export default {
                             </button>
                         </td>
                     </tr>
-                    <tr v-if="filtrarTickets.length === 0">
+                    <tr v-if="paginatedTickets.length === 0">
                         <td colspan="7" class="px-4 py-3 text-xs text-center text-gray-500 sm:text-sm">
                             No se encontraron resultados.
                         </td>
@@ -488,72 +509,13 @@ export default {
             </table>
         </div>
 
-        <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30">
-            <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg">
-                <div class="p-4 border-2 border-gray-400 rounded-lg">
-                    <h2 class="mb-4 text-xl font-bold text-gray-600">Detalles del Ticket</h2>
-                    <table class="w-full border-collapse">
-                        <thead>
-                            <tr>
-                                <th class="py-2 pr-10 text-left text-gray-600 border-b-2 border-gray-400">
-                                    Campo
-                                </th>
-                                <th class="py-2 text-left text-gray-600 border-b-2 border-gray-400">
-                                    Valor
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(field, index) in formFieldsVer" :key="index" class="border-b border-gray-400">
-                                <td class="py-2 pr-10 font-semibold text-left text-gray-500">
-                                    {{ field.label }}
-                                </td>
-                                <td class="py-2 text-left text-gray-600">
-                                    <!-- Mostrar fecha con formato si es 'created_at' -->
-                                    <span v-if="field.name === 'created_at'">
-                                        {{
-                                            ticketSeleccionado[field.name]
-                                                ? new Date(ticketSeleccionado[field.name]).toLocaleString()
-                                                : "No disponible"
-                                        }}
-                                    </span>
-
-                                    <!-- Mostrar la imagen si el campo es 'tic_archivo' -->
-                                    <span v-else-if="field.name === 'tic_archivo'">
-                                        <div v-if="ticketSeleccionado[field.name]">
-                                            <img :src="`/storage/${ticketSeleccionado[field.name]}`"
-                                                alt="Archivo asociado"
-                                                class="object-cover w-32 h-32 border border-gray-300 rounded-lg cursor-pointer"
-                                                @click="openImageModal(`/storage/${ticketSeleccionado[field.name]}`)" />
-                                        </div>
-                                        <div v-else>No disponible</div>
-                                    </span>
-
-                                    <!-- Mostrar texto por defecto para otros campos -->
-                                    <span v-else>{{ ticketSeleccionado[field.name] || "No disponible" }}</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="flex justify-end mt-4">
-                        <button @click="cerrarModal" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
-                            Cerrar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal de Imagen Ampliada -->
-        <div v-if="isImageModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
-            <div class="relative max-w-4xl p-4 bg-white rounded-lg shadow-lg">
-                <img :src="selectedImageUrl" alt="Imagen ampliada" class="max-w-full max-h-screen" />
-                <button @click="closeImageModal"
-                    class="absolute top-2 right-2 text-white text-2xl font-bold bg-gray-800 rounded-full px-2 focus:outline-none">
-                    &times;
-                </button>
-            </div>
+        <!-- Paginación -->
+        <div class="flex justify-center items-center mt-6">
+            <button v-for="page in totalPages" :key="page" @click="goToPage(page)"
+                :class="{'bg-green-500 text-white': currentPage === page, 'bg-gray-200 text-gray-600': currentPage !== page}"
+                class="mx-1 px-4 py-2 rounded hover:bg-gray-300">
+                {{ page }}
+            </button>
         </div>
     </div>
 </template>
