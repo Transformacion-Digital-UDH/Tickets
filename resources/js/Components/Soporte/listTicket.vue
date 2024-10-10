@@ -428,7 +428,7 @@ export default {
                     <!-- Acciones -->
                     <div class="flex justify-end mt-auto space-x-3">
                         <button
-                            v-if="ticket.tic_estado === 'Asignado'"
+                            v-if="ticket.tic_estado === 'Asignado' || ticket.tic_estado === 'Reabierto'"
                             @click="aceptarTicket(ticket)"
                             class="text-blue-500 hover:text-blue-700 transition-colors duration-200"
                         >
