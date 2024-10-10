@@ -37,11 +37,11 @@ const selectedFilePreview = ref("");
 const formData = ref({
     tic_titulo: "",
     tic_descripcion: "",
+    tic_archivo: null,
     pri_id: "",
     cat_id: "",
     pab_id: "",
     aul_id: "",
-    tic_archivo: null,
 });
 
 const prioridades = ref([]);
@@ -56,6 +56,10 @@ const handleFileChange = (event) => {
         selectedFileName.value = file.name;
         selectedFilePreview.value = URL.createObjectURL(file);
         formData.value.tic_archivo = file;
+    } else {
+        selectedFileName.value = "";
+        selectedFilePreview.value = "";
+        formData.value.tic_archivo = null;
     }
 };
 
@@ -89,6 +93,12 @@ const resetForm = () => {
         aul_id: "",
     };
     errores.value = {};
+    selectedFileName.value = "";
+    selectedFilePreview.value = "";
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+        fileInput.value = "";
+    }
 };
 
 const fetchPrioridades = async () => {
@@ -415,9 +425,7 @@ onMounted(() => {
                 }}</span>
             </div>
             <div class="file-upload-wrapper">
-                <h3 class="block mb-1 mt-2 text-gray-500 flex">
-                    Imagen
-                </h3>
+                <h3 class="block mb-1 mt-2 text-gray-500 flex">Imagen</h3>
                 <label
                     class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
                 >
