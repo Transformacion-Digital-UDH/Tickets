@@ -22,7 +22,8 @@ class SoporteTicketController extends Controller
     {
         $ticket = Ticket::findOrFail($id); // Buscar el ticket por ID
 
-        if ($ticket->tic_estado === 'Asignado') {
+        // Verificar si el ticket está en estado Asignado o Reabierto
+        if ($ticket->tic_estado === 'Asignado' || $ticket->tic_estado === 'Reabierto') {
             // Cambiar el estado del ticket a "En progreso"
             $ticket->update(['tic_estado' => 'En progreso']);
 
@@ -34,10 +35,11 @@ class SoporteTicketController extends Controller
         } else {
             return response()->json([
                 'status' => false,
-                'msg' => 'El ticket no se puede aceptar porque no está en estado Asignado.',
+                'msg' => 'El ticket no se puede aceptar porque no está en estado Asignado o Reabierto.',
             ], 400);
         }
     }
+
 
     // Método para obtener tickets asignados al soporte
     public function obtenerTickets()
