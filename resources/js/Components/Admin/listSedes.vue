@@ -149,7 +149,8 @@ const eliminarItem = async () => {
 
 const cerrarCrearModal = async () => {
     mostrarModalCrear.value = false;
-    await fetchSedes();
+    localStorage.setItem("currentPage", 1);
+    await fetchSedes(currentPage.value);
 };
 
 const abrirDetallesModal = (sede) => {
