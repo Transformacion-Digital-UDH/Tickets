@@ -17,7 +17,7 @@
 
     <!-- Tabla de Tickets Resueltos -->
     <div v-if="filtrarTicketsResueltos.length > 0" class="overflow-x-auto bg-white rounded-lg shadow-md">
-      <!-- Ajustamos el formato de la tabla solo para pantallas grandes -->
+      <!-- Tabla para pantallas grandes -->
       <table class="min-w-full divide-y divide-gray-200 hidden md:table">
         <thead class="bg-white">
           <tr>
@@ -42,9 +42,13 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          <tr v-for="(ticket, index) in filtrarTicketsResueltos" :key="ticket.id" class="transition-colors duration-200 border-b hover:bg-gray-100">
+          <tr
+            v-for="(ticket, index) in paginatedTickets"
+            :key="ticket.id"
+            class="transition-colors duration-200 border-b hover:bg-gray-100"
+          >
             <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
-              {{ index + 1 }}
+              {{ index + 1 + (currentPage - 1) * ticketsPerPage }}
             </td>
             <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
               {{ ticket.categoria }}
@@ -64,22 +68,17 @@
               {{ new Date(ticket.created_at).toLocaleDateString() }}
             </td>
           </tr>
-          <tr v-if="filtrarTicketsResueltos.length === 0">
-            <td colspan="6" class="px-4 py-3 text-xs text-center text-gray-500 sm:text-sm">
-              No se encontraron tickets resueltos.
-            </td>
-          </tr>
         </tbody>
       </table>
 
-      <!-- Para pantallas pequeñas, mostramos el contenido como tarjetas -->
+      <!-- Tarjetas para pantallas pequeñas -->
       <div class="md:hidden space-y-4">
         <div
-          v-for="(ticket, index) in filtrarTicketsResueltos"
+          v-for="(ticket, index) in paginatedTickets"
           :key="ticket.id"
           class="bg-white p-4 rounded-lg shadow-md space-y-2 border border-gray-200"
         >
-          <div class="text-sm font-bold text-gray-500">N°: {{ index + 1 }}</div>
+          <div class="text-sm font-bold text-gray-500">N°: {{ index + 1 + (currentPage - 1) * ticketsPerPage }}</div>
           <div class="text-sm font-bold text-gray-500">Categoría: <span class="text-gray-700">{{ ticket.categoria }}</span></div>
           <div class="text-sm font-bold text-gray-500">Título: <span class="text-gray-700">{{ ticket.tic_titulo }}</span></div>
           <div class="text-sm font-bold text-gray-500">Prioridad: <span class="text-gray-700">{{ ticket.prioridad }}</span></div>
@@ -91,9 +90,19 @@
       </div>
     </div>
 
-    <div v-else class="text-center text-gray-500">
-      No hay tickets resueltos para mostrar.
+    <!-- Paginación -->
+    <div class="flex justify-center space-x-2 mt-4">
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        @click="currentPage = page"
+        :class="{'bg-green-500 text-white': currentPage === page, 'bg-gray-200 text-gray-600': currentPage !== page}"
+        class="px-3 py-1 rounded-lg focus:outline-none transition-colors"
+      >
+        {{ page }}
+      </button>
     </div>
+
   </div>
 </template>
 
@@ -104,6 +113,8 @@ export default {
   setup() {
     const tickets = ref([]);
     const buscarQuery = ref('');
+    const currentPage = ref(1);
+    const ticketsPerPage = 10; // Cambiado para mostrar 10 filas
 
     // Computed para filtrar solo tickets resueltos
     const filtrarTicketsResueltos = computed(() => {
@@ -122,6 +133,17 @@ export default {
       }
 
       return filteredTickets;
+    });
+
+    // Paginación
+    const paginatedTickets = computed(() => {
+      const start = (currentPage.value - 1) * ticketsPerPage;
+      const end = start + ticketsPerPage;
+      return filtrarTicketsResueltos.value.slice(start, end);
+    });
+
+    const totalPages = computed(() => {
+      return Math.ceil(filtrarTicketsResueltos.value.length / ticketsPerPage);
     });
 
     const recargarTickets = async () => {
@@ -148,6 +170,10 @@ export default {
     return {
       buscarQuery,
       filtrarTicketsResueltos,
+      paginatedTickets,
+      currentPage,
+      totalPages,
+      ticketsPerPage, // Variable añadida para control
     };
   },
 };
@@ -162,4 +188,9 @@ export default {
     font-size: 0.75rem;
   }
 }
-</style>
+
+/* Estilo para el paginador */
+button {
+  cursor: pointer;
+}
+</style
