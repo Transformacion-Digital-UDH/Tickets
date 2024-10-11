@@ -8,11 +8,12 @@ use App\Http\Controllers\Admin\PrioridadController;
 use App\Http\Controllers\Admin\SedeController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\UsuarioController;
+use App\Http\Controllers\Soporte\SoporteDashboardController;
+use App\Http\Controllers\Usuario\UsuarioDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::controller(DashboardController::class)->group(function () {
-        Route::get('/dashboard', 'index')->name('dashboard');
         Route::get('/dashboard/fetch-tickets-data', 'traer');
     });
 
@@ -105,5 +106,23 @@ Route::middleware(['auth', 'role:Admin|Usuario|Soporte'])->group(function () {
     });
     Route::controller(UsuarioController::class)->group(function () {
         Route::post('/registrar-sede', 'registrarSedeUnaVez');
+    });
+});
+
+Route::middleware(['auth', 'check.sede'])->group(function () {
+    Route::middleware(['auth', 'role:Admin'])->group(function () {
+        Route::controller(DashboardController::class)->group(function () {
+            Route::get('/dashboard', 'index')->name('dashboard');
+        });
+    });
+    Route::middleware(['auth', 'role:Usuario'])->group(function () {
+        Route::controller(UsuarioDashboardController::class)->group(function () {
+            Route::get('/user-dashboard', 'index')->name('user-dashboard');
+        });
+    });
+    Route::middleware(['auth', 'role:Soporte'])->group(function () {
+        Route::controller(SoporteDashboardController::class)->group(function () {
+            Route::get('/support-dashboard', 'index')->name('support-dashboard');
+        });
     });
 });

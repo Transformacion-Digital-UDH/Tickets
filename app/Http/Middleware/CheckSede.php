@@ -4,20 +4,21 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth as FacadesAuth;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class comprobarRole
+class CheckSede
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next)
     {
-        if (!FacadesAuth::check() || FacadesAuth::user()->rol->rol_nombre !== $role) {
-            abort(403, "Acceso denegado");
+        if (Auth::check() && Auth::user()->sed_id == null) {
+            return redirect()->route('elegirsede')
+                ->with('error', 'Debes elegir una sede antes de acceder al sistema.');
         }
 
         return $next($request);

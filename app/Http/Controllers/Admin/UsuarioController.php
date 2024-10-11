@@ -16,31 +16,46 @@ class UsuarioController extends Controller
 {
     public function registrarSedeUnaVez(Request $request)
     {
-        $validatedData = $request->validate([
+        $validarDatos = $request->validate([
             'sed_id' => 'required|exists:sedes,id',
+        ], [
+            'sed_id.required' => 'El campo sede es obligatorio.',
+            'sed_id.exists' => 'La sede seleccionada no es válida.',
         ]);
 
         $user = Auth::user();
 
-        if (!$user->sed_id) {
-            $user->sed_id = $validatedData['sed_id'];
-            $user->save();
-        } else {
-            if ($user->hasRole('Admin')) {
-                return redirect()->route('dashboard');
-            } elseif ($user->hasRole('Usuario')) {
-                return redirect()->route('user-dashboard');
-            } elseif ($user->hasRole('Soporte')) {
-                return redirect()->route('support-dashboard');
-            }
+        if ($user->sed_id) {
+            $redirectUrl = $this->getDashboardRedirectUrl($user->rol->rol_nombre);
+            return response()->json([
+                'message' => 'Ya has registrado una sede previamente.',
+                'redirectUrl' => $redirectUrl,
+            ], 400);
         }
 
-        if ($user->hasRole('Admin')) {
-            return redirect()->route('dashboard');
-        } elseif ($user->hasRole('Usuario')) {
-            return redirect()->route('user-dashboard');
-        } elseif ($user->hasRole('Soporte')) {
-            return redirect()->route('support-dashboard');
+        $user->sed_id = $validarDatos['sed_id'];
+        $user->save();
+
+        $redirectUrl = $this->getDashboardRedirectUrl($user->rol->rol_nombre);
+
+        return response()->json([
+            'message' => 'Sede añadida exitosamente',
+            'usuario' => $user,
+            'redirectUrl' => $redirectUrl,
+        ], 201);
+    }
+
+    private function getDashboardRedirectUrl($role)
+    {
+        switch ($role) {
+            case 'Admin':
+                return route('admin-dashboard');
+            case 'Usuario':
+                return route('user-dashboard');
+            case 'Soporte':
+                return route('support-dashboard');
+            default:
+                return route('user-dashboard');
         }
     }
 
