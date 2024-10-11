@@ -49,7 +49,7 @@ export default {
     },
     computed: {
         sedeKeys() {
-            return ["id", "sed_direccion", "sed_telefono"];
+            return ["id", "sed_direccion", "sed_telefono", "sed_imagen"];
         },
         userKeys() {
             return ["id", "celular", "email", "sed_id"];

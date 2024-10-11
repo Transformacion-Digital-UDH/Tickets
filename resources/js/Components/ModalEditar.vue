@@ -160,6 +160,16 @@ const updateFile = async () => {
             }
         );
 
+        const updatedImageURL = response.data.image_url;
+        props.formFields.forEach((field) => {
+            if (field.type === "file") {
+                selectedFilePreviews.value[field.name] = {
+                    name: formData.value[field.name].name,
+                    url: updatedImageURL,
+                };
+            }
+        });
+
         emit("update", response.data);
 
         cerrarModal();
@@ -477,21 +487,17 @@ const cerrarModal = () => emit("cerrar");
                                         v-if="selectedFilePreviews[field.name]"
                                         class="mt-4"
                                     >
-                                        <div
-                                            v-for="(file, index) in [
-                                                selectedFilePreviews[
-                                                    field.name
-                                                ],
-                                            ]"
-                                            :key="index"
-                                            class="overflow-hidden border border-gray-300 rounded-lg"
-                                        >
-                                            <img
-                                                :src="file.url"
-                                                :alt="file.name"
-                                                class="object-cover w-full h-50"
-                                            />
-                                        </div>
+                                        <img
+                                            :src="
+                                                selectedFilePreviews[field.name]
+                                                    .url
+                                            "
+                                            :alt="
+                                                selectedFilePreviews[field.name]
+                                                    .name
+                                            "
+                                            class="object-cover w-full h-50"
+                                        />
                                     </div>
                                 </div>
 

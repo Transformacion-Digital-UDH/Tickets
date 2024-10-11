@@ -8,11 +8,42 @@ use App\Models\User;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class UsuarioController extends Controller
 {
+    public function registrarSedeUnaVez(Request $request)
+    {
+        $validatedData = $request->validate([
+            'sed_id' => 'required|exists:sedes,id',
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user->sed_id) {
+            $user->sed_id = $validatedData['sed_id'];
+            $user->save();
+        } else {
+            if ($user->hasRole('Admin')) {
+                return redirect()->route('dashboard');
+            } elseif ($user->hasRole('Usuario')) {
+                return redirect()->route('user-dashboard');
+            } elseif ($user->hasRole('Soporte')) {
+                return redirect()->route('support-dashboard');
+            }
+        }
+
+        if ($user->hasRole('Admin')) {
+            return redirect()->route('dashboard');
+        } elseif ($user->hasRole('Usuario')) {
+            return redirect()->route('user-dashboard');
+        } elseif ($user->hasRole('Soporte')) {
+            return redirect()->route('support-dashboard');
+        }
+    }
+
     public function soporte()
     {
         return Inertia::render("Admin/Soporte", [

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sedes', function (Blueprint $table) {
             $table->id();
+            $table->string('sed_imagen')->nullable();
             $table->string('sed_nombre')->nullable();
             $table->string('sed_direccion')->nullable();
             $table->string('sed_ciudad')->nullable();
