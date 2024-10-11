@@ -4,6 +4,7 @@ import { onMounted, ref } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
+const user = ref(window.authUser || {});
 const sedes = ref([]);
 
 const fetchSedes = async () => {
@@ -42,7 +43,14 @@ const seleccionarSede = async (sede) => {
             }
         );
 
-        toast.success("Sede seleccionada correctamente.");
+        toast.success(`Bienvenido, ${user.value.name}`, {
+            autoClose: 4000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-green-500 p-4",
+        });
 
         if (response.data.redirectUrl) {
             window.location.href = response.data.redirectUrl;
@@ -52,12 +60,23 @@ const seleccionarSede = async (sede) => {
     } catch (error) {
         if (error.response && error.response.data) {
             console.error("Error response:", error.response.data);
-            toast.error(
-                error.response.data.message ||
-                    "Hubo un error al seleccionar la sede."
-            );
+            toast.error("Hubo un error al seleccionar la sede.", {
+                autoClose: 4000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         } else {
-            toast.error("Hubo un error al seleccionar la sede.");
+            toast.error("Hubo un error al seleccionar la sede.", {
+                autoClose: 4000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
         }
     }
 };

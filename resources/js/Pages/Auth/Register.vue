@@ -1,5 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import AuthenticationCard from "@/Components/AuthenticationCard.vue";
 import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
 import Checkbox from "@/Components/Checkbox.vue";
@@ -19,7 +21,27 @@ const form = useForm({
 
 const submit = () => {
     form.post(route("register"), {
-        onFinish: () => form.reset("password", "password_confirmation"),
+        onSuccess: () => {
+            toast.success("Se ha registrado correctamente, ahora seleccione la sede a la que pertenece.", {
+                autoClose: 4000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-green-500 p-4",
+            });
+            form.reset("password", "password_confirmation");
+        },
+        onError: () => {
+            toast.error("Ups! Algo malo sucedió", {
+                autoClose: 4000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
+        },
     });
 };
 </script>
