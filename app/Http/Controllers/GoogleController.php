@@ -9,7 +9,6 @@ use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller
 {
-
     public function redirect()
     {
         return Socialite::driver('google')->redirect();
@@ -20,12 +19,17 @@ class GoogleController extends Controller
         try {
             $user_google = Socialite::driver('google')->user();
 
-            $se_registro = User::where('email', $user_google->email)->where('activo', '!=', 0)->first();
+            $se_registro = User::where('email', $user_google->email)
+                ->where('activo', '!=', 0)
+                ->first();
+
             if (empty($se_registro)) {
                 $isUDHEmail = str_ends_with($user_google->email, '@udh.edu.pe');
                 if (!$isUDHEmail) {
-                    return redirect()->route('login')->with('error', 'Ingrese un correo institucional de la UDH.');
+                    return redirect()->route('login')
+                        ->with('error', 'Ingrese un correo institucional de la UDH.');
                 }
+
                 $user = new User();
                 $user->email = $user_google->email;
                 $user->google_id = $user_google->id;
@@ -35,18 +39,25 @@ class GoogleController extends Controller
                 $user->email_verified_at = now();
                 $user->assignRole('Usuario');
                 $user->save();
+
                 Auth::login($user);
-                return redirect()->route('user-dashboard')->with('success', 'Ha iniciado sesión como usuario.');
+
+                return redirect()->route('elegirsede')->with('success', 'Por favor elige una sede.');
             } else {
                 if ($se_registro->estado == 2) {
-                    return redirect()->redirect('login')->with('error', 'Su cuenta se encuentra suspendido');
+                    return redirect()->route('login')->with('error', 'Su cuenta se encuentra suspendida.');
                 }
+
                 Auth::login($se_registro);
             }
-            // Aca extraeremos el nombre del rol...
+
+            if (Auth::user()->sed_id == null) {
+                return redirect()->route('elegirsede')
+                    ->with('success', 'Por favor elige una sede.');
+            }
+
             $roleName = Auth::user()->rol->rol_nombre;
 
-            // Para luego compararlo con una condicional y poder redirigir a su ruta correcta...
             if ($roleName === 'Admin') {
                 return redirect()->intended(RouteServiceProvider::$ADMINHOME)
                     ->with('success', 'Ha iniciado sesión como administrador.');

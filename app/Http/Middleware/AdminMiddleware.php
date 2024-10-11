@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Auth;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
@@ -16,11 +17,11 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!Auth::check()) {
+        if(!FacadesAuth::check()) {
             return redirect()->route('login');
         }
 
-        if(Auth::user()->rol->rol_nombre !== 'Admin') {
+        if(FacadesAuth::user()->rol->rol_nombre !== 'Admin') {
             return redirect()->route('login');
         }
 

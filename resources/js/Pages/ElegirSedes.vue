@@ -34,18 +34,38 @@ export default {
 
         async seleccionarSede(sede) {
             try {
-                const response = await axios.post("/registrar-sede", {
-                    sede_id: sede.id,
-                });
+                const response = await axios.post(
+                    "/registrar-sede",
+                    {
+                        sed_id: sede.id,
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document
+                                .querySelector('meta[name="csrf-token"]')
+                                .getAttribute("content"),
+                        },
+                    }
+                );
 
                 toast.success("Sede seleccionada correctamente.");
 
                 if (response.data.redirectUrl) {
                     window.location.href = response.data.redirectUrl;
+                } else {
+                    window.location.reload();
                 }
             } catch (error) {
-                console.error("Error al seleccionar la sede:", error);
-                toast.error("Hubo un error al seleccionar la sede.");
+                if (error.response && error.response.data) {
+                    console.error("Error response:", error.response.data);
+                    toast.error(
+                        error.response.data.message ||
+                            "Hubo un error al seleccionar la sede."
+                    );
+                } else {
+                    toast.error("Hubo un error al seleccionar la sede.");
+                }
             }
         },
     },

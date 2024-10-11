@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Soporte'])->group(function () {
     Route::controller(SoporteDashboardController::class)->group(function () {
-        Route::get('/support-dashboard', 'index')->name('support-dashboard');
     });
 
     Route::controller(SoporteTicketController::class)->group(function () {

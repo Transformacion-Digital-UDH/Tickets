@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Usuario'])->group(function () {
     Route::controller(UsuarioDashboardController::class)->group(function () {
-        Route::get('/user-dashboard', 'index')->name('user-dashboard');
         Route::get('/user-dashboard/fetch-tickets-data', 'traer');
     });
 
