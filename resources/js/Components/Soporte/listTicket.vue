@@ -7,49 +7,49 @@ export default {
     },
     setup() {
         const tickets = ref([]);
-        const prioridades = ref([]); // Para las prioridades
-        const categorias = ref([]); // Para las categorías
-        const isTableView = ref(false); // Controla si se muestra la vista de tabla o tarjetas
-        const mostrarModal = ref(false);
-        const ticketSeleccionado = ref(null);
-        const buscarQuery = ref(""); // Barra de búsqueda
-        const filtroEstado = ref([]); // Filtro por estado (array para checkboxes)
-        const filtroPrioridad = ref(""); // Filtro por prioridad
-        const filtroCategoria = ref(""); // Filtro por categoría
-        const dropdownOpen = ref(false); // Estado del dropdown
-        const isImageModalOpen = ref(false);
+        const prioridades = ref([]);
+        const categorias = ref([]);
+        const isTableView = ref(false);
+        const mostrarModal = ref(false); // Control del estado del modal
+        const ticketSeleccionado = ref(null); // Ticket seleccionado para el modal
+        const buscarQuery = ref("");
+        const filtroEstado = ref([]);
+        const filtroPrioridad = ref("");
+        const filtroCategoria = ref("");
+        const dropdownOpen = ref(false);
+        const isImageModalOpen = ref(false); // Modal de imagen ampliada
         const selectedImageUrl = ref("");
 
         // Variables para paginación
-        const currentPage = ref(1); // Página actual
-        const ticketsPerPage = ref(10); // Número de tickets por página (2 filas * 5 tickets por fila = 10 tickets)
+        const currentPage = ref(1); // <-- Definimos currentPage
+        const ticketsPerPage = ref(10);
 
         // Función para detectar si es dispositivo móvil
-        const isMobile = ref(window.innerWidth < 768); // Definimos si es móvil según el ancho de la pantalla
+        const isMobile = ref(window.innerWidth < 768);
 
         const checkIsMobile = () => {
             isMobile.value = window.innerWidth < 768;
             if (isMobile.value) {
-                isTableView.value = false; // Deshabilitar vista de tabla en móviles
+                isTableView.value = false;
             }
         };
 
-        // Listener para cambios en el tamaño de la ventana
         window.addEventListener('resize', checkIsMobile);
 
-        // Detectar si es móvil al cargar la página
         onMounted(() => {
             checkIsMobile();
             recargarTickets();
         });
 
+        // Función para abrir el modal y mostrar detalles del ticket
         const abrirModal = (ticket) => {
             ticketSeleccionado.value = { ...ticket };
-            mostrarModal.value = true;
+            mostrarModal.value = true; // Mostrar el modal
         };
 
+        // Función para cerrar el modal
         const cerrarModal = () => {
-            mostrarModal.value = false;
+            mostrarModal.value = false; // Cerrar el modal
         };
 
         const openImageModal = (url) => {
@@ -82,7 +82,6 @@ export default {
         ]);
 
         const toggleView = () => {
-            // Solo permitir cambiar la vista si no está en dispositivo móvil
             if (!isMobile.value) {
                 isTableView.value = !isTableView.value;
             }
@@ -92,7 +91,6 @@ export default {
             dropdownOpen.value = !dropdownOpen.value;
         };
 
-        // Método para obtener los tickets paginados
         const paginatedTickets = computed(() => {
             const startIndex = (currentPage.value - 1) * ticketsPerPage.value;
             const endIndex = startIndex + ticketsPerPage.value;
@@ -106,7 +104,6 @@ export default {
         const filtrarTickets = computed(() => {
             let filteredTickets = tickets.value;
 
-            // Filtro por búsqueda
             if (buscarQuery.value) {
                 const query = buscarQuery.value.toLowerCase();
                 filteredTickets = filteredTickets.filter((ticket) => {
@@ -123,21 +120,18 @@ export default {
                 });
             }
 
-            // Filtro por estados seleccionados (checkboxes)
             if (filtroEstado.value.length) {
                 filteredTickets = filteredTickets.filter((ticket) =>
                     filtroEstado.value.includes(ticket.tic_estado)
                 );
             }
 
-            // Filtro por prioridad
             if (filtroPrioridad.value) {
                 filteredTickets = filteredTickets.filter(
                     (ticket) => ticket.prioridad === filtroPrioridad.value
                 );
             }
 
-            // Filtro por categoría
             if (filtroCategoria.value) {
                 filteredTickets = filteredTickets.filter(
                     (ticket) => ticket.categoria === filtroCategoria.value
@@ -152,7 +146,6 @@ export default {
                 const response = await fetch("support-optener");
                 const data = await response.json();
 
-                // Extraemos las prioridades y categorías de los tickets
                 prioridades.value = [
                     ...new Set(data.map((ticket) => ticket.prioridad)),
                 ];
@@ -178,15 +171,14 @@ export default {
                     .sort(
                         (a, b) =>
                             new Date(b.created_at) - new Date(a.created_at)
-                    ); // Orden descendente por fecha
+                    );
             } catch (error) {
                 console.error("Error al recargar los tickets:", error);
             }
         };
 
         const verDetalles = (ticket) => {
-            ticketSeleccionado.value = { ...ticket }; // Asignar el ticket seleccionado
-            mostrarModal.value = true; // Mostrar el modal
+            abrirModal(ticket); // Llamamos a abrirModal para mostrar el modal
         };
 
         const aceptarTicket = async (ticket) => {
@@ -211,8 +203,8 @@ export default {
                 const data = await response.json();
 
                 if (data.status) {
-                    await recargarTickets(); // Recargar todos los tickets después de aceptar uno
-                    await nextTick(); // Asegurar que Vue procesa el renderizado
+                    await recargarTickets();
+                    await nextTick();
                 } else {
                     console.error(data.msg);
                 }
@@ -226,7 +218,7 @@ export default {
                 const response = await fetch(
                     `/soporte/tickets/finalizar/${ticket.id}`,
                     {
-                        method: "POST", // Usa POST según tu configuración de rutas
+                        method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                             "X-CSRF-TOKEN": document
@@ -243,8 +235,8 @@ export default {
                 const data = await response.json();
 
                 if (data.status) {
-                    await recargarTickets(); // Recargar todos los tickets después de finalizar uno
-                    await nextTick(); // Asegurar que Vue procesa el renderizado
+                    await recargarTickets();
+                    await nextTick();
                 } else {
                     console.error(data.msg);
                 }
@@ -253,7 +245,6 @@ export default {
             }
         };
 
-        // Función para cambiar a la página seleccionada
         const goToPage = (page) => {
             currentPage.value = page;
         };
@@ -295,21 +286,20 @@ export default {
             formFieldsVer,
             aceptarTicket,
             finalizarTicket,
-            buscarQuery, // Retornamos buscarQuery
-            filtroEstado, // Filtro por estado (array para checkboxes)
+            buscarQuery,
+            filtroEstado,
             filtroPrioridad,
             filtroCategoria,
             filtrarTickets,
             getEstadoLabelClass,
             toggleDropdown,
-            dropdownOpen, // Estado del dropdown
-            estadosDisponibles, // Lista de estados disponibles
-            isMobile, // Retornamos para saber si es móvil
-            paginatedTickets, // Tickets paginados
-            currentPage, // Página actual
-            ticketsPerPage, // Tickets por página
-            totalPages, // Total de páginas
-            goToPage, // Cambiar de página
+            dropdownOpen,
+            estadosDisponibles,
+            isMobile,
+            paginatedTickets,
+            totalPages,
+            goToPage,
+            currentPage, // <-- Aquí retornamos currentPage
         };
     },
 };
@@ -351,7 +341,7 @@ export default {
             </div>
         </div>
 
-        <!-- Botón para cambiar la vista (ahora con íconos) -->
+        <!-- Botón para cambiar la vista -->
         <div class="text-right mb-4" v-if="!isMobile">
             <button @click="toggleView"
                 class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition-colors duration-300">
@@ -359,15 +349,68 @@ export default {
             </button>
         </div>
 
-        <!-- Mostrar mensaje de éxito si existe -->
-        <div v-if="success" class="alert alert-success mb-4 text-center text-green-600">
-            {{ success }}
+        <!-- Modal de detalles del ticket -->
+        <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30 z-50">
+            <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg z-50">
+                <div class="p-4 border-2 border-gray-400 rounded-lg">
+                    <h2 class="mb-4 text-xl font-bold text-gray-600">Detalles del Ticket</h2>
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="py-2 pr-10 text-left text-gray-600 border-b-2 border-gray-400">
+                                    Campo
+                                </th>
+                                <th class="py-2 text-left text-gray-600 border-b-2 border-gray-400">
+                                    Valor
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(field, index) in formFieldsVer" :key="index" class="border-b border-gray-400">
+                                <td class="py-2 pr-10 font-semibold text-left text-gray-500">
+                                    {{ field.label }}
+                                </td>
+                                <td class="py-2 text-left text-gray-600">
+                                    <!-- Mostrar fecha con formato si es 'created_at' -->
+                                    <span v-if="field.name === 'created_at'">
+                                        {{
+                                            ticketSeleccionado[field.name]
+                                                ? new Date(ticketSeleccionado[field.name]).toLocaleString()
+                                                : "No disponible"
+                                        }}
+                                    </span>
+
+                                    <!-- Mostrar la imagen si el campo es 'tic_archivo' -->
+                                    <span v-else-if="field.name === 'tic_archivo'">
+                                        <div v-if="ticketSeleccionado[field.name]">
+                                            <img :src="`/storage/${ticketSeleccionado[field.name]}`"
+                                                alt="Archivo asociado"
+                                                class="object-cover w-32 h-32 border border-gray-300 rounded-lg cursor-pointer"
+                                                @click="openImageModal(`/storage/${ticketSeleccionado[field.name]}`)" />
+                                        </div>
+                                        <div v-else>No disponible</div>
+                                    </span>
+
+                                    <!-- Mostrar texto por defecto para otros campos -->
+                                    <span v-else>{{ ticketSeleccionado[field.name] || "No disponible" }}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="flex justify-end mt-4">
+                        <button @click="cerrarModal" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Vista de Tarjetas -->
         <div v-if="!isTableView && paginatedTickets.length > 0"
             class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-            <div v-for="ticket in paginatedTickets" :key="ticket.id" class="relative w-full">
+            <div v-for="ticket in paginatedTickets" :key="ticket.id" class="relative w-full z-10">
                 <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
                     'bg-orange-600': ticket.tic_estado === 'Abierto',
                     'bg-gray-600': ticket.tic_estado === 'Asignado',
@@ -376,7 +419,7 @@ export default {
                     'bg-red-600': ticket.tic_estado === 'Cerrado',
                     'bg-yellow-600': ticket.tic_estado === 'Reabierto',
                 }"></span>
-                <div class="relative h-full p-4 bg-white border-2 rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl"
+                <div class="relative h-full p-4 bg-white border-2 rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl z-10"
                     :class="{
                         'border-orange-600': ticket.tic_estado === 'Abierto',
                         'border-gray-600': ticket.tic_estado === 'Asignado',
@@ -516,6 +559,17 @@ export default {
                 class="mx-1 px-4 py-2 rounded hover:bg-gray-300">
                 {{ page }}
             </button>
+        </div>
+
+        <!-- Modal de Imagen Ampliada -->
+        <div v-if="isImageModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
+            <div class="relative max-w-4xl p-4 bg-white rounded-lg shadow-lg">
+                <img :src="selectedImageUrl" alt="Imagen ampliada" class="max-w-full max-h-screen" />
+                <button @click="closeImageModal"
+                    class="absolute top-2 right-2 text-white text-2xl font-bold bg-gray-800 rounded-full px-2 focus:outline-none">
+                    &times;
+                </button>
+            </div>
         </div>
     </div>
 </template>
