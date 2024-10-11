@@ -6,12 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\Sede;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class SedeController extends Controller
 {
     public function elegirsede()
     {
+        $user = Auth::user();
+
+        if ($user->sede_id) {
+            if ($user->hasRole('Admin')) {
+                return redirect()->route('dashboard');
+            } elseif ($user->hasRole('Usuario')) {
+                return redirect()->route('user-dashboard');
+            } elseif ($user->hasRole('Soporte')) {
+                return redirect()->route('support-dashboard');
+            }
+        }
+
         return Inertia::render('ElegirSedes');
     }
 
@@ -44,10 +57,6 @@ class SedeController extends Controller
     {
         $sedes = Sede::all();
 
-        if (Auth::user()->hasAnyRole(['Soporte', 'Usuario'])) {
-            return response()->json(['sedes' => []], 200);
-        }
-
         return response()->json($sedes, 200);
     }
 
@@ -63,6 +72,30 @@ class SedeController extends Controller
 
         $sede = Sede::create($validarDatos);
         return response()->json(['message' => 'Sede creada correctamente', 'sede' => $sede], 201);
+    }
+
+    public function upload(Request $request, $id)
+    {
+        $sede = Sede::findOrFail($id);
+
+        if ($request->hasFile('sed_imagen')) {
+            if ($sede->sed_imagen) {
+                if (Storage::disk('public')->exists($sede->sed_imagen)) {
+                    Storage::disk('public')->delete($sede->sed_imagen);
+                }
+            }
+
+            $filePath = $request->file('sed_imagen')->store('sede_images', 'public');
+            $sede->sed_imagen = $filePath;
+            $sede->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'msg' => 'Archivo actualizado correctamente',
+            'sede' => $sede,
+            'image_url' => Storage::url($sede->sed_imagen),
+        ]);
     }
 
     public function update(Request $request, Sede $sede)

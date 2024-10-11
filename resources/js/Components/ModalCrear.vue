@@ -48,7 +48,6 @@ const errores = ref([]);
 const loading = ref(false);
 const isMobile = ref(false);
 const successMessage = ref("");
-const formDataOriginal = ref({});
 
 const handleResize = () => {
     isMobile.value = window.innerWidth <= 768;
@@ -194,14 +193,18 @@ const handleFileChange = (event, fieldName) => {
     }
 };
 
-const uploadFile = async (ticketId) => {
-    const formDataTicket = new FormData();
-    formDataTicket.append("tic_archivo", formData.value["tic_archivo"]);
+const uploadFile = async (id) => {
+    const formDatas = new FormData();
+    Object.keys(formData.value).forEach((key) => {
+        if (formData.value[key] instanceof File) {
+            formDatas.append(key, formData.value[key]);
+        }
+    });
 
     try {
         const response = await axios.post(
-            `${props.endpoint}/${ticketId}/upload`,
-            formDataTicket,
+            `${props.endpoint}/${id}/upload`,
+            formDatas,
             {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -338,13 +341,17 @@ const submitForm = async () => {
 
 const crearItemCompleto = async () => {
     try {
-        const ticket = await submitForm();
+        const response = await submitForm();
 
-        if (formData.value["tic_archivo"] instanceof File) {
-            await uploadFile(ticket.id);
+        if (formData.value["tic_archivo"] instanceof File && response.ticket) {
+            await uploadFile(response.ticket.id);
         }
 
-        emit("crear", ticket);
+        if (formData.value["sed_imagen"] instanceof File && response.sede) {
+            await uploadFile(response.sede.id);
+        }
+
+        emit("crear", response.ticket || response.sede);
         cerrarModal();
     } catch (error) {
         console.error("Error en la creación del item:", error);

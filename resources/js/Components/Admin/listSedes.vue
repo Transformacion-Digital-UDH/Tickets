@@ -75,6 +75,7 @@ const mapSedeData = (sede, index, totalSedes) => {
         sed_ciudad: sede.sed_ciudad,
         sed_telefono: validatePhoneNumber(sede.sed_telefono),
         sed_activo: sede.sed_activo,
+        sed_imagen: sede.sed_imagen,
         row_number: totalSedes - (startIndex + index),
     };
 };
@@ -114,6 +115,7 @@ const formFields = [
     { name: "sed_direccion", label: "Dirección", type: "text", required: true },
     { name: "sed_ciudad", label: "Ciudad", type: "text", required: true },
     { name: "sed_telefono", label: "Teléfono", type: "number", required: true },
+    { name: "sed_imagen", label: "Imágenes", type: "file", required: true },
     { name: "sed_activo", label: "Estado", type: "boolean" },
 ];
 
@@ -122,6 +124,7 @@ const formFieldsVer = [
     { name: "sed_direccion", label: "Dirección", type: "text" },
     { name: "sed_ciudad", label: "Ciudad", type: "text" },
     { name: "sed_telefono", label: "Teléfono", type: "number" },
+    { name: "sed_imagen", label: "Imágenes", type: "file" },
 ];
 
 const eliminarItem = async () => {

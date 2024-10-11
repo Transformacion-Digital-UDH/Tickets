@@ -1,7 +1,66 @@
+<script>
+import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
+export default {
+    data() {
+        return {
+            sedes: [],
+        };
+    },
+    mounted() {
+        this.fetchSedes();
+    },
+    methods: {
+        async fetchSedes() {
+            try {
+                const response = await axios.get("/sedes");
+                this.sedes = response.data.map((sede) => ({
+                    id: sede.id,
+                    name: sede.sed_nombre,
+                    location: sede.sed_ciudad,
+                    description: sede.sed_direccion,
+                    image: sede.sed_imagen
+                        ? `/storage/${sede.sed_imagen}`
+                        : "https://via.placeholder.com/300x200?text=Sin+Imagen",
+                    buttonText: "Seleccionar Sede",
+                }));
+            } catch (error) {
+                console.error("Error al cargar las sedes:", error);
+                toast.error("Error al cargar las sedes.");
+            }
+        },
+
+        async seleccionarSede(sede) {
+            try {
+                const response = await axios.post("/registrar-sede", {
+                    sede_id: sede.id,
+                });
+
+                toast.success("Sede seleccionada correctamente.");
+
+                if (response.data.redirectUrl) {
+                    window.location.href = response.data.redirectUrl;
+                }
+            } catch (error) {
+                console.error("Error al seleccionar la sede:", error);
+                toast.error("Hubo un error al seleccionar la sede.");
+            }
+        },
+    },
+};
+</script>
+
 <template>
     <div class="sedes-container">
         <div class="sedes-table">
-            <div class="card" v-for="sede in sedes" :key="sede.id">
+            <div
+                class="card"
+                v-for="sede in sedes"
+                :key="sede.id"
+                @click="seleccionarSede(sede)"
+            >
                 <img
                     :src="sede.image"
                     alt="Imagen de la sede"
@@ -22,42 +81,15 @@
     </div>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            sedes: [
-                {
-                    id: 1,
-                    name: "Sede Central",
-                    location: "Ciudad Principal",
-                    description: "Oficinas y laboratorios principales.",
-                    image: "https://via.placeholder.com/300x200?text=Sede+Central",
-                    buttonText: "Ver Detalles",
-                },
-                {
-                    id: 2,
-                    name: "Sede Norte",
-                    location: "Suburbios del Norte",
-                    description: "Sede de programas tecnológicos.",
-                    image: "https://via.placeholder.com/300x200?text=Sede+Norte",
-                    buttonText: "Ver Detalles",
-                },
-                {
-                    id: 3,
-                    name: "Sede Sur",
-                    location: "Distrito Sur",
-                    description: "Enfocada en ciencias de la salud.",
-                    image: "https://via.placeholder.com/300x200?text=Sede+Sur",
-                    buttonText: "Ver Detalles",
-                },
-            ],
-        };
-    },
-};
-</script>
-
 <style scoped>
+.sede-image {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    border-radius: 5px;
+    /* Ensure that the image fits the card properly */
+}
+
 .sedes-container {
     display: flex;
     justify-content: center;
@@ -87,13 +119,6 @@ export default {
 .card:hover {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     transform: scale(1.05); /* Efecto de zoom */
-}
-
-.sede-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: transform 0.3s ease; /* Animación para la imagen */
 }
 
 .card:hover .sede-image {

@@ -1,14 +1,13 @@
 <?php
 
-use App\Http\Controllers\Admin\AsignadoController;
-use App\Http\Controllers\Admin\CategoriaController;
-use App\Http\Controllers\Admin\PrioridadController;
-use App\Http\Controllers\Admin\SedeController;
-use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\AulaController;
+use App\Http\Controllers\Admin\CategoriaController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PabellonController;
+use App\Http\Controllers\Admin\PrioridadController;
+use App\Http\Controllers\Admin\SedeController;
 use App\Http\Controllers\Admin\TicketController;
+use App\Http\Controllers\Admin\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Admin'])->group(function () {
@@ -19,14 +18,12 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 
     Route::controller(SedeController::class)->group(function () {
         Route::get('/sede', 'index')->name('sede');
-        Route::get('/elegirsede', 'elegirsede')->name('elegirsede');
-        Route::get('/sedes', 'traer');
         Route::get('/sedespaginated', 'traerPaginated');
         Route::post('/sedes', 'store');
+        Route::post('/sedes/{id}/upload', 'upload');
         Route::put('/sedes/{sede}', 'update');
         Route::delete('/sedes/{sede}/eliminar', 'eliminar');
     });
-
 
     Route::controller(UsuarioController::class)->group(function () {
         /** SOPORTE TÉCNICO **/
@@ -98,5 +95,15 @@ Route::middleware(['auth', 'role:Admin|Usuario'])->group(function () {
 
     Route::controller(AulaController::class)->group(function () {
         Route::get('/aulas', 'traer');
+    });
+});
+
+Route::middleware(['auth', 'role:Admin|Usuario|Soporte'])->group(function () {
+    Route::controller(SedeController::class)->group(function () {
+        Route::get('/elegirsede', 'elegirsede')->name('elegirsede');
+        Route::get('/sedes', 'traer');
+    });
+    Route::controller(UsuarioController::class)->group(function () {
+        Route::post('/registrar-sede', 'registrarSedeUnaVez');
     });
 });
