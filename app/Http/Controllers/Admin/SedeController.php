@@ -25,7 +25,7 @@ class SedeController extends Controller
             }
         }
 
-        return Inertia::render('ElegirSedes');
+        return Inertia::render('ElegirSedes', ['authUser' => Auth::user()]);
     }
 
     public function index()
