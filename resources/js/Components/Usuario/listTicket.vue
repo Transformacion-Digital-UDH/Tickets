@@ -598,7 +598,7 @@ const cerrarEliminarModal = () => {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(ticket, index) in tickets.inProgress"
+                                v-for="(ticket) in tickets.inProgress"
                                 :key="ticket.id"
                                 class="transition-colors duration-200 border-b hover:bg-gray-100"
                             >

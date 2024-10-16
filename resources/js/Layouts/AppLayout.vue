@@ -213,9 +213,9 @@ defineProps({ title: String });
             </nav>
 
             <div class="flex flex-col flex-1">
-                <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
+                <nav class="bg-[#222D32] border-b border-[#222D32]">
                     <div
-                        class="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8"
+                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
                     >
                         <button
                             @click="interactuarSidebar"
@@ -406,9 +406,9 @@ defineProps({ title: String });
             </nav>
 
             <div class="flex flex-col flex-1">
-                <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
+                <nav class="bg-[#222D32] border-b border-[#222D32]">
                     <div
-                        class="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8"
+                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
                     >
                         <button
                             @click="interactuarSidebar"
@@ -603,9 +603,9 @@ defineProps({ title: String });
             </nav>
 
             <div class="flex flex-col flex-1">
-                <nav class="bg-[#2EBAA1] border-b border-[#2EBAA1]">
+                <nav class="bg-[#222D32] border-b border-[#222D32]">
                     <div
-                        class="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8"
+                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
                     >
                         <button
                             @click="interactuarSidebar"
