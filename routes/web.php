@@ -7,15 +7,32 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     if (Auth::check()) {
-        return Inertia::render('Welcome', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-            'laravelVersion' => Application::VERSION,
-            'phpVersion' => PHP_VERSION,
-        ]);
-    } else {
-        return redirect()->route('login');
+        $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            return Inertia::render('Admin/Dashboard', [
+                'canLogin' => Route::has('login'),
+                'canRegister' => Route::has('register'),
+                'laravelVersion' => Application::VERSION,
+                'phpVersion' => PHP_VERSION,
+            ]);
+        } elseif ($user->hasRole('soporte')) {
+            return Inertia::render('Soporte/Dashboard', [
+                'canLogin' => Route::has('login'),
+                'canRegister' => Route::has('register'),
+                'laravelVersion' => Application::VERSION,
+                'phpVersion' => PHP_VERSION,
+            ]);
+        } elseif ($user->hasRole('usuario')) {
+            return Inertia::render('Usuario/Dashboard', [
+                'canLogin' => Route::has('login'),
+                'canRegister' => Route::has('register'),
+                'laravelVersion' => Application::VERSION,
+                'phpVersion' => PHP_VERSION,
+            ]);
+        }
     }
+    return redirect()->route('login');
 });
 
 require __DIR__ . '/admin.php';

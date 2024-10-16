@@ -11,19 +11,9 @@ const props = defineProps({
 });
 
 if (props.success) {
-    toast.success(
-        {
-            render: () => h(StarMessage, { message: props.success }),
-        },
-        {
-            autoClose: 4000,
-            position: "bottom-right",
-            style: {
-                width: "400px",
-            },
-            className: "border-l-4 border-red-500 p-4",
-        }
-    );
+    setTimeout(() => {
+        window.location.reload();
+    }, 10);
 }
 </script>
 
