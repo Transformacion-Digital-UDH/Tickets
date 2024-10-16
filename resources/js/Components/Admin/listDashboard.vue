@@ -38,7 +38,7 @@ onMounted(() => {
     >
         <div class="card">
             <div class="icon-container">
-                <i class="fas fa-hourglass-half icon"></i>
+                <i class="fas fa-door-open icon"></i>
             </div>
             <div class="content">
                 <h3>Abiertos</h3>
@@ -49,7 +49,7 @@ onMounted(() => {
 
         <div class="card">
             <div class="icon-container">
-                <i class="fas fa-hourglass-half icon"></i>
+                <i class="fas fa-user-shield icon"></i>
             </div>
             <div class="content">
                 <h3>Asignados</h3>
@@ -84,7 +84,7 @@ onMounted(() => {
 
         <div class="card">
             <div class="icon-container">
-                <i class="fas fa-check icon"></i>
+                <i class="fas fa-times icon"></i>
             </div>
             <div class="content">
                 <h3>Cerrados</h3>
@@ -95,7 +95,7 @@ onMounted(() => {
 
         <div class="card">
             <div class="icon-container">
-                <i class="fas fa-check icon"></i>
+                <i class="fas fa-door-open icon"></i>
             </div>
             <div class="content">
                 <h3>Reabiertos</h3>
