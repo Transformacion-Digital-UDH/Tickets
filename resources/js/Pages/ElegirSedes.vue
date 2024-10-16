@@ -7,6 +7,16 @@ import "vue3-toastify/dist/index.css";
 const user = ref(window.authUser || {});
 const sedes = ref([]);
 
+const props = defineProps({
+    success: String,
+});
+
+if (props.success) {
+    setTimeout(() => {
+        window.location.reload();
+    }, 10);
+}
+
 const fetchSedes = async () => {
     try {
         const response = await axios.get("/sedes");

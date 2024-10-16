@@ -15,7 +15,7 @@ class SedeController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->sede_id) {
+        if ($user && $user->sed_id) {
             if ($user->hasRole('Admin')) {
                 return redirect()->route('dashboard');
             } elseif ($user->hasRole('Usuario')) {
@@ -25,7 +25,7 @@ class SedeController extends Controller
             }
         }
 
-        return Inertia::render('ElegirSedes', ['authUser' => Auth::user()]);
+        return Inertia::render('ElegirSedes', ['authUser' => $user]);
     }
 
     public function index()
