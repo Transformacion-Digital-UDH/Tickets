@@ -1,20 +1,21 @@
 <?php
 
-use App\Http\Controllers\Admin\AulaController;
-use App\Http\Controllers\Admin\CategoriaController;
-use App\Http\Controllers\Admin\PabellonController;
-use App\Http\Controllers\Admin\PrioridadController;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    if (Auth::check()) {
+        return Inertia::render('Welcome', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'laravelVersion' => Application::VERSION,
+            'phpVersion' => PHP_VERSION,
+        ]);
+    } else {
+        return redirect()->route('login');
+    }
 });
 
 require __DIR__ . '/admin.php';
