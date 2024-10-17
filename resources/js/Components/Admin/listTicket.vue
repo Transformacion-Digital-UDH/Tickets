@@ -24,6 +24,10 @@ import axios from "axios";
 
 library.add(faThLarge, faTable, faFilter, faTimes);
 
+const handleVerComentarios = (ticket) => {
+    window.location.href = `/comentario/${ticket.id}`;
+};
+
 const tickets = ref([]);
 const prioridades = ref([]);
 const soportes = ref([]);
@@ -789,6 +793,7 @@ const getEstadoLabelClass = (estado) => {
                 :tickets="filtrarTickets"
                 :currentPage="currentPage"
                 :totalPages="totalPages"
+                @comment="handleVerComentarios"
                 @open="handleAbrir"
                 @close="handleCerrar"
                 @asign="handleAsign"

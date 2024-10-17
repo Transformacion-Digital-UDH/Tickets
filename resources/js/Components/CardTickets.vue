@@ -33,6 +33,7 @@ onBeforeUnmount(() => {
 });
 
 const emit = defineEmits([
+    "comment",
     "open",
     "close",
     "asign",
@@ -55,7 +56,8 @@ const emit = defineEmits([
             <div
                 v-for="ticket in tickets"
                 :key="ticket.id"
-                class="relative w-full"
+                class="relative w-full cursor-pointer transition duration-300 transform hover:scale-105 hover:shadow-lg"
+                @click="$emit('comment', ticket)"
             >
                 <span
                     class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg"
