@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('tic_id')->constrained('tickets');
             $table->foreignId('use_id')->constrained('users');
             $table->text('com_texto')->nullable();
+            $table->string('com_adjunto')->nullable();
             $table->boolean('com_activo')->default(true);
             $table->timestamps();
         });

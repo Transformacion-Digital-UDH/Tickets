@@ -47,6 +47,32 @@ class UsuarioTicketController extends Controller
         return response()->json($tickets);
     }
 
+    public function traerReabiertos(Request $request)
+    {
+        $userId = Auth::id();
+
+        $estado = $request->input('estado', 'Reabierto');
+
+        $totalTickets = Ticket::where('use_id', $userId)
+            ->where('tic_estado', $estado)
+            ->where('tic_activo', true)
+            ->count();
+
+        $tickets = Ticket::with('prioridad', 'categoria', 'pabellon', 'aula')
+            ->where('use_id', $userId)
+            ->where('tic_estado', $estado)
+            ->where('tic_activo', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate(8);
+
+        $tickets->getCollection()->transform(function ($ticket, $key) use ($totalTickets, $tickets) {
+            $ticket->row_number = $totalTickets - (($tickets->currentPage() - 1) * $tickets->perPage() + $key);
+            return $ticket;
+        });
+
+        return response()->json($tickets);
+    }
+
     public function create()
     {
         $tickets = Ticket::with(['aula', 'aula.pabellon', 'prioridad', 'categoria', 'pabellon'])->get();

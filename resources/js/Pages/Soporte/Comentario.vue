@@ -63,7 +63,7 @@ const subirComentario = async () => {
         }
 
         const response = await axios.post(
-            `/tickets/${ticket.value.id}/comentarios`,
+            `/soporte/tickets/${ticket.value.id}/comentarios`,
             formData,
             {
                 headers: {

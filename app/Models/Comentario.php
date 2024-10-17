@@ -9,7 +9,7 @@ class Comentario extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tic_id', 'use_id', 'com_texto', 'com_activo'];
+    protected $fillable = ['tic_id', 'use_id', 'com_texto', 'com_adjunto', 'com_activo'];
 
     public function ticket()
     {

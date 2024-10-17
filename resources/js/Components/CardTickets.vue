@@ -138,7 +138,7 @@ const emit = defineEmits([
                     <div class="flex mt-4 space-x-1 justify-end">
                         <button
                             v-if="ticket.tic_estado === 'Cerrado'"
-                            @click="$emit('open', ticket)"
+                            @click.stop="$emit('open', ticket)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-green-300 to-green-500 hover:from-green-400 hover:to-green-600 absolute bottom-0 left-0 mb-6 ml-6"
                             title="Reabrir Ticket"
                         >
@@ -150,7 +150,7 @@ const emit = defineEmits([
                                 ticket.tic_estado === 'Asignado' ||
                                 ticket.tic_estado === 'Reabierto'
                             "
-                            @click="$emit('close', ticket)"
+                            @click.stop="$emit('close', ticket)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 absolute bottom-0 left-0 mb-6 ml-6"
                             title="Cerrar Ticket"
                         >
@@ -162,28 +162,28 @@ const emit = defineEmits([
                                 ticket.tic_estado === 'Asignado' ||
                                 ticket.tic_estado === 'Reabierto'
                             "
-                            @click="$emit('asign', ticket)"
+                            @click.stop="$emit('asign', ticket)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-blue-300 to-blue-500 hover:from-blue-400 hover:to-blue-600"
                             title="Asignar Soporte"
                         >
                             <i class="mr-1 fas fa-user-plus"></i>
                         </button>
                         <button
-                            @click="$emit('view', ticket)"
+                            @click.stop="$emit('view', ticket)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
                             title="Ver detalles"
                         >
                             <i class="mr-1 fas fa-eye"></i>
                         </button>
                         <button
-                            @click="$emit('edit', ticket)"
+                            @click.stop="$emit('edit', ticket)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-teal-300 to-teal-500 hover:from-teal-400 hover:to-green-600"
                             title="Editar"
                         >
                             <i class="mr-1 fas fa-edit"></i>
                         </button>
                         <button
-                            @click="$emit('eliminar', ticket)"
+                            @click.stop="$emit('eliminar', ticket)"
                             class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-red-300 to-red-500 hover:from-red-400 hover:to-red-600"
                             title="Eliminar"
                         >

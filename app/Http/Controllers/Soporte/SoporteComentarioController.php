@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Soporte;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comentario;
@@ -8,13 +8,13 @@ use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ComentarioController extends Controller
+class SoporteComentarioController extends Controller
 {
     public function verComentarios(Ticket $ticket)
     {
         $comentarios = Comentario::where('tic_id', $ticket->id)->with('user')->get();
 
-        return Inertia::render('Admin/Comentario', [
+        return Inertia::render('Soporte/Comentario', [
             'ticket' => $ticket,
             'comentarios' => $comentarios,
             'success' => session('success'),
@@ -38,7 +38,7 @@ class ComentarioController extends Controller
             'use_id' => $request->user()->id,
             'com_texto' => $request->com_texto,
             'com_adjunto' => $archivoAdjunto,
-        ])->load('user');;
+        ])->load('user');
 
         return response()->json(['comentario' => $comentario], 201);
     }
