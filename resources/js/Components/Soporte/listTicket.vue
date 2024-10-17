@@ -3,34 +3,34 @@ import { ref, onMounted, computed, nextTick } from "vue";
 import ModalFinalizar from "@/Components/ModalFinalizar.vue";
 import ModalAceptar from "../ModalAceptar.vue";
 
-// Definimos los props
 const props = defineProps({
     success: String,
 });
 
-// Estado reactivo
 const mostrarModalFinalizar = ref(false);
 const mostrarModalAceptar = ref(false);
 const tickets = ref([]);
 const prioridades = ref([]);
 const categorias = ref([]);
 const isTableView = ref(false);
-const mostrarModal = ref(false); // Control del estado del modal
-const ticketSeleccionado = ref(null); // Ticket seleccionado para el modal
+const mostrarModal = ref(false);
+const ticketSeleccionado = ref(null);
 const buscarQuery = ref("");
 const filtroEstado = ref([]);
 const filtroPrioridad = ref("");
 const filtroCategoria = ref("");
 const dropdownOpen = ref(false);
-const isImageModalOpen = ref(false); // Modal de imagen ampliada
+const isImageModalOpen = ref(false);
 const selectedImageUrl = ref("");
 
-// Variables para paginación
-const currentPage = ref(1); // <-- Definimos currentPage
+const currentPage = ref(1);
 const ticketsPerPage = ref(10);
 
-// Función para detectar si es dispositivo móvil
 const isMobile = ref(window.innerWidth < 768);
+
+const handleVerComentarios = (ticket) => {
+    window.location.href = `/soporte/comentario/${ticket.id}`;
+};
 
 const checkIsMobile = () => {
     isMobile.value = window.innerWidth < 768;
@@ -46,30 +46,25 @@ onMounted(() => {
     recargarTickets();
 });
 
-// Función para abrir el modal y mostrar detalles del ticket
 const abrirModal = (ticket) => {
     ticketSeleccionado.value = { ...ticket };
-    mostrarModal.value = true; // Mostrar el modal
+    mostrarModal.value = true;
 };
 
-// Función para cerrar el modal
 const cerrarModal = () => {
-    mostrarModal.value = false; // Cerrar el modal
+    mostrarModal.value = false;
 };
 
-// Función para abrir modal de imagen ampliada
 const openImageModal = (url) => {
     selectedImageUrl.value = url;
     isImageModalOpen.value = true;
 };
 
-// Función para cerrar modal de imagen ampliada
 const closeImageModal = () => {
     isImageModalOpen.value = false;
     selectedImageUrl.value = "";
 };
 
-// Estados disponibles
 const estadosDisponibles = [
     "Abierto",
     "Asignado",
@@ -79,7 +74,6 @@ const estadosDisponibles = [
     "Reabierto",
 ];
 
-// Campos del formulario para visualizar
 const formFieldsVer = ref([
     { label: "Título", name: "tic_titulo" },
     { label: "Descripción", name: "tic_descripcion" },
@@ -90,31 +84,26 @@ const formFieldsVer = ref([
     { label: "Imagen", name: "tic_archivo" },
 ]);
 
-// Función para alternar entre vista de tabla y tarjetas
 const toggleView = () => {
     if (!isMobile.value) {
         isTableView.value = !isTableView.value;
     }
 };
 
-// Función para alternar el dropdown de estados
 const toggleDropdown = () => {
     dropdownOpen.value = !dropdownOpen.value;
 };
 
-// Paginación de tickets filtrados
 const paginatedTickets = computed(() => {
     const startIndex = (currentPage.value - 1) * ticketsPerPage.value;
     const endIndex = startIndex + ticketsPerPage.value;
     return filtrarTickets.value.slice(startIndex, endIndex);
 });
 
-// Número total de páginas
 const totalPages = computed(() => {
     return Math.ceil(filtrarTickets.value.length / ticketsPerPage.value);
 });
 
-// Función para filtrar tickets según los filtros aplicados
 const filtrarTickets = computed(() => {
     let filteredTickets = tickets.value;
 
@@ -155,7 +144,6 @@ const filtrarTickets = computed(() => {
     return filteredTickets;
 });
 
-// Función para recargar los tickets desde el servidor
 const recargarTickets = async () => {
     try {
         const response = await fetch("support-optener");
@@ -187,7 +175,6 @@ const recargarTickets = async () => {
     }
 };
 
-// Función para ver detalles del ticket
 const verDetalles = (ticket) => {
     abrirModal(ticket);
 };
@@ -197,7 +184,6 @@ const aceptarTicket = (ticket) => {
     mostrarModalAceptar.value = true;
 };
 
-// Función para aceptar un ticket
 const confirmarAceptacion = async () => {
     try {
         if (!ticketSeleccionado.value) {
@@ -475,7 +461,8 @@ const getEstadoLabelClass = (estado) => {
             <div
                 v-for="ticket in paginatedTickets"
                 :key="ticket.id"
-                class="relative w-full z-10"
+                @click="handleVerComentarios(ticket)"
+                class="relative w-full cursor-pointer transition duration-300 transform hover:scale-105 hover:shadow-lg z-10.stop"
             >
                 <span
                     class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg"
@@ -552,7 +539,7 @@ const getEstadoLabelClass = (estado) => {
                                 ticket.tic_estado === 'Asignado' ||
                                 ticket.tic_estado === 'Reabierto'
                             "
-                            @click="aceptarTicket(ticket)"
+                            @click.stop="aceptarTicket(ticket)"
                             class="text-blue-500 hover:text-blue-700 transition-colors duration-200"
                         >
                             <i class="fas fa-check mr-1"></i> Aceptar
@@ -561,7 +548,7 @@ const getEstadoLabelClass = (estado) => {
                         <!-- Botón de finalizar -->
                         <button
                             v-if="ticket.tic_estado === 'En progreso'"
-                            @click="finalizarTicket(ticket)"
+                            @click.stop="finalizarTicket(ticket)"
                             class="text-green-500 hover:text-green-700 transition-colors duration-200"
                         >
                             <i class="fas fa-check-circle mr-1"></i> Finalizar
@@ -569,7 +556,7 @@ const getEstadoLabelClass = (estado) => {
 
                         <!-- Botón para ver detalles -->
                         <button
-                            @click="verDetalles(ticket)"
+                            @click.stop="verDetalles(ticket)"
                             class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
                         >
                             <i class="mr-1 fas fa-eye"></i> Ver
@@ -623,7 +610,8 @@ const getEstadoLabelClass = (estado) => {
                     <tr
                         v-for="(ticket, index) in paginatedTickets"
                         :key="ticket.id"
-                        class="transition-colors duration-200 border-b hover:bg-gray-100"
+                        class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
+                        @click="handleVerComentarios(ticket)"
                     >
                         <td
                             class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
@@ -662,21 +650,21 @@ const getEstadoLabelClass = (estado) => {
                         >
                             <button
                                 v-if="ticket.tic_estado === 'Asignado'"
-                                @click="aceptarTicket(ticket)"
+                                @click.stop="aceptarTicket(ticket)"
                                 class="text-blue-500 hover:text-blue-700 transition-colors duration-200"
                             >
                                 <i class="fas fa-check mr-1"></i> Aceptar
                             </button>
                             <button
                                 v-if="ticket.tic_estado === 'En progreso'"
-                                @click="finalizarTicket(ticket)"
+                                @click.stop="finalizarTicket(ticket)"
                                 class="text-green-500 hover:text-green-700 transition-colors duration-200"
                             >
                                 <i class="fas fa-check-circle mr-1"></i>
                                 Finalizar
                             </button>
                             <button
-                                @click="verDetalles(ticket)"
+                                @click.stop="verDetalles(ticket)"
                                 class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
                             >
                                 <i class="fas fa-eye mr-1"></i> Ver

@@ -63,8 +63,6 @@ class User extends Authenticatable
         $this->notify(new ResetPasswordNotification($token));
     }
 
-
-
     /**
      * Get the attributes that should be cast.
      *
@@ -101,9 +99,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Sede::class, 'sed_id');
     }
-    
+
     public function asignados()
     {
         return $this->hasMany(Asignado::class, 'sop_id', 'id');
+    }
+
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class, 'use_id');
     }
 }

@@ -58,4 +58,9 @@ class Ticket extends Model
     {
         return $this->hasOne(Asignado::class, 'tic_id')->latestOfMany();
     }
+
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class, 'tic_id');
+    }
 }

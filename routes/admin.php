@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AulaController;
 use App\Http\Controllers\Admin\CategoriaController;
+use App\Http\Controllers\Admin\ComentarioController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PabellonController;
 use App\Http\Controllers\Admin\PrioridadController;
@@ -78,6 +79,11 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         Route::put('/tickets/{id}/updateEstado', 'updateEstado');
         Route::post('/tickets/{id}/upload', 'upload');
         Route::delete('/tickets/{id}/eliminar', 'eliminar');
+    });
+
+    Route::controller(ComentarioController::class)->group(function () {
+        Route::get('/comentario/{ticket}', 'verComentarios')->name('comentario.ver');
+        Route::post('/tickets/{ticket}/comentarios', 'guardarComentario')->name('comentarios.guardar');
     });
 });
 

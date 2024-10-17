@@ -24,6 +24,10 @@ import axios from "axios";
 
 library.add(faThLarge, faTable, faFilter, faTimes);
 
+const handleVerComentarios = (ticket) => {
+    window.location.href = `/comentario/${ticket.id}`;
+};
+
 const tickets = ref([]);
 const prioridades = ref([]);
 const soportes = ref([]);
@@ -789,6 +793,7 @@ const getEstadoLabelClass = (estado) => {
                 :tickets="filtrarTickets"
                 :currentPage="currentPage"
                 :totalPages="totalPages"
+                @comment="handleVerComentarios"
                 @open="handleAbrir"
                 @close="handleCerrar"
                 @asign="handleAsign"
@@ -845,7 +850,8 @@ const getEstadoLabelClass = (estado) => {
                         <tr
                             v-for="ticket in filtrarTickets"
                             :key="ticket.id"
-                            class="transition-colors duration-200 border-b hover:bg-gray-100"
+                            @click="handleVerComentarios(ticket)"
+                            class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
                         >
                             <td
                                 class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
@@ -889,7 +895,7 @@ const getEstadoLabelClass = (estado) => {
                             >
                                 <button
                                     v-if="ticket.tic_estado === 'Cerrado'"
-                                    @click="handleAbrir(ticket)"
+                                    @click.stop="handleAbrir(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-green-300 to-green-500 hover:from-green-400 hover:to-green-600 flex items-center space-x-2"
                                     title="Reabrir Ticket"
                                 >
@@ -901,7 +907,7 @@ const getEstadoLabelClass = (estado) => {
                                         ticket.tic_estado === 'Asignado' ||
                                         ticket.tic_estado === 'Reabierto'
                                     "
-                                    @click="handleCerrar(ticket)"
+                                    @click.stop="handleCerrar(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 flex items-center space-x-2"
                                     title="Cerrar Ticket"
                                 >
@@ -913,28 +919,28 @@ const getEstadoLabelClass = (estado) => {
                                         ticket.tic_estado === 'Asignado' ||
                                         ticket.tic_estado === 'Reabierto'
                                     "
-                                    @click="handleAsign(ticket)"
+                                    @click.stop="handleAsign(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-blue-300 to-blue-500 hover:from-blue-400 hover:to-blue-600"
                                     title="Asignar Soporte"
                                 >
                                     <i class="fas fa-user-plus"></i>
                                 </button>
                                 <button
-                                    @click="handleView(ticket)"
+                                    @click.stop="handleView(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
                                     title="Ver detalles"
                                 >
                                     <i class="fas fa-eye"></i>
                                 </button>
                                 <button
-                                    @click="handleEdit(ticket)"
+                                    @click.stop="handleEdit(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-teal-300 to-teal-500 hover:from-teal-400 hover:to-green-600"
                                     title="Editar"
                                 >
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button
-                                    @click="handleEliminar(ticket)"
+                                    @click.stop="handleEliminar(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-red-300 to-red-500 hover:from-red-400 hover:to-red-600"
                                     title="Eliminar"
                                 >

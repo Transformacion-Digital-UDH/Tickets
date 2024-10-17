@@ -170,6 +170,15 @@ const updateFile = async () => {
             }
         });
 
+        toast.success("Ticket actualizado correctamente", {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-green-500 p-2",
+        });
+
         emit("update", response.data);
 
         cerrarModal();
