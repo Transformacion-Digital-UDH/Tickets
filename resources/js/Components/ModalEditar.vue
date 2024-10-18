@@ -480,6 +480,19 @@ const cerrarModal = () => emit("cerrar");
                                     Seleccionar {{ field.label }}
                                 </label>
 
+                                <!-- Botón adicional para tomar foto con cámara -->
+                                <label
+                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                                >
+                                    <input
+                                        type="file"
+                                        capture="environment"
+                                        class="hidden"
+                                        @change="handleFileChange($event, field.name)"
+                                    />
+                                    Tomar Foto
+                                </label>
+
                                 <div class="mt-2">
                                     <div
                                         v-if="

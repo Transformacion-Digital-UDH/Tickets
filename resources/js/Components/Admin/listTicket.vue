@@ -435,7 +435,7 @@ formFields.value = [
     },
     {
         name: "tic_archivo",
-        label: "Imágenes",
+        label: "Imagen",
         type: "file",
         required: false,
     },
