@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Sede;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -133,5 +134,29 @@ class SedeController extends Controller
     {
         $sede->update(['sed_activo' => 1]);
         return response()->json(['message' => 'Sede activada correctamente'], 200);
+    }
+
+    public function actualizarSede(Request $request)
+    {
+        $request->validate([
+            'sed_id' => 'required|exists:sedes,id',
+        ]);
+
+        $user = Auth::user();
+        $user->sed_id = $request->input('sed_id');
+        $user->save();
+
+        return Redirect::back()->with('success', 'Sede actualizada correctamente.');
+    }
+
+    public function showSedeForm()
+    {
+        $sedes = Sede::all();
+        $userSedeId = Auth::user()->sed_id;
+
+        return response()->json([
+            'data' => $sedes,
+            'user_sede_id' => $userSedeId,
+        ], 200);
     }
 }
