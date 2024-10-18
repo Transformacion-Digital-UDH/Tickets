@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PasswordGeneratedMail;
 use App\Models\Rol;
 use App\Models\User;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -133,7 +135,6 @@ class UsuarioController extends Controller
 
     public function storeSoporte(Request $request)
     {
-        // Validar los datos del request
         $validarDatos = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|max:255|email|unique:users,email',
@@ -143,24 +144,23 @@ class UsuarioController extends Controller
             'activo' => 'boolean',
         ]);
 
-        // Buscar el rol de 'Soporte'
         $soporte_rol = Rol::where('rol_nombre', 'Soporte')->first();
 
-        // Verificar si el rol fue encontrado
         if (!$soporte_rol) {
             return response()->json(['message' => 'Rol Soporte no encontrado'], 404);
         }
 
-        // Encriptar la contraseña
-        $validarDatos['password'] = bcrypt($validarDatos['password']);
-        $validarDatos['rol_id'] = $soporte_rol->id; // Asignar el rol_id
+        $plainPassword = $validarDatos['password'];
+
+        $validarDatos['password'] = bcrypt($plainPassword);
+        $validarDatos['rol_id'] = $soporte_rol->id;
 
         try {
-            // Crear el nuevo usuario
             $soporte = User::create($validarDatos);
 
-            // Asignar el rol de 'Soporte' al nuevo usuario
             $soporte->assignRole('Soporte');
+
+            Mail::to($soporte->email)->send(new PasswordGeneratedMail($soporte, $plainPassword));
 
             return response()->json([
                 'message' => 'Soporte técnico creado exitosamente',
@@ -190,15 +190,27 @@ class UsuarioController extends Controller
             return response()->json(['message' => 'Rol Usuario no encontrado'], 404);
         }
 
-        $validarDatos['password'] = bcrypt($validarDatos['password']);
+        $plainPassword = $validarDatos['password'];
+
+        $validarDatos['password'] = bcrypt($plainPassword);
         $validarDatos['rol_id'] = $usuario_rol->id;
 
-        $usuario = User::create($validarDatos);
+        try {
+            $usuario = User::create($validarDatos);
 
-        return response()->json([
-            'message' => 'Usuario creado exitosamente',
-            'usuario' => $usuario,
-        ], 201);
+            $usuario->assignRole('Usuario');
+
+            Mail::to($usuario->email)->send(new PasswordGeneratedMail($usuario, $plainPassword));
+
+            return response()->json([
+                'message' => 'Usuario técnico creado exitosamente',
+                'usuario' => $usuario,
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear soporte técnico: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function updateSoporte(Request $request, $id)
