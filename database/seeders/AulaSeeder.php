@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Aula;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AulaSeeder extends Seeder
@@ -13,40 +12,19 @@ class AulaSeeder extends Seeder
      */
     public function run(): void
     {
-        Aula::create([
-            'pab_id' => 1,
-            'aul_numero' => 'Aula 1',
-            'aul_activo' => true,
-        ]);
+        $totalAulasPorPiso = 7; // Ahora hay 7 aulas por piso
+        $pabellon = 6; // Solo queremos generar para el pabellón 6
+        $pisos = 6; // Pabellón 6 tiene 6 pisos
 
-        Aula::create([
-            'pab_id' => 2,
-            'aul_numero' => 'Aula 2',
-            'aul_activo' => true,
-        ]);
-
-        Aula::create([
-            'pab_id' => 3,
-            'aul_numero' => 'Aula 3',
-            'aul_activo' => true,
-        ]);
-
-        Aula::create([
-            'pab_id' => 4,
-            'aul_numero' => 'Aula 4',
-            'aul_activo' => true,
-        ]);
-
-        Aula::create([
-            'pab_id' => 5,
-            'aul_numero' => 'Aula 5',
-            'aul_activo' => true,
-        ]);
-
-        Aula::create([
-            'pab_id' => 6,
-            'aul_numero' => 'Aula 6',
-            'aul_activo' => true,
-        ]);
+        for ($piso = 1; $piso <= $pisos; $piso++) {
+            for ($aula = 1; $aula <= $totalAulasPorPiso; $aula++) {
+                $numeroAula = sprintf("%d%02d", $piso, $aula); // Formato de 3 dígitos: Piso + Aula (ej: 101, 102...)
+                Aula::create([
+                    'pab_id' => $pabellon,
+                    'aul_numero' => $numeroAula,
+                    'aul_activo' => true,
+                ]);
+            }
+        }
     }
 }

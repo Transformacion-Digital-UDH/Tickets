@@ -178,6 +178,7 @@ watch(
     { immediate: true }
 );
 
+// Método para manejar la selección de archivo o captura de imagen
 const handleFileChange = (event, fieldName) => {
     const file = event.target.files[0];
     if (file) {
@@ -193,6 +194,7 @@ const handleFileChange = (event, fieldName) => {
     }
 };
 
+// Método para subir el archivo
 const uploadFile = async (id) => {
     const formDatas = new FormData();
     Object.keys(formData.value).forEach((key) => {
@@ -398,7 +400,93 @@ const cerrarModal = () => emit("cerrar");
                             <p class="text-red-600">*</p>
                         </h3>
 
-                        <template v-if="field.type === 'select'">
+                        <template v-if="field.type === 'file'">
+                            <div class="file-upload-wrapper">
+                                <!-- Input para seleccionar un archivo -->
+                                <input
+                                    :id="field.name"
+                                    :name="field.name"
+                                    type="file"
+                                    accept="image/*"
+                                    class="hidden"
+                                    @change="handleFileChange($event, field.name)"
+                                />
+                                <label
+                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                                    :for="field.name"
+                                >
+                                    Seleccionar Imagen
+                                </label>
+
+                                <!-- Botón para abrir la cámara -->
+                                <label
+                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                                >
+                                    <input
+                                        :id="field.name + '_camera'"
+                                        :name="field.name"
+                                        type="file"
+                                        accept="image/*"
+                                        capture="environment"
+                                        class="hidden"
+                                        @change="handleFileChange($event, field.name)"
+                                    />
+                                    Tomar Foto
+                                </label>
+
+                                <!-- Previsualización de archivos seleccionados -->
+                                <div class="mt-2">
+                                    <div
+                                        v-if="
+                                            selectedFileName[field.name] &&
+                                            !isMobile
+                                        "
+                                        class="text-sm text-gray-500"
+                                    >
+                                        Archivo seleccionado:
+                                        <ul>
+                                            <li
+                                                v-for="file in selectedFileName[
+                                                    field.name
+                                                ]"
+                                                :key="file"
+                                            >
+                                                {{ file }}
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div
+                                        v-if="selectedFilePreviews[field.name]"
+                                        class="mt-4"
+                                    >
+                                        <div
+                                            v-for="(
+                                                file, index
+                                            ) in selectedFilePreviews[
+                                                field.name
+                                            ]"
+                                            :key="index"
+                                            class="overflow-hidden border border-gray-300 rounded-lg"
+                                        >
+                                            <img
+                                                :src="file.url"
+                                                :alt="file.name"
+                                                class="object-cover w-full h-50"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <span
+                                    v-if="errores[field.name]"
+                                    class="text-red-500 text-sm"
+                                    >{{ errores[field.name][0] }}</span
+                                >
+                            </div>
+                        </template>
+
+                        <template v-else-if="field.type === 'select'">
                             <select
                                 :id="field.name"
                                 :name="field.name"
@@ -478,75 +566,6 @@ const cerrarModal = () => emit("cerrar");
                                 class="text-red-500 text-sm"
                                 >{{ errores[field.name][0] }}</span
                             >
-                        </template>
-
-                        <template v-else-if="field.type === 'file'">
-                            <div class="file-upload-wrapper">
-                                <input
-                                    :id="field.name"
-                                    :name="field.name"
-                                    type="file"
-                                    class="hidden"
-                                    @change="
-                                        handleFileChange($event, field.name)
-                                    "
-                                />
-                                <label
-                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
-                                    :for="field.name"
-                                >
-                                    Seleccionar {{ field.label }}
-                                </label>
-
-                                <div class="mt-2">
-                                    <div
-                                        v-if="
-                                            selectedFileName[field.name] &&
-                                            !isMobile
-                                        "
-                                        class="text-sm text-gray-500"
-                                    >
-                                        Archivo seleccionado:
-                                        <ul>
-                                            <li
-                                                v-for="file in selectedFileName[
-                                                    field.name
-                                                ]"
-                                                :key="file"
-                                            >
-                                                {{ file }}
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                    <div
-                                        v-if="selectedFilePreviews[field.name]"
-                                        class="mt-4"
-                                    >
-                                        <div
-                                            v-for="(
-                                                file, index
-                                            ) in selectedFilePreviews[
-                                                field.name
-                                            ]"
-                                            :key="index"
-                                            class="overflow-hidden border border-gray-300 rounded-lg"
-                                        >
-                                            <img
-                                                :src="file.url"
-                                                :alt="file.name"
-                                                class="object-cover w-full h-50"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <span
-                                    v-if="errores[field.name]"
-                                    class="text-red-500 text-sm"
-                                    >{{ errores[field.name][0] }}</span
-                                >
-                            </div>
                         </template>
 
                         <template v-else>
