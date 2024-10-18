@@ -115,6 +115,13 @@ Route::middleware(['auth', 'role:Admin|Usuario|Soporte'])->group(function () {
     });
 });
 
+Route::middleware(['auth', 'role:Soporte'])->group(function () {
+    Route::controller(SedeController::class)->group(function () {
+        Route::put('/sedes/{sede}', 'actualizarSede')->name('actualizar-sede');
+        Route::get('/profile-sedes', 'showSedeForm');
+    });
+});
+
 Route::middleware(['auth', 'check.sede'])->group(function () {
     Route::middleware(['auth', 'role:Admin'])->group(function () {
         Route::controller(DashboardController::class)->group(function () {
