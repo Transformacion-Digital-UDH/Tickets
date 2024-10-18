@@ -436,6 +436,18 @@ onMounted(() => {
                         class="hidden"
                     />
                 </label>
+                <!-- Botón para tomar foto -->
+                <label
+                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                >
+                    <input
+                        type="file"
+                        capture="environment"
+                        class="hidden"
+                        @change="handleFileChange"
+                    />
+                    Tomar Foto
+                </label>
                 <div class="mt-2">
                     <div v-if="selectedFileName" class="text-sm text-gray-500">
                         Archivo seleccionado: {{ selectedFileName }}
