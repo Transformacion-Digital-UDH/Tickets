@@ -32,6 +32,11 @@ class SoporteTicketController extends Controller
                 $admin->notify(new TicketStatusChanged($ticket, 'En progreso', $personName));
             }
 
+            $usuario = $ticket->user;
+            if ($usuario) {
+                $usuario->notify(new TicketStatusChanged($ticket, 'En progreso', $personName));
+            }
+
             return response()->json([
                 'status' => true,
                 'msg' => 'Ticket aceptado y cambiado a En progreso.',
@@ -47,20 +52,17 @@ class SoporteTicketController extends Controller
 
     public function obtenerTickets()
     {
-        $userId = auth()->id(); // Obtener el ID del usuario autenticado (soporte)
+        $userId = auth()->id();
 
-        // Obtener los tickets asignados al soporte
         $tickets = Ticket::whereHas('asignados', function ($query) use ($userId) {
             $query->where('sop_id', $userId);
-        })->with(['prioridad', 'categoria', 'user']) // Asegurarse de cargar relaciones
+        })->with(['prioridad', 'categoria', 'user'])
             ->distinct()
             ->get();
 
-        // Retornar los tickets en formato JSON
         return response()->json($tickets);
     }
 
-    // Método para finalizar un ticket
     public function finalizarTicket(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
@@ -72,6 +74,11 @@ class SoporteTicketController extends Controller
         $administradores = User::role('Admin')->get();
         foreach ($administradores as $admin) {
             $admin->notify(new TicketStatusChanged($ticket, 'Resuelto', $personName));
+        }
+
+        $usuario = $ticket->user;
+        if ($usuario) {
+            $usuario->notify(new TicketStatusChanged($ticket, 'Resuelto', $personName));
         }
 
         return response()->json([

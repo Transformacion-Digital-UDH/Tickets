@@ -81,11 +81,6 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
         Route::post('/tickets/{id}/upload', 'upload');
         Route::delete('/tickets/{id}/eliminar', 'eliminar');
     });
-
-    Route::controller(ComentarioController::class)->group(function () {
-        Route::get('/comentario/{ticket}', 'verComentarios')->name('comentario.ver');
-        Route::post('/tickets/{ticket}/comentarios', 'guardarComentario')->name('comentarios.guardar');
-    });
 });
 
 Route::middleware(['auth', 'role:Admin|Usuario'])->group(function () {
@@ -110,6 +105,11 @@ Route::middleware(['auth', 'role:Admin|Usuario|Soporte'])->group(function () {
     Route::controller(NotificationController::class)->group(function () {
         Route::get('/notificaciones', 'index');
         Route::post('/notificaciones/marcar-leidas', 'marcarNotificacionesComoLeidas');
+    });
+
+    Route::controller(ComentarioController::class)->group(function () {
+        Route::get('/comentario/{ticket}', 'verComentarios')->name('comentario.ver');
+        Route::post('/tickets/{ticket}/comentarios', 'guardarComentario')->name('comentarios.guardar');
     });
 
     Route::controller(SedeController::class)->group(function () {
