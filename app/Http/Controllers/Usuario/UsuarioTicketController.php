@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Usuario;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\User;
+use App\Notifications\TicketStatusChanged;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -111,6 +113,13 @@ class UsuarioTicketController extends Controller
             'tic_estado' => 'Abierto',
             'tic_activo' => true,
         ]);
+
+        $personName = auth()->user()->name;
+
+        $administradores = User::role('Admin')->get();
+        foreach ($administradores as $admin) {
+            $admin->notify(new TicketStatusChanged($ticket, 'Abierto', $personName));
+        }
 
         return response()->json($ticket, 201);
     }

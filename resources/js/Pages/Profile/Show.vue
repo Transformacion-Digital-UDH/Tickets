@@ -32,10 +32,13 @@ defineProps({
                     <SectionBorder />
                 </div>
 
-                <div v-if="$page.props.jetstream.canUpdateProfileInformation">
-                    <ChangeSede
-                        :user="$page.props.auth.user"
-                    />
+                <div
+                    v-if="
+                        $page.props.jetstream.canUpdateProfileInformation &&
+                        $page.props.auth.user.rol.name === 'Soporte'
+                    "
+                >
+                    <ChangeSede :user="$page.props.auth.user" />
 
                     <SectionBorder />
                 </div>

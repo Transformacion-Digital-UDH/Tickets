@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Soporte;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\User;
+use App\Notifications\TicketStatusChanged;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SoporteTicketController extends Controller
 {
-    // Método para mostrar la vista de soporte
     public function index()
     {
         return Inertia::render('Soporte/Ticket', [
@@ -17,15 +18,19 @@ class SoporteTicketController extends Controller
         ]);
     }
 
-    // Método para aceptar un ticket y cambiar su estado a "En progreso"
     public function aceptarTicket(Request $request, $id)
     {
-        $ticket = Ticket::findOrFail($id); // Buscar el ticket por ID
+        $ticket = Ticket::findOrFail($id);
 
-        // Verificar si el ticket está en estado Asignado o Reabierto
         if ($ticket->tic_estado === 'Asignado' || $ticket->tic_estado === 'Reabierto') {
-            // Cambiar el estado del ticket a "En progreso"
             $ticket->update(['tic_estado' => 'En progreso']);
+
+            $personName = auth()->user()->name;
+
+            $administradores = User::role('Admin')->get();
+            foreach ($administradores as $admin) {
+                $admin->notify(new TicketStatusChanged($ticket, 'En progreso', $personName));
+            }
 
             return response()->json([
                 'status' => true,
@@ -40,8 +45,6 @@ class SoporteTicketController extends Controller
         }
     }
 
-
-    // Método para obtener tickets asignados al soporte
     public function obtenerTickets()
     {
         $userId = auth()->id(); // Obtener el ID del usuario autenticado (soporte)
@@ -60,10 +63,16 @@ class SoporteTicketController extends Controller
     // Método para finalizar un ticket
     public function finalizarTicket(Request $request, $id)
     {
-        $ticket = Ticket::findOrFail($id); // Buscar el ticket por ID
+        $ticket = Ticket::findOrFail($id);
 
-        // Cambiar el estado del ticket a "Finalizado"
         $ticket->update(['tic_estado' => 'Resuelto']);
+
+        $personName = auth()->user()->name;
+
+        $administradores = User::role('Admin')->get();
+        foreach ($administradores as $admin) {
+            $admin->notify(new TicketStatusChanged($ticket, 'Resuelto', $personName));
+        }
 
         return response()->json([
             'status' => true,
