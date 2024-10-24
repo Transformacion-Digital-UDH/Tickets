@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Asignado;
 use App\Models\Ticket;
+use App\Models\User;
+use App\Notifications\TicketStatusChanged;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -105,7 +107,7 @@ class TicketController extends Controller
         ]);
 
         $ticket = Ticket::findOrFail($id);
-
+        $personName = auth()->user()->name;
         $asignado = Asignado::where('tic_id', $ticket->id)->first();
 
         if ($asignado) {
@@ -117,6 +119,11 @@ class TicketController extends Controller
                 'tic_estado' => 'Asignado',
                 'sop_id' => $validatedData['sop_id'],
             ]);
+
+            $soportes = User::role('Soporte')->get();
+            foreach ($soportes as $soporte) {
+                $soporte->notify(new TicketStatusChanged($ticket, 'Asignado', $personName));
+            }
 
             return response()->json([
                 'status' => true,
@@ -134,6 +141,11 @@ class TicketController extends Controller
                 'tic_estado' => 'Asignado',
                 'sop_id' => $validatedData['sop_id'],
             ]);
+
+            $soportes = User::role('Soporte')->get();
+            foreach ($soportes as $soporte) {
+                $soporte->notify(new TicketStatusChanged($ticket, 'Asignado', $personName));
+            }
 
             return response()->json([
                 'status' => true,
@@ -213,9 +225,35 @@ class TicketController extends Controller
                 ], 422);
             }
 
+            $personName = auth()->user()->name;
+
             $ticket->update([
                 'tic_estado' => $request->input('tic_estado'),
             ]);
+
+            if ($request->input('tic_estado') === 'Cerrado') {
+                $user = $ticket->user;
+                if ($user) {
+                    $user->notify(new TicketStatusChanged($ticket, 'Cerrado', $personName));
+                }
+    
+                if ($ticket->soporteActual && $ticket->soporteActual->soporte) {
+                    $soporteAsignado = $ticket->soporteActual->soporte;
+                    $soporteAsignado->notify(new TicketStatusChanged($ticket, 'Cerrado', $personName));
+                }
+            }
+
+            elseif ($request->input('tic_estado') === 'Reabierto') {
+                $user = $ticket->user;
+                if ($user) {
+                    $user->notify(new TicketStatusChanged($ticket, 'Reabierto', $personName));
+                }
+    
+                if ($ticket->soporteActual && $ticket->soporteActual->soporte) {
+                    $soporteAsignado = $ticket->soporteActual->soporte;
+                    $soporteAsignado->notify(new TicketStatusChanged($ticket, 'Reabierto', $personName));
+                }
+            }
 
             return response()->json([
                 'status' => true,

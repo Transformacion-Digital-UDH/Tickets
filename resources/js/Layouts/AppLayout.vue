@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import ApplicationMark from "@/Components/ApplicationMark.vue";
 import Banner from "@/Components/Banner.vue";
@@ -22,6 +22,7 @@ import {
     faBell,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import axios from "axios";
 
 library.add(
     faTachometerAlt,
@@ -45,6 +46,7 @@ const hayNotificaciones = ref(false);
 const verificarNotificaciones = async () => {
     try {
         const response = await axios.get("/notificaciones");
+        console.log(response.data?.notificaciones);
         notificaciones.value = response.data?.notificaciones || [];
         hayNotificaciones.value = notificaciones.value.some((n) => !n.read_at);
     } catch (error) {
@@ -61,7 +63,9 @@ const verNotificaciones = async () => {
         try {
             await axios.post("/notificaciones/marcar-leidas");
             notificaciones.value.forEach((n) => (n.read_at = new Date()));
-            hayNotificaciones.value = false;
+            hayNotificaciones.value = notificaciones.value.some(
+                (n) => !n.read_at
+            );
         } catch (error) {
             console.error(
                 "Error al marcar las notificaciones como leídas",
@@ -71,6 +75,10 @@ const verNotificaciones = async () => {
     }
     mostrarNotificaciones.value = !mostrarNotificaciones.value;
 };
+
+watch(notificaciones, () => {
+    hayNotificaciones.value = notificaciones.value.some((n) => !n.read_at);
+});
 
 const abrirSidebar = ref(true);
 const mostrarTextoSidebar = ref(true);
@@ -371,7 +379,8 @@ defineProps({ title: String });
                                                         'Abierto'
                                                     "
                                                 >
-                                                    El usuario {{
+                                                    El usuario
+                                                    {{
                                                         notification.data
                                                             .person_name
                                                     }}
@@ -381,6 +390,33 @@ defineProps({ title: String });
                                                             .tic_title
                                                     }}</strong
                                                     >.
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        notification.data
+                                                            .comment
+                                                    "
+                                                >
+                                                    {{
+                                                        notification.data
+                                                            .person_name
+                                                    }}
+                                                    ha hecho un comentario en el
+                                                    ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >.
+                                                    <br />
+                                                    <span
+                                                        class="text-gray-500 text-sm"
+                                                    >
+                                                        Comentario: "{{
+                                                            notification.data
+                                                                .comment
+                                                        }}"
+                                                    </span>
                                                 </template>
                                                 <div
                                                     class="text-gray-500 text-sm"
@@ -612,7 +648,11 @@ defineProps({ title: String });
                         </button>
 
                         <div class="flex items-center space-x-1">
-                            <Dropdown align="right" width="48">
+                            <Dropdown
+                                align="right"
+                                width="78"
+                                v-model="mostrarNotificaciones"
+                            >
                                 <template #trigger>
                                     <button
                                         @click="verNotificaciones"
@@ -622,21 +662,25 @@ defineProps({ title: String });
                                         <font-awesome-icon
                                             icon="bell"
                                             class="text-white"
-                                            style="font-size: 1.2rem"
+                                            style="font-size: 1.5rem"
                                         />
                                         <span
-                                            v-if="hayNotificaciones"
-                                            class="absolute top-0 right-0 w-3 h-3 bg-red-600 rounded-full text-xs flex items-center justify-center text-white"
+                                            class="absolute top-0 right-0 min-w-[1rem] h-4 bg-red-600 rounded-full text-xs flex items-center justify-center text-white"
+                                            v-if="
+                                                notificaciones.length > 0 ||
+                                                !hayNotificaciones
+                                            "
                                         >
-                                            {{ notificaciones.length }}
+                                            {{
+                                                notificaciones.length > 0
+                                                    ? notificaciones.length
+                                                    : 0
+                                            }}
                                         </span>
                                     </button>
                                 </template>
                                 <template #content>
-                                    <div
-                                        v-if="mostrarNotificaciones"
-                                        class="p-2 w-64"
-                                    >
+                                    <div class="p-2 w-72">
                                         <h4 class="font-semibold">
                                             Notificaciones
                                         </h4>
@@ -645,13 +689,89 @@ defineProps({ title: String });
                                                 v-for="notification in notificaciones"
                                                 :key="notification.id"
                                                 class="border-b border-gray-200 py-2"
+                                                :class="{
+                                                    'bg-gray-100':
+                                                        !notification.read_at,
+                                                }"
                                             >
-                                                Ticket "{{
-                                                    notification.data.tic_title
-                                                }}" ha sido actualizado a "{{
-                                                    notification.data
-                                                        .new_status
-                                                }}"
+                                                <template
+                                                    v-if="
+                                                        notification.data
+                                                            .new_status ===
+                                                        'Asignado'
+                                                    "
+                                                >
+                                                    <strong>
+                                                        {{
+                                                            notification.data
+                                                                .person_name
+                                                        }}
+                                                        | Admin
+                                                    </strong>
+                                                    te ha asignado el ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >.
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        notification.data
+                                                            .new_status ===
+                                                        'Cerrado'
+                                                    "
+                                                >
+                                                    <strong>
+                                                        {{
+                                                            notification.data
+                                                                .person_name
+                                                        }}
+                                                        | Admin
+                                                    </strong>
+                                                    ha cerrado el ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >.
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        notification.data
+                                                            .comment
+                                                    "
+                                                >
+                                                    {{
+                                                        notification.data
+                                                            .person_name
+                                                    }}
+                                                    ha hecho un comentario en el
+                                                    ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >.
+                                                    <br />
+                                                    <span
+                                                        class="text-gray-500 text-sm"
+                                                    >
+                                                        Comentario: "{{
+                                                            notification.data
+                                                                .comment
+                                                        }}"
+                                                    </span>
+                                                </template>
+                                                <div
+                                                    class="text-gray-500 text-sm"
+                                                >
+                                                    {{
+                                                        new Date(
+                                                            notification.created_at
+                                                        ).toLocaleString()
+                                                    }}
+                                                </div>
                                             </li>
                                         </ul>
                                         <div v-if="!notificaciones.length">
@@ -866,66 +986,244 @@ defineProps({ title: String });
                             </svg>
                         </button>
 
-                        <Dropdown align="right" width="48">
-                            <template #trigger>
-                                <button
-                                    @click="interactuarDropdown"
-                                    class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
-                                >
-                                    <template
-                                        v-if="
-                                            $page.props.auth.user
-                                                .profile_photo_url
-                                        "
+                        <div class="flex items-center space-x-1">
+                            <Dropdown
+                                align="right"
+                                width="78"
+                                v-model="mostrarNotificaciones"
+                            >
+                                <template #trigger>
+                                    <button
+                                        @click="verNotificaciones"
+                                        class="relative focus:outline-none mr-4"
+                                        title="Notificaciones"
                                     >
-                                        <img
-                                            class="w-8 h-8 rounded-full"
-                                            :src="
+                                        <font-awesome-icon
+                                            icon="bell"
+                                            class="text-white"
+                                            style="font-size: 1.5rem"
+                                        />
+                                        <span
+                                            class="absolute top-0 right-0 min-w-[1rem] h-4 bg-red-600 rounded-full text-xs flex items-center justify-center text-white"
+                                            v-if="
+                                                notificaciones.length > 0 ||
+                                                !hayNotificaciones
+                                            "
+                                        >
+                                            {{
+                                                notificaciones.length > 0
+                                                    ? notificaciones.length
+                                                    : 0
+                                            }}
+                                        </span>
+                                    </button>
+                                </template>
+                                <template #content>
+                                    <div class="p-2 w-72">
+                                        <h4 class="font-semibold">
+                                            Notificaciones
+                                        </h4>
+                                        <ul>
+                                            <li
+                                                v-for="notification in notificaciones"
+                                                :key="notification.id"
+                                                class="border-b border-gray-200 py-2"
+                                                :class="{
+                                                    'bg-gray-100':
+                                                        !notification.read_at,
+                                                }"
+                                            >
+                                                <template
+                                                    v-if="
+                                                        notification.data
+                                                            .new_status ===
+                                                        'Cerrado'
+                                                    "
+                                                >
+                                                    <strong>
+                                                        {{
+                                                            notification.data
+                                                                .person_name
+                                                        }}
+                                                        | Admin
+                                                    </strong>
+                                                    ha cerrado su ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >.
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        notification.data
+                                                            .new_status ===
+                                                        'Reabierto'
+                                                    "
+                                                >
+                                                    <strong>
+                                                        {{
+                                                            notification.data
+                                                                .person_name
+                                                        }}
+                                                        | Admin
+                                                    </strong>
+                                                    ha reabierto su ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >.
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        notification.data
+                                                            .new_status ===
+                                                        'En progreso'
+                                                    "
+                                                >
+                                                    {{
+                                                        notification.data
+                                                            .person_name
+                                                    }}
+                                                    ha aceptado su ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >, ahora está en progreso.
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        notification.data
+                                                            .new_status ===
+                                                        'Resuelto'
+                                                    "
+                                                >
+                                                    {{
+                                                        notification.data
+                                                            .person_name
+                                                    }}
+                                                    ha resuelto su ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >, trabajo concluido.
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        notification.data
+                                                            .comment
+                                                    "
+                                                >
+                                                    {{
+                                                        notification.data
+                                                            .person_name
+                                                    }}
+                                                    ha hecho un comentario en el
+                                                    ticket
+                                                    <strong>{{
+                                                        notification.data
+                                                            .tic_title
+                                                    }}</strong
+                                                    >.
+                                                    <br />
+                                                    <span
+                                                        class="text-gray-500 text-sm"
+                                                    >
+                                                        Comentario: "{{
+                                                            notification.data
+                                                                .comment
+                                                        }}"
+                                                    </span>
+                                                </template>
+                                                <div
+                                                    class="text-gray-500 text-sm"
+                                                >
+                                                    {{
+                                                        new Date(
+                                                            notification.created_at
+                                                        ).toLocaleString()
+                                                    }}
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <div v-if="!notificaciones.length">
+                                            No hay notificaciones.
+                                        </div>
+                                    </div>
+                                </template>
+                            </Dropdown>
+
+                            <Dropdown align="right" width="48">
+                                <template #trigger>
+                                    <button
+                                        @click="interactuarDropdown"
+                                        class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
+                                    >
+                                        <template
+                                            v-if="
                                                 $page.props.auth.user
                                                     .profile_photo_url
                                             "
-                                            :alt="$page.props.auth.user.name"
-                                        />
-                                    </template>
-                                    <template v-else>
-                                        <div
-                                            class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full"
                                         >
-                                            {{
-                                                getInitials(
+                                            <img
+                                                class="w-8 h-8 rounded-full"
+                                                :src="
+                                                    $page.props.auth.user
+                                                        .profile_photo_url
+                                                "
+                                                :alt="
                                                     $page.props.auth.user.name
-                                                )
-                                            }}
-                                        </div>
-                                    </template>
+                                                "
+                                            />
+                                        </template>
+                                        <template v-else>
+                                            <div
+                                                class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full"
+                                            >
+                                                {{
+                                                    getInitials(
+                                                        $page.props.auth.user
+                                                            .name
+                                                    )
+                                                }}
+                                            </div>
+                                        </template>
 
-                                    <span
-                                        class="hidden ml-2 font-semibold text-white lg:block"
-                                        >{{ $page.props.auth.user.name }}</span
+                                        <span
+                                            class="hidden ml-2 font-semibold text-white lg:block"
+                                            >{{
+                                                $page.props.auth.user.name
+                                            }}</span
+                                        >
+                                        <font-awesome-icon
+                                            icon="chevron-down"
+                                            class="ml-2 text-white"
+                                        />
+                                    </button>
+                                </template>
+                                <template #content>
+                                    <DropdownLink :href="route('profile.show')"
+                                        >Perfil</DropdownLink
                                     >
-                                    <font-awesome-icon
-                                        icon="chevron-down"
-                                        class="ml-2 text-white"
-                                    />
-                                </button>
-                            </template>
-                            <template #content>
-                                <DropdownLink :href="route('profile.show')"
-                                    >Perfil</DropdownLink
-                                >
-                                <DropdownLink
-                                    v-if="$page.props.jetstream.hasApiFeatures"
-                                    :href="route('api-tokens.index')"
-                                    >API Tokens</DropdownLink
-                                >
-                                <div class="border-t border-gray-200"></div>
-                                <form @submit.prevent="logout">
-                                    <DropdownLink as="button"
-                                        >Cerrar sesión</DropdownLink
+                                    <DropdownLink
+                                        v-if="
+                                            $page.props.jetstream.hasApiFeatures
+                                        "
+                                        :href="route('api-tokens.index')"
+                                        >API Tokens</DropdownLink
                                     >
-                                </form>
-                            </template>
-                        </Dropdown>
+                                    <div class="border-t border-gray-200"></div>
+                                    <form @submit.prevent="logout">
+                                        <DropdownLink as="button"
+                                            >Cerrar sesión</DropdownLink
+                                        >
+                                    </form>
+                                </template>
+                            </Dropdown>
+                        </div>
                     </div>
                 </nav>
 
