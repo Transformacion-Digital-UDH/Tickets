@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AulaController;
 use App\Http\Controllers\Admin\CategoriaController;
 use App\Http\Controllers\Admin\ComentarioController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PabellonController;
 use App\Http\Controllers\Admin\PrioridadController;
 use App\Http\Controllers\Admin\SedeController;
@@ -106,6 +107,11 @@ Route::middleware(['auth', 'role:Admin|Usuario'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:Admin|Usuario|Soporte'])->group(function () {
+    Route::controller(NotificationController::class)->group(function () {
+        Route::get('/notificaciones', 'index');
+        Route::post('/notificaciones/marcar-leidas', 'marcarNotificacionesComoLeidas');
+    });
+
     Route::controller(SedeController::class)->group(function () {
         Route::get('/elegirsede', 'elegirsede')->name('elegirsede');
         Route::get('/sedes', 'traer');
