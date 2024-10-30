@@ -46,7 +46,7 @@ const hayNotificaciones = ref(false);
 const verificarNotificaciones = async () => {
     try {
         const response = await axios.get("/notificaciones");
-        console.log(response.data?.notificaciones);
+        // console.log(response.data?.notificaciones);
         notificaciones.value = response.data?.notificaciones || [];
         hayNotificaciones.value = notificaciones.value.some((n) => !n.read_at);
     } catch (error) {
@@ -391,33 +391,6 @@ defineProps({ title: String });
                                                     }}</strong
                                                     >.
                                                 </template>
-                                                <template
-                                                    v-else-if="
-                                                        notification.data
-                                                            .comment
-                                                    "
-                                                >
-                                                    {{
-                                                        notification.data
-                                                            .person_name
-                                                    }}
-                                                    ha hecho un comentario en el
-                                                    ticket
-                                                    <strong>{{
-                                                        notification.data
-                                                            .tic_title
-                                                    }}</strong
-                                                    >.
-                                                    <br />
-                                                    <span
-                                                        class="text-gray-500 text-sm"
-                                                    >
-                                                        Comentario: "{{
-                                                            notification.data
-                                                                .comment
-                                                        }}"
-                                                    </span>
-                                                </template>
                                                 <div
                                                     class="text-gray-500 text-sm"
                                                 >
@@ -735,33 +708,6 @@ defineProps({ title: String });
                                                             .tic_title
                                                     }}</strong
                                                     >.
-                                                </template>
-                                                <template
-                                                    v-else-if="
-                                                        notification.data
-                                                            .comment
-                                                    "
-                                                >
-                                                    {{
-                                                        notification.data
-                                                            .person_name
-                                                    }}
-                                                    ha hecho un comentario en el
-                                                    ticket
-                                                    <strong>{{
-                                                        notification.data
-                                                            .tic_title
-                                                    }}</strong
-                                                    >.
-                                                    <br />
-                                                    <span
-                                                        class="text-gray-500 text-sm"
-                                                    >
-                                                        Comentario: "{{
-                                                            notification.data
-                                                                .comment
-                                                        }}"
-                                                    </span>
                                                 </template>
                                                 <div
                                                     class="text-gray-500 text-sm"
@@ -1110,33 +1056,6 @@ defineProps({ title: String });
                                                             .tic_title
                                                     }}</strong
                                                     >, trabajo concluido.
-                                                </template>
-                                                <template
-                                                    v-else-if="
-                                                        notification.data
-                                                            .comment
-                                                    "
-                                                >
-                                                    {{
-                                                        notification.data
-                                                            .person_name
-                                                    }}
-                                                    ha hecho un comentario en el
-                                                    ticket
-                                                    <strong>{{
-                                                        notification.data
-                                                            .tic_title
-                                                    }}</strong
-                                                    >.
-                                                    <br />
-                                                    <span
-                                                        class="text-gray-500 text-sm"
-                                                    >
-                                                        Comentario: "{{
-                                                            notification.data
-                                                                .comment
-                                                        }}"
-                                                    </span>
                                                 </template>
                                                 <div
                                                     class="text-gray-500 text-sm"
