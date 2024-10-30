@@ -1,22 +1,44 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faSave, faTimes, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import axios from "axios";
+import { ref, onMounted, watch, computed, onBeforeUnmount } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+import ButtonCrearActualizar from "@/Components/ButtonCrearActualizar.vue";
+import ButtonCerrar from "@/Components/ButtonCerrar.vue";
 
-library.add(faSave, faTimes, faSpinner);
+const selectedFileName = ref({});
+const selectedFilePreviews = ref({});
 
 const props = defineProps({
-    formFields: {
-        type: Array,
-        default: () => [],
-    },
+    formFields: Array,
     endpoint: {
         type: String,
         required: true,
     },
     itemName: String,
+    prioridads: {
+        type: Array,
+        default: () => [],
+    },
+    usuarios: {
+        type: Array,
+        default: () => [],
+    },
+    categorias: {
+        type: Array,
+        default: () => [],
+    },
+    sedes: {
+        type: Array,
+        default: () => [],
+    },
+    pabellons: {
+        type: Array,
+        default: () => [],
+    },
+    aulas: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(["cerrar", "crear"]);
@@ -24,41 +46,317 @@ const emit = defineEmits(["cerrar", "crear"]);
 const formData = ref({});
 const errores = ref([]);
 const loading = ref(false);
+const isMobile = ref(false);
 const successMessage = ref("");
+
+const handleResize = () => {
+    isMobile.value = window.innerWidth <= 768;
+};
+
+onMounted(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener("resize", handleResize);
+});
+
+const visibleFields = computed(() => {
+    return props.formFields.filter((field) => field.type !== "boolean");
+});
 
 onMounted(() => {
     props.formFields.forEach((field) => {
-        formData.value[field.name] = field.default || "";
+        if (field.type === "boolean") {
+            formData.value[field.name] = true;
+        } else {
+            formData.value[field.name] = field.default || "";
+        }
     });
 });
+
+watch(
+    () => props.prioridads,
+    (newPrioridades) => {
+        if (newPrioridades && newPrioridades.length > 0) {
+            props.formFields.forEach((field) => {
+                if (field.name === "pri_id") {
+                    field.options = newPrioridades.map((prioridad) => ({
+                        value: prioridad.value,
+                        label: prioridad.text,
+                    }));
+                }
+            });
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.usuarios,
+    (newUsuarios) => {
+        if (newUsuarios && newUsuarios.length > 0) {
+            props.formFields.forEach((field) => {
+                if (field.name === "use_id") {
+                    field.options = newUsuarios.map((usuario) => ({
+                        value: usuario.value,
+                        label: usuario.text,
+                    }));
+                }
+            });
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.categorias,
+    (newCategorias) => {
+        if (newCategorias && newCategorias.length > 0) {
+            props.formFields.forEach((field) => {
+                if (field.name === "cat_id") {
+                    field.options = newCategorias.map((categoria) => ({
+                        value: categoria.value,
+                        label: categoria.text,
+                    }));
+                }
+            });
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.sedes,
+    (newSedes) => {
+        if (newSedes && newSedes.length > 0) {
+            props.formFields.forEach((field) => {
+                if (field.name === "sed_id") {
+                    field.options = newSedes.map((sede) => ({
+                        value: sede.value,
+                        label: sede.text,
+                    }));
+                }
+            });
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.pabellons,
+    (newPabellones) => {
+        if (newPabellones && newPabellones.length > 0) {
+            props.formFields.forEach((field) => {
+                if (field.name === "pab_id") {
+                    field.options = newPabellones.map((pabellon) => ({
+                        value: pabellon.value,
+                        label: pabellon.text,
+                    }));
+                }
+            });
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.aulas,
+    (newAulas) => {
+        if (newAulas && newAulas.length > 0) {
+            props.formFields.forEach((field) => {
+                if (field.name === "aul_id") {
+                    field.options = newAulas.map((aula) => ({
+                        value: aula.value,
+                        label: aula.text,
+                    }));
+                }
+            });
+        }
+    },
+    { immediate: true }
+);
+
+// Método para manejar la selección de archivo o captura de imagen
+const handleFileChange = (event, fieldName) => {
+    const file = event.target.files[0];
+    if (file) {
+        selectedFileName.value[fieldName] = [file.name];
+        formData.value[fieldName] = file;
+
+        selectedFilePreviews.value[fieldName] = [
+            {
+                name: file.name,
+                url: URL.createObjectURL(file),
+            },
+        ];
+    }
+};
+
+// Método para subir el archivo
+const uploadFile = async (id) => {
+    const formDatas = new FormData();
+    Object.keys(formData.value).forEach((key) => {
+        if (formData.value[key] instanceof File) {
+            formDatas.append(key, formData.value[key]);
+        }
+    });
+
+    try {
+        const response = await axios.post(
+            `${props.endpoint}/${id}/upload`,
+            formDatas,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        toast.error(`Error al subir la imagen`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
+        throw error;
+    }
+};
 
 const submitForm = async () => {
     loading.value = true;
     successMessage.value = "";
-    errores.value = [];
+    errores.value = {};
+    let isValid = true;
+
+    const data = {};
+
+    props.formFields.forEach((field) => {
+        const fieldValue = formData.value[field.name];
+
+        if (field.required && !fieldValue) {
+            errores.value[field.name] = [
+                `El campo ${field.label} es requerido`,
+            ];
+            isValid = false;
+        } else {
+            data[field.name] = fieldValue;
+        }
+
+        if (field.label.toLowerCase().includes("teléfono")) {
+            if (!fieldValue) {
+                errores.value[field.name] = [
+                    `El campo ${field.label} es requerido`,
+                ];
+                isValid = false;
+            } else {
+                let phoneValue = String(fieldValue).trim();
+
+                if (phoneValue.startsWith("+51")) {
+                    formData.value[field.name] = phoneValue
+                        .replace("+51", "")
+                        .trim();
+                }
+
+                const regex = /^[0-9]+$/;
+                if (!regex.test(formData.value[field.name])) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe contener solo números.`,
+                    ];
+                    isValid = false;
+                }
+
+                if (phoneValue.length !== 9) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe tener exactamente 9 dígitos.`,
+                    ];
+                    isValid = false;
+                } else {
+                    formData.value[field.name] = phoneValue;
+                }
+            }
+        }
+
+        if (field.label.toLowerCase().includes("correo")) {
+            if (!fieldValue) {
+                errores.value[field.name] = [
+                    `El campo ${field.label} es requerido`,
+                ];
+                isValid = false;
+            } else {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(fieldValue)) {
+                    errores.value[field.name] = [
+                        `El campo ${field.label} debe ser un correo válido.`,
+                    ];
+                    isValid = false;
+                }
+            }
+        }
+    });
+
+    if (!isValid) {
+        loading.value = false;
+        return;
+    }
+
     try {
-        const response = await axios.post(props.endpoint, formData.value, {
+        const response = await axios.post(props.endpoint, data, {
             headers: {
+                "Content-Type": "application/json",
                 "X-CSRF-TOKEN": document
                     .querySelector('meta[name="csrf-token"]')
                     .getAttribute("content"),
             },
         });
-        emit("crear", response.data);
 
-        successMessage.value = "Creación exitosa!";
-        props.formFields.forEach((field) => {
-            formData.value[field.name] = field.default || "";
+        toast.success(`${props.itemName} creado correctamente`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-green-500 p-2",
         });
-        emit("cerrar");
+
+        return response.data;
     } catch (error) {
+        toast.error(`Error al crear ${props.itemName}`, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-red-500 p-2",
+        });
         if (error.response && error.response.status === 422) {
             errores.value = error.response.data.errors;
         } else {
             console.error("Error:", error);
         }
+        throw error;
     } finally {
         loading.value = false;
+    }
+};
+
+const crearItemCompleto = async () => {
+    try {
+        const response = await submitForm();
+
+        if (formData.value["tic_archivo"] instanceof File && response.ticket) {
+            await uploadFile(response.ticket.id);
+        }
+
+        if (formData.value["sed_imagen"] instanceof File && response.sede) {
+            await uploadFile(response.sede.id);
+        }
+
+        emit("crear", response.ticket || response.sede);
+        cerrarModal();
+    } catch (error) {
+        console.error("Error en la creación del item:", error);
     }
 };
 
@@ -67,58 +365,236 @@ const cerrarModal = () => emit("cerrar");
 
 <template>
     <div
-        class="fixed inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50"
+        class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30"
     >
         <div
-            class="w-full max-w-lg p-6 transition-transform transform bg-white rounded-lg shadow-lg"
+            class="w-full h-full md:h-auto md:max-w-2xl p-6 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] md:max-h-[100vh]"
         >
-            <h2 class="mb-4 text-xl font-bold text-gray-600">
-                Crear {{ itemName }}
-            </h2>
-            <p v-if="successMessage" class="mb-4 text-green-500">
-                {{ successMessage }}
-            </p>
-            <div v-for="(field, index) in formFields" :key="index">
-                <label :for="field.name" class="block mb-2 text-gray-500"
-                    >{{ field.label }}:</label
-                >
-                <input
-                    :id="field.name"
-                    :type="field.type"
-                    v-model="formData[field.name]"
-                    :placeholder="`Ingrese ${field.label.toLowerCase()}`"
-                    class="flex-grow w-full p-2 mb-1 placeholder-gray-400 border border-gray-300 rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                />
-                <p v-if="errores[field.name]" class="text-sm text-red-500">
-                    {{ errores[field.name][0] }}
+            <div class="border-2 border-[#2EBAA1] p-4 rounded-lg">
+                <h2 class="mb-4 text-xl font-bold text-[#2EBAA1]">
+                    Crear {{ itemName }}
+                </h2>
+                <p v-if="successMessage" class="mb-4 text-green-500">
+                    {{ successMessage }}
                 </p>
-            </div>
-            <div class="flex justify-end mt-6 space-x-4">
-                <button
-                    @click="submitForm"
-                    :disabled="loading"
-                    class="flex justify-center items-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-300 to-[#2EBAA1] rounded-lg shadow-md hover:from-green-400 hover:to-[#2EBAA1] focus:outline-none focus:ring-2 focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                >
-                    <font-awesome-icon
-                        v-if="loading"
-                        icon="spinner"
-                        class="mr-2 animate-spin"
+
+                <div class="grid gap-4">
+                    <div
+                        v-for="(field, index) in visibleFields"
+                        :key="index"
+                        :class="{
+                            'md:col-span-1 grid-cols-1':
+                                field.type !== 'textarea' &&
+                                field.type !== 'file',
+                            'md:col-span-2 grid-cols-2':
+                                field.type === 'textarea' ||
+                                field.type === 'file',
+                        }"
+                    >
+                        <h3 class="block text-gray-500 flex">
+                            <label
+                                :for="field.name"
+                                class="block mb-2 text-gray-500"
+                                >{{ field.label }}</label
+                            >
+                            <p class="text-red-600">*</p>
+                        </h3>
+
+                        <template v-if="field.type === 'file'">
+                            <div class="file-upload-wrapper">
+                                <!-- Input para seleccionar un archivo -->
+                                <input
+                                    :id="field.name"
+                                    :name="field.name"
+                                    type="file"
+                                    accept="image/*"
+                                    class="hidden"
+                                    @change="handleFileChange($event, field.name)"
+                                />
+                                <label
+                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                                    :for="field.name"
+                                >
+                                    Seleccionar Imagen
+                                </label>
+
+                                <!-- Botón para abrir la cámara -->
+                                <label
+                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
+                                >
+                                    <input
+                                        :id="field.name + '_camera'"
+                                        :name="field.name"
+                                        type="file"
+                                        accept="image/*"
+                                        capture="environment"
+                                        class="hidden"
+                                        @change="handleFileChange($event, field.name)"
+                                    />
+                                    Tomar Foto
+                                </label>
+
+                                <!-- Previsualización de archivos seleccionados -->
+                                <div class="mt-2">
+                                    <div
+                                        v-if="
+                                            selectedFileName[field.name] &&
+                                            !isMobile
+                                        "
+                                        class="text-sm text-gray-500"
+                                    >
+                                        Archivo seleccionado:
+                                        <ul>
+                                            <li
+                                                v-for="file in selectedFileName[
+                                                    field.name
+                                                ]"
+                                                :key="file"
+                                            >
+                                                {{ file }}
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div
+                                        v-if="selectedFilePreviews[field.name]"
+                                        class="mt-4"
+                                    >
+                                        <div
+                                            v-for="(
+                                                file, index
+                                            ) in selectedFilePreviews[
+                                                field.name
+                                            ]"
+                                            :key="index"
+                                            class="overflow-hidden border border-gray-300 rounded-lg"
+                                        >
+                                            <img
+                                                :src="file.url"
+                                                :alt="file.name"
+                                                class="object-cover w-full h-50"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <span
+                                    v-if="errores[field.name]"
+                                    class="text-red-500 text-sm"
+                                    >{{ errores[field.name][0] }}</span
+                                >
+                            </div>
+                        </template>
+
+                        <template v-else-if="field.type === 'select'">
+                            <select
+                                :id="field.name"
+                                :name="field.name"
+                                v-model="formData[field.name]"
+                                :autocomplete="field.autocomplete || 'off'"
+                                :class="{
+                                    'text-[#2EBAA1]':
+                                        formData[field.name] === '',
+                                    'text-gray-900':
+                                        formData[field.name] !== '',
+                                }"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            >
+                                <option value="" disabled selected>
+                                    Seleccione su {{ field.label }}
+                                </option>
+                                <option
+                                    v-for="option in field.options"
+                                    :key="option.value"
+                                    :value="option.value"
+                                >
+                                    {{ option.label }}
+                                </option>
+                            </select>
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
+                            >
+                        </template>
+
+                        <template v-else-if="field.type === 'number'">
+                            <input
+                                :id="field.name"
+                                :name="field.name"
+                                type="number"
+                                v-model.number="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                :autocomplete="field.autocomplete || 'off'"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            />
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
+                            >
+                        </template>
+
+                        <template v-else-if="field.type === 'text'">
+                            <input
+                                :id="field.name"
+                                :name="field.name"
+                                type="text"
+                                v-model="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                :autocomplete="field.autocomplete || 'off'"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            />
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
+                            >
+                        </template>
+
+                        <template v-else-if="field.type === 'textarea'">
+                            <textarea
+                                :id="field.name"
+                                :name="field.name"
+                                v-model="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                :autocomplete="field.autocomplete || 'off'"
+                                class="w-full h-32 p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            ></textarea>
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
+                            >
+                        </template>
+
+                        <template v-else>
+                            <input
+                                :id="field.name"
+                                :name="field.name"
+                                :type="field.type"
+                                v-model="formData[field.name]"
+                                :placeholder="`Ingrese ${field.label.toLowerCase()}`"
+                                :autocomplete="field.autocomplete || 'off'"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                            />
+                            <span
+                                v-if="errores[field.name]"
+                                class="text-red-500 text-sm"
+                                >{{ errores[field.name][0] }}</span
+                            >
+                        </template>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-6 space-x-4">
+                    <ButtonCrearActualizar
+                        @click="crearItemCompleto"
+                        :loading="loading"
+                        :itemName="'Crear'"
                     />
-                    <font-awesome-icon
-                        v-else
-                        icon="save"
-                        class="mr-2 text-lg"
-                    />
-                    Crear
-                </button>
-                <button
-                    @click="cerrarModal"
-                    :disabled="loading"
-                    class="flex justify-center px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-gray-300 to-gray-400 rounded-lg shadow-md hover:from-gray-300 hover:to-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-                >
-                    <font-awesome-icon icon="times" class="mr-2 text-lg" />
-                    Cerrar
-                </button>
+                    <ButtonCerrar @click="cerrarModal" />
+                </div>
             </div>
         </div>
     </div>

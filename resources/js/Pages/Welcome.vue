@@ -1,5 +1,7 @@
 <script setup>
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, usePage } from "@inertiajs/vue3";
+
+const page = usePage();
 
 defineProps({
     canLogin: {
@@ -23,6 +25,29 @@ function handleImageError() {
     document.getElementById("docs-card")?.classList.add("!row-span-1");
     document.getElementById("docs-card-content")?.classList.add("!flex-row");
     document.getElementById("background")?.classList.add("!hidden");
+}
+
+// Función para obtener la ruta correcta del dashboard según el rol del usuario
+function getDashboardRoute() {
+    const user = page.props.auth.user;
+
+    // Verificar si hay un usuario autenticado
+    if (!user) {
+        return "/"; // Si no hay usuario autenticado, redirigir a la página principal
+    }
+
+    // Verificar si el usuario tiene un rol y accedemos al nombre del rol
+    const role = user.rol?.name;
+
+    // Lógica de redirección basada en el nombre del rol
+    switch (role) {
+        case "Admin":
+            return route("dashboard"); // Ruta para administradores
+        case "Soporte":
+            return route("support-dashboard"); // Ruta para soporte
+        case "Usuario":
+            return route("user-dashboard"); // Ruta para usuarios
+    }
 }
 </script>
 
@@ -57,7 +82,7 @@ function handleImageError() {
                     <nav v-if="canLogin" class="flex justify-end flex-1 -mx-3">
                         <Link
                             v-if="$page.props.auth.user"
-                            :href="route('dashboard')"
+                            :href="getDashboardRoute()"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
                             Dashboard

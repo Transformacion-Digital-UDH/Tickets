@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
+import ChangeSede from "@/Pages/Profile/Partials/ChangeSede.vue";
 import DeleteUserForm from "@/Pages/Profile/Partials/DeleteUserForm.vue";
 import LogoutOtherBrowserSessionsForm from "@/Pages/Profile/Partials/LogoutOtherBrowserSessionsForm.vue";
 import SectionBorder from "@/Components/SectionBorder.vue";
@@ -27,6 +28,17 @@ defineProps({
                     <UpdateProfileInformationForm
                         :user="$page.props.auth.user"
                     />
+
+                    <SectionBorder />
+                </div>
+
+                <div
+                    v-if="
+                        $page.props.jetstream.canUpdateProfileInformation &&
+                        $page.props.auth.user.rol.name === 'Soporte'
+                    "
+                >
+                    <ChangeSede :user="$page.props.auth.user" />
 
                     <SectionBorder />
                 </div>

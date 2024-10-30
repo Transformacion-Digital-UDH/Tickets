@@ -3,12 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -17,6 +20,7 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -54,7 +58,10 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -91,5 +98,15 @@ class User extends Authenticatable
     public function sede()
     {
         return $this->belongsTo(Sede::class, 'sed_id');
+    }
+
+    public function asignados()
+    {
+        return $this->hasMany(Asignado::class, 'sop_id', 'id');
+    }
+
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class, 'use_id');
     }
 }

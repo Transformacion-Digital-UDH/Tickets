@@ -5,62 +5,66 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
-
+use Inertia\Inertia;
 class CategoriaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Inertia::render('Admin/Categoria', [
+            'success' => session('success'),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function traerPaginated()
     {
-        //
+        $totalCategorias = Categoria::count();
+
+        $categorias = Categoria::orderBy('created_at', 'desc')->paginate(5);
+
+        $categorias->getCollection()->transform(function ($categoria, $key) use ($totalCategorias, $categorias) {
+            $categoria->row_number = $totalCategorias - (($categorias->currentPage() - 1) * $categorias->perPage() + $key);
+            return $categoria;
+        });
+
+        return response()->json($categorias, 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function traer()
+    {
+        $categorias = Categoria::all();
+        return response()->json($categorias);
+    }
+
     public function store(Request $request)
     {
-        //
+        $validarDatos = $request->validate([
+            'cat_nombre' => 'required|string|max:255',
+            'cat_activo' => 'boolean',
+        ]);
+
+        $categoria = Categoria::create($validarDatos);
+        return response()->json($categoria, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Categoria $categoria)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Categoria $categoria)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Categoria $categoria)
     {
-        //
+        $validarDatos = $request->validate([
+            'cat_nombre' => 'required|string|max:255',
+            'cat_activo' => 'nullable|boolean',
+        ]);
+
+        if ($request->has('cat_activo')) {
+            $validarDatos['cat_activo'] = filter_var($request->input('cat_activo'), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $categoria->update($validarDatos);
+
+        return response()->json(['message' => 'Categoría actualizada correctamente', 'categoria' => $categoria]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Categoria $categoria)
+    public function eliminar(Categoria $categoria)
     {
-        //
+        $categoria->delete();
+        return response()->json(['message' => 'Categoría desactivada correctamente'], 200);
     }
 }

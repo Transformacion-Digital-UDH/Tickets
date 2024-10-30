@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onMounted } from "vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import AuthenticationCard from "@/Components/AuthenticationCard.vue";
 import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
 import Checkbox from "@/Components/Checkbox.vue";
@@ -8,51 +9,45 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
-import Select from "@/Components/Select.vue";
-
-const sedes = ref([]);
-
-const isSedeValida = (value) => {
-    return sedes.value.some((sede) => sede.value === value);
-};
-
-const fetchSedes = async () => {
-    try {
-        const response = await fetch("/api/sedes");
-        const data = await response.json();
-        sedes.value = data
-            .filter((sede) => sede.sed_activo === 1)
-            .map((sede) => ({
-                value: sede.id,
-                text: sede.sed_nombre,
-            }));
-    } catch (error) {
-        console.error("Error al cargar las sedes:", error);
-    }
-};
-
-onMounted(() => {
-    fetchSedes();
-});
 
 const form = useForm({
     name: "",
+    apellidos: "",
     email: "",
     password: "",
     password_confirmation: "",
-    sed_id: "",
     terms: false,
 });
 
 const submit = () => {
     form.post(route("register"), {
-        onFinish: () => form.reset("password", "password_confirmation"),
+        onSuccess: () => {
+            toast.success("Se ha registrado correctamente, ahora seleccione la sede a la que pertenece.", {
+                autoClose: 4000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-green-500 p-4",
+            });
+            form.reset("password", "password_confirmation");
+        },
+        onError: () => {
+            toast.error("Ups! Algo malo sucedió", {
+                autoClose: 4000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-4",
+            });
+        },
     });
 };
 </script>
 
 <template>
-    <Head title="Register" />
+    <Head title="Registro" />
 
     <AuthenticationCard>
         <template #logo>
@@ -65,14 +60,14 @@ const submit = () => {
             ¿Ya tienes una cuenta?
             <Link
                 :href="route('login')"
-                class="font-semibold text-gray-800 hover:text-gray-600 hover:underline"
+                class="font-semibold text-gray-800 hover:text-[#2EBAA1] hover:underline"
             >
                 Inicia sesión aquí
             </Link>
         </div>
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="name" value="Nombres y Apellidos" />
+                <InputLabel for="name" value="Nombres" />
                 <TextInput
                     id="name"
                     v-model="form.name"
@@ -83,6 +78,19 @@ const submit = () => {
                     autocomplete="name"
                 />
                 <InputError class="mt-2" :message="form.errors.name" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="apellidos" value="Apellidos" />
+                <TextInput
+                    id="apellidos"
+                    v-model="form.apellidos"
+                    type="text"
+                    class="block w-full mt-1"
+                    required
+                    autocomplete="family-name"
+                />
+                <InputError class="mt-2" :message="form.errors.apellidos" />
             </div>
 
             <div class="mt-4">
@@ -130,21 +138,6 @@ const submit = () => {
                 />
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="sed_id" value="Selecciona una Sede" />
-                <Select
-                    id="sed_id"
-                    v-model="form.sed_id"
-                    :options="sedes"
-                    :disabled="sedes.length === 0"
-                    :validate="isSedeValida"
-                    name="sed_id"
-                    placeholder="Por favor seleccione una sede"
-                    required
-                />
-                <InputError class="mt-2" :message="form.errors.sed_id" />
-            </div>
-
             <div
                 v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature"
                 class="mt-4"
@@ -163,14 +156,14 @@ const submit = () => {
                             <a
                                 target="_blank"
                                 :href="route('terms.show')"
-                                class="text-xs text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                class="text-xs text-gray-600 underline rounded-md hover:text-[#2EBAA1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >Términos de servicio</a
                             >
                             y
                             <a
                                 target="_blank"
                                 :href="route('policy.show')"
-                                class="text-xs text-gray-600 underline rounded-md hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                class="text-xs text-gray-600 underline rounded-md hover:text-[#2EBAA1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >Política de privacidad</a
                             >
                         </div>
