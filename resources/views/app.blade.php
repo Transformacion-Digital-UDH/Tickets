@@ -4,8 +4,23 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title inertia>{{ config('app.name', 'UDH') }}</title>
+
+    <meta name="description" content="Sistema de atención para tickets de soporte informático de la UDH.">
+    <meta name="keywords"
+        content="Soporte UDH, Incidencias UDH, Soporte tecnico, Averias UDH, Universidad de Huanuco, Huanuco, UDH">
+    <meta name="author" content="Laboratorio de Transformacion Digital">
+    <meta name="theme-color" content="#2EBAA0">
+
+    <!-- Open Graph -->
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="{{ config('app.name', 'Satsi UDH') }}">
+    <meta property="og:title" content="{{ config('app.name') }}">
+    <meta property="og:description" content="Sistema de atención para tickets de soporte informático de la UDH.">
+        <meta property="og:image" content="{{ asset('img/og_image.jpg') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
