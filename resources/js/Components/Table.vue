@@ -46,6 +46,31 @@ export default {
                 this.isMobile = window.innerWidth < 768;
             }, 150);
         },
+        visiblePages() {
+            const pages = [];
+            const { currentPage, totalPages } = this;
+            const range = this.isMobile ? 1 : 2;
+
+            if (totalPages <= 1) return [1];
+
+            pages.push(1);
+
+            if (currentPage - range > 2) pages.push("...");
+
+            for (
+                let i = Math.max(2, currentPage - range);
+                i <= Math.min(totalPages - 1, currentPage + range);
+                i++
+            ) {
+                pages.push(i);
+            }
+
+            if (currentPage + range < totalPages - 1) pages.push("...");
+
+            pages.push(totalPages);
+
+            return pages;
+        },
     },
     computed: {
         sedeKeys() {
@@ -221,23 +246,32 @@ export default {
                 </tbody>
             </table>
         </div>
-        <div class="mt-4 flex justify-center">
+        <div class="mt-4 flex flex-wrap justify-center gap-2">
             <button
-                v-for="page in Array.from(
-                    { length: totalPages },
-                    (_, i) => i + 1
-                )"
+                v-for="page in visiblePages()"
                 :key="page"
+                :disabled="page === '...'"
                 :class="[
-                    currentPage === page
+                    page === currentPage
                         ? 'bg-[#2EBAA1] text-white'
                         : 'bg-white text-[#2EBAA1]',
-                    'mx-2 px-3 py-1 rounded-lg',
+                    'mx-1 px-3 py-1 rounded-lg pagination-button',
+                    { 'cursor-default': page === '...' },
                 ]"
-                @click="$emit('changePage', page)"
+                @click="page !== '...' && $emit('changePage', page)"
             >
                 {{ page }}
             </button>
         </div>
     </div>
 </template>
+
+<style scoped>
+@media (max-width: 640px) {
+    .pagination-button {
+        margin: 0.5rem 0.1rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
