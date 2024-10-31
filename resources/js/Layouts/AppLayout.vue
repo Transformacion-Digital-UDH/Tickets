@@ -526,7 +526,7 @@ defineProps({ title: String });
             >
                 <div class="w-full py-4">
                     <div class="flex items-center justify-center mb-6">
-                        <Link :href="route('dashboard')">
+                        <Link :href="route('support-dashboard')">
                             <ApplicationMark class="block w-auto h-8" />
                         </Link>
                     </div>
@@ -844,7 +844,7 @@ defineProps({ title: String });
             >
                 <div class="w-full py-4">
                     <div class="flex items-center justify-center mb-6">
-                        <Link :href="route('dashboard')">
+                        <Link :href="route('user-dashboard')">
                             <ApplicationMark class="block w-auto h-8" />
                         </Link>
                     </div>
