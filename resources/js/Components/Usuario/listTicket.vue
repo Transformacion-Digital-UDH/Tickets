@@ -10,7 +10,6 @@ import ModalEliminar from "@/Components/ModalEliminar.vue";
 const storedTab = localStorage.getItem("activeTab") || "open";
 const activeTab = ref(storedTab);
 
-const prioridades = ref([]);
 const categorias = ref([]);
 const pabellones = ref([]);
 const aulas = ref([]);
@@ -58,8 +57,6 @@ const mapTicketData = (ticket, index, totalTickets) => {
         tic_titulo: ticket.tic_titulo,
         tic_descripcion: ticket.tic_descripcion,
         tic_archivo: ticket.tic_archivo,
-        pri_id: ticket.pri_id,
-        pri_nombre: ticket.prioridad?.pri_nombre || "No disponible",
         cat_id: ticket.cat_id,
         cat_nombre: ticket.categoria?.cat_nombre || "No disponible",
         pab_id: ticket.pab_id,
@@ -115,38 +112,6 @@ const loadTickets = async (page = 1) => {
             "Error al cargar los tickets:",
             error?.response?.data?.message || error.message
         );
-    }
-};
-
-const fetchPrioridades = async () => {
-    try {
-        const response = await axios.get("/prioridades");
-        prioridades.value = response.data
-            .filter((prioridad) => prioridad.pri_activo)
-            .map((prioridad) => ({
-                value: prioridad.id,
-                text: prioridad.pri_nombre,
-            }));
-        formFields.value = formFields.value.map((field) => {
-            if (field.name === "pri_id") {
-                return {
-                    ...field,
-                    options: prioridades.value,
-                };
-            }
-            return field;
-        });
-        formFieldsVer.value = formFieldsVer.value.map((field) => {
-            if (field.name === "pri_id") {
-                return {
-                    ...field,
-                    options: prioridades.value,
-                };
-            }
-            return field;
-        });
-    } catch (error) {
-        console.error("Error al cargar las prioridades:", error);
     }
 };
 
@@ -247,13 +212,6 @@ const fetchAulas = async () => {
 };
 
 formFields.value = [
-    { name: "tic_titulo", label: "Título", type: "text" },
-    {
-        name: "pri_id",
-        label: "Prioridad",
-        type: "select",
-        options: prioridades.value,
-    },
     {
         name: "cat_id",
         label: "Categoría",
@@ -267,6 +225,7 @@ formFields.value = [
         options: pabellones.value,
     },
     { name: "aul_id", label: "Aula", type: "select", options: aulas.value },
+    { name: "tic_titulo", label: "Asunto", type: "text" },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     {
         name: "tic_archivo",
@@ -277,11 +236,10 @@ formFields.value = [
 ];
 
 formFieldsVer.value = [
-    { name: "tic_titulo", label: "Título", type: "text" },
-    { name: "pri_nombre", label: "Prioridad", type: "text" },
     { name: "cat_nombre", label: "Categoría", type: "text" },
     { name: "pab_nombre", label: "Pabellón", type: "text" },
     { name: "aul_numero", label: "Aula", type: "text" },
+    { name: "tic_titulo", label: "Asunto", type: "text" },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_estado", label: "Estado", type: "text" },
     { name: "tic_archivo", label: "Imágenes", type: "file" },
@@ -291,7 +249,6 @@ const fetchAllData = async () => {
     try {
         await Promise.all([
             loadTickets(),
-            fetchPrioridades(),
             fetchCategorias(),
             fetchPabellones(),
             fetchAulas(),
@@ -371,7 +328,7 @@ const cerrarEliminarModal = () => {
             </h1>
 
             <div
-                class="overflow-x-auto pl-1 pt-5 pb-1 flex justify-left flex-wrap"
+                class="overflow-x-auto pl-1 pt-5 pb-1 flex justify-center flex-wrap"
             >
                 <button
                     :class="[
@@ -1103,6 +1060,7 @@ const cerrarEliminarModal = () => {
                         </button>
                     </div>
                 </div>
+                
                 <div class="block sm:hidden" v-if="activeTab === 'closed'">
                     <div
                         v-for="ticket in tickets.closed"
@@ -1168,7 +1126,6 @@ const cerrarEliminarModal = () => {
                 :item="itemSeleccionado"
                 itemName="Ticket"
                 :formFields="formFields"
-                :prioridads="prioridades"
                 :categorias="categorias"
                 :pabellons="pabellones"
                 :aulas="aulas"

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('use_id')->constrained('users');
             $table->foreignId('cat_id')->constrained('categorias');
-            $table->foreignId('pri_id')->constrained('prioridads');
+            $table->foreignId('pri_id')->nullable()->constrained('prioridads');
             $table->foreignId('pab_id')->constrained('pabellons');
             $table->foreignId('aul_id')->constrained('aulas');
             $table->string('tic_titulo')->nullable();

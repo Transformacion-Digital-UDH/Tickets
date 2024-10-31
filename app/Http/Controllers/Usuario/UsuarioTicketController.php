@@ -77,7 +77,7 @@ class UsuarioTicketController extends Controller
 
     public function create()
     {
-        $tickets = Ticket::with(['aula', 'aula.pabellon', 'prioridad', 'categoria', 'pabellon'])->get();
+        $tickets = Ticket::with(['aula', 'aula.pabellon', 'categoria', 'pabellon'])->get();
 
         return Inertia::render('Usuario/CrearTicket', [
             'tickets' => $tickets,
@@ -90,7 +90,6 @@ class UsuarioTicketController extends Controller
             'tic_titulo' => 'required|string|max:255',
             'tic_descripcion' => 'required|string',
             'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'pri_id' => 'required|exists:prioridads,id',
             'cat_id' => 'required|exists:categorias,id',
             'pab_id' => 'required|exists:pabellons,id',
             'aul_id' => 'required|exists:aulas,id',
@@ -105,7 +104,6 @@ class UsuarioTicketController extends Controller
             'tic_titulo' => $validatedData['tic_titulo'],
             'tic_descripcion' => $validatedData['tic_descripcion'],
             'tic_archivo' => $filePath,
-            'pri_id' => $validatedData['pri_id'],
             'use_id' => Auth::id(),
             'cat_id' => $validatedData['cat_id'],
             'pab_id' => $validatedData['pab_id'],
@@ -133,7 +131,6 @@ class UsuarioTicketController extends Controller
                 'tic_titulo' => 'required|string|max:255',
                 'tic_descripcion' => 'required|string|max:400',
                 'cat_id' => 'required|exists:categorias,id',
-                'pri_id' => 'required|exists:prioridads,id',
                 'pab_id' => 'required|exists:pabellons,id',
                 'aul_id' => 'required|exists:aulas,id',
             ]);
@@ -146,7 +143,7 @@ class UsuarioTicketController extends Controller
                 ], 422);
             }
 
-            $data = $request->only(['tic_titulo', 'tic_descripcion', 'cat_id', 'pri_id', 'pab_id', 'aul_id']);
+            $data = $request->only(['tic_titulo', 'tic_descripcion', 'cat_id', 'pab_id', 'aul_id']);
 
             $ticket->update($data);
 
