@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, computed, onBeforeUnmount } from "vue";
 
 const isMobile = ref(false);
 
@@ -17,6 +17,42 @@ const props = defineProps({
         required: true,
     },
     success: String,
+});
+
+const visiblePages = computed(() => {
+    const pages = [];
+    const maxVisiblePages = isMobile.value ? 3 : 5;
+    const pageRange = Math.floor(maxVisiblePages / 2);
+
+    if (props.totalPages <= maxVisiblePages) {
+        for (let i = 1; i <= props.totalPages; i++) {
+            pages.push(i);
+        }
+    } else {
+        pages.push(1);
+
+        if (props.currentPage - pageRange > 2) {
+            pages.push("...");
+        }
+
+        const startPage = Math.max(2, props.currentPage - pageRange);
+        const endPage = Math.min(
+            props.totalPages - 1,
+            props.currentPage + pageRange
+        );
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+
+        if (props.currentPage + pageRange < props.totalPages - 1) {
+            pages.push("...");
+        }
+
+        pages.push(props.totalPages);
+    }
+
+    return pages;
 });
 
 const handleResize = () => {
@@ -204,18 +240,17 @@ const emit = defineEmits([
         </div>
         <div class="mt-4 flex justify-center" v-if="totalPages > 1">
             <button
-                v-for="page in Array.from(
-                    { length: totalPages },
-                    (_, i) => i + 1
-                )"
+                v-for="page in visiblePages"
                 :key="page"
+                :disabled="page === '...'"
                 :class="[
                     currentPage === page
                         ? 'bg-[#2EBAA1] text-white'
                         : 'bg-white text-[#2EBAA1]',
-                    'mx-2 px-3 py-1 rounded-lg',
+                    'mx-2 px-3 py-1 rounded-lg pagination-button',
+                    { 'cursor-default': page === '...' },
                 ]"
-                @click="$emit('changePage', page)"
+                @click="page !== '...' && $emit('changePage', page)"
             >
                 {{ page }}
             </button>
@@ -230,3 +265,13 @@ const emit = defineEmits([
         </div>
     </div>
 </template>
+
+<style scoped>
+@media (max-width: 640px) {
+    .pagination-button {
+        margin: 0.5rem 0.1rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
