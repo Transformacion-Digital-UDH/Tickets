@@ -479,7 +479,9 @@ const cerrarModal = () => emit("cerrar");
                                         type="file"
                                         capture="environment"
                                         class="hidden"
-                                        @change="handleFileChange($event, field.name)"
+                                        @change="
+                                            handleFileChange($event, field.name)
+                                        "
                                     />
                                     Tomar Foto
                                 </label>

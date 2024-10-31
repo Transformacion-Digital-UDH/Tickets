@@ -103,6 +103,7 @@ class TicketController extends Controller
     {
         $validatedData = $request->validate([
             'sop_id' => 'required|exists:users,id',
+            'sop_id' => 'required|exists:users,id',
             'es_asignado' => 'boolean',
         ]);
 

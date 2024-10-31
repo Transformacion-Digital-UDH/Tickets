@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import filterTicketState from "@/Components/filterTicketState.vue";
@@ -460,8 +460,62 @@ formFieldsVer.value = [
     { name: "aul_numero", label: "Aula", type: "text" },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_estado", label: "Estado", type: "text" },
-    { name: "tic_archivo", label: "Imágenes", type: "file" },
+    { name: "tic_archivo", label: "Imagen", type: "file" },
 ];
+
+const setFormFieldsVer = (ticket) => {
+    formFieldsVer.value = [
+        {
+            name: "tic_titulo",
+            label: "Título",
+            type: "text",
+            value: ticket.tic_titulo,
+        },
+        {
+            name: "pri_nombre",
+            label: "Prioridad",
+            type: "text",
+            value: ticket.pri_nombre,
+        },
+        { name: "name", label: "Usuario", type: "text", value: ticket.name },
+        {
+            name: "cat_nombre",
+            label: "Categoría",
+            type: "text",
+            value: ticket.cat_nombre,
+        },
+        {
+            name: "pab_nombre",
+            label: "Pabellón",
+            type: "text",
+            value: ticket.pab_nombre,
+        },
+        {
+            name: "aul_numero",
+            label: "Aula",
+            type: "text",
+            value: ticket.aul_numero,
+        },
+        {
+            name: "tic_descripcion",
+            label: "Descripción",
+            type: "textarea",
+            value: ticket.tic_descripcion,
+        },
+        {
+            name: "tic_estado",
+            label: "Estado",
+            type: "text",
+            value: ticket.tic_estado,
+        },
+        {
+            name: "tic_archivo",
+            label: "Imagen",
+            type: "file",
+            value: ticket.tic_archivo,
+        },
+    ];
+};
 
 const cerrarTicket = async (ticket) => {
     if (ticket) {
@@ -587,6 +641,12 @@ const abrirDetallesModal = (ticket) => {
     itemSeleccionado.value = ticket;
     mostrarModalDetalles.value = true;
 };
+
+watch(itemSeleccionado, (newTicket) => {
+    if (newTicket) {
+        setFormFieldsVer(newTicket);
+    }
+});
 
 const cerrarDetallesModal = async () => {
     mostrarModalDetalles.value = false;
@@ -997,8 +1057,10 @@ const getEstadoLabelClass = (estado) => {
             v-if="mostrarModalAsignar"
             :formFieldsAsignar="formFieldsAsignar"
             :soportes="soportes"
+            :prioridades="prioridades"
             :ticketId="itemSeleccionado?.id || null"
             :selectedSoporteId="itemSeleccionado?.sop_id || null"
+            :selectedPrioridadId="itemSeleccionado?.pri_id || null"
             itemName="Soporte Técnico"
             endpoint="/asignar"
             @cerrar="cerrarAsignarModal"

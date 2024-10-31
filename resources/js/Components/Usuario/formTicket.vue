@@ -38,13 +38,11 @@ const formData = ref({
     tic_titulo: "",
     tic_descripcion: "",
     tic_archivo: null,
-    pri_id: "",
     cat_id: "",
     pab_id: "",
     aul_id: "",
 });
 
-const prioridades = ref([]);
 const categorias = ref([]);
 const pabellones = ref([]);
 const aulas = ref([]);
@@ -87,7 +85,6 @@ const resetForm = () => {
         tic_titulo: "",
         tic_descripcion: "",
         tic_archivo: null,
-        pri_id: "",
         cat_id: "",
         pab_id: "",
         aul_id: "",
@@ -98,20 +95,6 @@ const resetForm = () => {
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput) {
         fileInput.value = "";
-    }
-};
-
-const fetchPrioridades = async () => {
-    try {
-        const response = await axios.get("/prioridades");
-        prioridades.value = response.data
-            .filter((prioridad) => prioridad.pri_activo)
-            .map((prioridad) => ({
-                value: prioridad.id,
-                text: prioridad.pri_nombre,
-            }));
-    } catch (error) {
-        console.error("Error al cargar las prioridades:", error);
     }
 };
 
@@ -182,9 +165,6 @@ const handleConfirm = async () => {
     }
     if (!formData.value.tic_descripcion) {
         errores.value.tic_descripcion = "La descripción es obligatoria.";
-    }
-    if (!formData.value.pri_id) {
-        errores.value.pri_id = "La prioridad es obligatoria.";
     }
     if (!formData.value.cat_id) {
         errores.value.cat_id = "La categoría es obligatoria.";
@@ -278,7 +258,6 @@ const alertaCreacion = () => {
 
 onMounted(() => {
     typeMessage();
-    fetchPrioridades();
     fetchCategorias();
     fetchPabellones();
     fetchAulas();
@@ -296,46 +275,7 @@ onMounted(() => {
             >
                 {{ currentMessage }}
             </h2>
-            <div class="mb-3">
-                <h3 class="block mb-1 text-gray-500 flex">
-                    Título
-                    <p class="text-red-600">*</p>
-                </h3>
-                <input
-                    v-model="formData.tic_titulo"
-                    type="text"
-                    placeholder="Escribe el título..."
-                    class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                />
-                <span class="text-red-500 text-sm">{{
-                    errores.tic_titulo
-                }}</span>
-            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <h3 class="block mb-1 text-gray-500 flex">
-                        Prioridad
-                        <p class="text-red-600">*</p>
-                    </h3>
-                    <select
-                        v-model="formData.pri_id"
-                        class="w-full p-2 border border-[#2EBAA1] rounded-md"
-                    >
-                        <option value="" disabled selected>
-                            Seleccione su prioridad
-                        </option>
-                        <option
-                            v-for="prioridad in prioridades"
-                            :key="prioridad.value"
-                            :value="prioridad.value"
-                        >
-                            {{ prioridad.text }}
-                        </option>
-                    </select>
-                    <span class="text-red-500 text-sm">{{
-                        errores.pri_id
-                    }}</span>
-                </div>
                 <div>
                     <h3 class="block mb-1 text-gray-500 flex">
                         Categoría
@@ -343,7 +283,7 @@ onMounted(() => {
                     </h3>
                     <select
                         v-model="formData.cat_id"
-                        class="w-full p-2 border border-[#2EBAA1] rounded-md"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                     >
                         <option value="" disabled selected>
                             Seleccione su categoría
@@ -367,7 +307,7 @@ onMounted(() => {
                     </h3>
                     <select
                         v-model="formData.pab_id"
-                        class="w-full p-2 border border-[#2EBAA1] rounded-md"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                     >
                         <option value="" disabled selected>
                             Seleccione su pabellón
@@ -384,14 +324,16 @@ onMounted(() => {
                         errores.pab_id
                     }}</span>
                 </div>
-                <div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-1 gap-4">
+                <div class="mt-3">
                     <h3 class="block mb-1 text-gray-500 flex">
                         Aula
                         <p class="text-red-600">*</p>
                     </h3>
                     <select
                         v-model="formData.aul_id"
-                        class="w-full p-2 border border-[#2EBAA1] rounded-md"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
                     >
                         <option value="" disabled selected>
                             Seleccione su aula
@@ -408,6 +350,21 @@ onMounted(() => {
                         errores.aul_id
                     }}</span>
                 </div>
+            </div>
+            <div class="mb-3 mt-3">
+                <h3 class="block mb-1 text-gray-500 flex">
+                    Asunto
+                    <p class="text-red-600">*</p>
+                </h3>
+                <input
+                    v-model="formData.tic_titulo"
+                    type="text"
+                    placeholder="Escribe el título..."
+                    class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
+                />
+                <span class="text-red-500 text-sm">{{
+                    errores.tic_titulo
+                }}</span>
             </div>
             <div>
                 <h3 class="block mb-1 mt-4 text-gray-500 flex">

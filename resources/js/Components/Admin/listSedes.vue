@@ -115,7 +115,7 @@ const formFields = [
     { name: "sed_direccion", label: "Dirección", type: "text", required: true },
     { name: "sed_ciudad", label: "Ciudad", type: "text", required: true },
     { name: "sed_telefono", label: "Teléfono", type: "number", required: true },
-    { name: "sed_imagen", label: "Imágenes", type: "file", required: true },
+    { name: "sed_imagen", label: "Imagen", type: "file", required: true },
     { name: "sed_activo", label: "Estado", type: "boolean" },
 ];
 
@@ -124,7 +124,7 @@ const formFieldsVer = [
     { name: "sed_direccion", label: "Dirección", type: "text" },
     { name: "sed_ciudad", label: "Ciudad", type: "text" },
     { name: "sed_telefono", label: "Teléfono", type: "number" },
-    { name: "sed_imagen", label: "Imágenes", type: "file" },
+    { name: "sed_imagen", label: "Imagen", type: "file" },
 ];
 
 const eliminarItem = async () => {

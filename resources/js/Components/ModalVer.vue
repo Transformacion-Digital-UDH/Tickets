@@ -50,6 +50,12 @@ const closeImageModal = () => {
     isImageModalOpen.value = false;
     selectedImageUrl.value = "";
 };
+
+const imageUrl = computed(() => {
+    return props.item?.tic_archivo
+        ? `/storage/${props.item.tic_archivo}`
+        : null;
+});
 </script>
 
 <template>
@@ -92,16 +98,12 @@ const closeImageModal = () => {
                                 v-if="field.type === 'file'"
                                 class="py-2 text-left text-gray-600"
                             >
-                                <div v-if="item[field.name]">
+                                <div v-if="imageUrl">
                                     <img
-                                        :src="`/storage/${item[field.name]}`"
+                                        :src="imageUrl"
                                         :alt="field.label"
                                         class="object-cover w-32 h-32 border border-gray-300 rounded-lg cursor-pointer"
-                                        @click="
-                                            openImageModal(
-                                                `/storage/${item[field.name]}`
-                                            )
-                                        "
+                                        @click="openImageModal(imageUrl)"
                                     />
                                 </div>
                                 <div v-else>No disponible</div>

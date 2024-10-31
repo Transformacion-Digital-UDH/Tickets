@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
@@ -20,6 +20,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    prioridades: {
+        type: Array,
+        default: () => [],
+    },
     ticketId: {
         type: Number,
         required: true,
@@ -28,60 +32,49 @@ const props = defineProps({
         type: Number,
         default: null,
     },
+    selectedPrioridadId: {
+        type: Number,
+        default: null,
+    },
 });
 
 const emit = defineEmits(["cerrar", "crear", "actualizar"]);
 
 const formData = ref({
-    sop_id: props.selectedSoporteId || null,
+    sop_id: props.selectedSoporteId || "",
+    pri_id: props.selectedPrioridadId || "",
     tic_id: props.ticketId,
 });
-const errores = ref([]);
+const errores = ref({
+    sop_id: "",
+    pri_id: "",
+});
 const loading = ref(false);
-const successMessage = ref("");
 const esActualizar = ref(!!props.selectedSoporteId);
 
-const visibleFields = computed(() => {
-    return props.formFieldsAsignar.filter((field) => field.type !== "boolean");
-});
+const initialSoporteId = ref(props.selectedSoporteId || "");
+const initialPrioridadId = ref(props.selectedPrioridadId || "");
 
 onMounted(() => {
-    initializeForm();
+    initialSoporteId.value = formData.value.sop_id;
+    initialPrioridadId.value = formData.value.pri_id;
 });
 
-const initializeForm = () => {
-    if (esActualizar.value) {
-        formData.value.sop_id = props.selectedSoporteId;
-    } else {
-        formData.value = {
-            sop_id: "",
-            tic_id: props.ticketId,
-            es_asignado: false,
-        };
-    }
-};
-
-watch(
-    () => props.soportes,
-    (newSoportes) => {
-        if (newSoportes && newSoportes.length > 0) {
-            props.formFieldsAsignar.forEach((field) => {
-                if (field.name === "sop_id") {
-                    field.options = newSoportes.map((soporte) => ({
-                        value: soporte.value,
-                        label: soporte.text,
-                    }));
-                }
-            });
-        }
-    },
-    { immediate: true }
-);
-
 const asignarSoporte = async () => {
+    errores.value = { sop_id: "", pri_id: "" };
+
+    if (!formData.value.sop_id) {
+        errores.value.sop_id = "El campo Soporte es requerido.";
+    }
+    if (!formData.value.pri_id) {
+        errores.value.pri_id = "El campo Prioridad es requerido.";
+    }
+
+    if (errores.value.sop_id || errores.value.pri_id) {
+        return;
+    }
+
     loading.value = true;
-    successMessage.value = "";
-    errores.value = [];
 
     try {
         const method = esActualizar.value ? "put" : "post";
@@ -91,6 +84,7 @@ const asignarSoporte = async () => {
 
         const requestData = {
             sop_id: formData.value.sop_id,
+            pri_id: formData.value.pri_id,
             es_asignado: true,
             tic_estado: "Asignado",
         };
@@ -103,23 +97,38 @@ const asignarSoporte = async () => {
             },
         });
 
-        if (!esActualizar.value) {
-            toast.success(`Soporte asignado exitosamente!`, {
-                autoClose: 3000,
-                position: "bottom-right",
-                style: { width: "400px" },
-                className: "border-l-4 border-green-500 p-2",
-            });
-            emit("crear", response.data);
-        } else {
-            toast.success(`Soporte reasignado exitosamente!`, {
-                autoClose: 3000,
-                position: "bottom-right",
-                style: { width: "400px" },
-                className: "border-l-4 border-green-500 p-2",
-            });
-            emit("actualizar", response.data);
+        let message = "¡";
+        const soporteChanged = initialSoporteId.value !== formData.value.sop_id;
+        const prioridadChanged =
+            initialPrioridadId.value !== formData.value.pri_id;
+
+        if (esActualizar.value) {
+            if (soporteChanged && prioridadChanged) {
+                message += "¡Soporte y Prioridad reasignados exitosamente!";
+            } else if (soporteChanged) {
+                message += "¡Soporte reasignado exitosamente!";
+            } else if (prioridadChanged) {
+                message += "¡Prioridad reasignada exitosamente!";
+            }
+        } else if (!esActualizar.value) {
+            if (soporteChanged && prioridadChanged) {
+                message += "¡Soporte y Prioridad asignados exitosamente!";
+            } else if (soporteChanged) {
+                message += "¡Soporte asignado exitosamente!";
+            } else if (prioridadChanged) {
+                message += "¡Prioridad asignada exitosamente!";
+            }
         }
+        message += "!";
+
+        toast.success(message, {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: { width: "400px" },
+            className: "border-l-4 border-green-500 p-2",
+        });
+
+        emit(esActualizar.value ? "actualizar" : "crear", response.data);
         emit("cerrar");
     } catch (error) {
         if (error.response && error.response.status === 422) {
@@ -148,46 +157,53 @@ const cerrarModal = () => emit("cerrar");
         <div class="w-full max-w-2xl p-6 bg-white rounded-lg shadow-lg">
             <div class="border-2 border-blue-500 p-4 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-blue-500">
-                    {{ esActualizar ? "Actualizar" : "Asignar" }} a un
-                    {{ itemName }}
+                    {{ esActualizar ? "Actualizar" : "Asignar" }} {{ itemName }}
                 </h2>
-                <p v-if="successMessage" class="mb-4 text-green-500">
-                    {{ successMessage }}
-                </p>
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div v-for="(field, index) in visibleFields" :key="index">
-                        <label
-                            :for="field.name"
-                            class="block mb-2 text-gray-500"
+                    <div>
+                        <label class="block mb-2 text-gray-500">Soporte:</label>
+                        <select
+                            v-model="formData.sop_id"
+                            class="w-full p-2 mb-1 border border-blue-500 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                         >
-                            {{ field.label }}:
-                        </label>
-
-                        <template v-if="field.type === 'select'">
-                            <select
-                                :id="field.name"
-                                :name="field.name"
-                                v-model="formData[field.name]"
-                                class="w-full p-2 mb-1 border border-blue-500 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                            <option value="" disabled>
+                                Seleccione un soporte
+                            </option>
+                            <option
+                                v-for="soporte in soportes"
+                                :key="soporte.value"
+                                :value="soporte.value"
                             >
-                                <option value="" disabled>
-                                    Seleccione su {{ field.label }}
-                                </option>
-                                <option
-                                    v-for="option in field.options"
-                                    :key="option.value"
-                                    :value="option.value"
-                                >
-                                    {{ option.label }}
-                                </option>
-                            </select>
-                        </template>
-                        <p
-                            v-if="errores[field.name]"
-                            class="text-sm text-red-500"
+                                {{ soporte.text }}
+                            </option>
+                        </select>
+                        <p v-if="errores.sop_id" class="text-sm text-red-500">
+                            {{ errores.sop_id }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block mb-2 text-gray-500"
+                            >Prioridad:</label
                         >
-                            {{ errores[field.name][0] }}
+                        <select
+                            v-model="formData.pri_id"
+                            class="w-full p-2 mb-1 border border-blue-500 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                        >
+                            <option value="" disabled>
+                                Seleccione una prioridad
+                            </option>
+                            <option
+                                v-for="prioridad in prioridades"
+                                :key="prioridad.value"
+                                :value="prioridad.value"
+                            >
+                                {{ prioridad.text }}
+                            </option>
+                        </select>
+                        <p v-if="errores.pri_id" class="text-sm text-red-500">
+                            {{ errores.pri_id }}
                         </p>
                     </div>
                 </div>
