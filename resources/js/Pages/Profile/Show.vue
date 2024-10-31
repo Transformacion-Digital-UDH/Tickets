@@ -1,4 +1,6 @@
 <script setup>
+import { ref, onMounted } from "vue";
+import MobileLayout from "@/Layouts/MobileLayout.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import ChangeSede from "@/Pages/Profile/Partials/ChangeSede.vue";
 import DeleteUserForm from "@/Pages/Profile/Partials/DeleteUserForm.vue";
@@ -8,6 +10,17 @@ import TwoFactorAuthenticationForm from "@/Pages/Profile/Partials/TwoFactorAuthe
 import UpdatePasswordForm from "@/Pages/Profile/Partials/UpdatePasswordForm.vue";
 import UpdateProfileInformationForm from "@/Pages/Profile/Partials/UpdateProfileInformationForm.vue";
 
+const isMobile = ref(false);
+
+const updateIsMobile = () => {
+    isMobile.value = window.innerWidth <= 768;
+};
+
+onMounted(() => {
+    updateIsMobile();
+    window.addEventListener("resize", updateIsMobile);
+});
+
 defineProps({
     confirmsTwoFactorAuthentication: Boolean,
     sessions: Array,
@@ -15,7 +28,7 @@ defineProps({
 </script>
 
 <template>
-    <AppLayout title="Profile">
+    <component :is="isMobile ? MobileLayout : AppLayout" title="Profile">
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
                 Cuenta
@@ -76,5 +89,5 @@ defineProps({
                 </template>
             </div>
         </div>
-    </AppLayout>
+    </component>
 </template>
