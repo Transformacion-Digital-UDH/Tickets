@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import MobileLayout from "@/Layouts/MobileLayout.vue";
 import { toast } from "vue3-toastify";
 import axios from "axios";
 import "vue3-toastify/dist/index.css";
@@ -19,6 +20,19 @@ const archivoAdjunto = ref(null);
 const error = ref(null);
 const archivoSeleccionado = ref("");
 const isMobile = ref(window.innerWidth <= 768);
+
+const updateIsMobile = () => {
+    isMobile.value = window.innerWidth <= 768;
+};
+
+onMounted(() => {
+    updateIsMobile();
+    window.addEventListener("resize", updateIsMobile);
+
+    if (props.success) {
+        mostrarExito(props.success);
+    }
+});
 
 const getInitials = (name) => {
     if (!name) return "";
@@ -135,7 +149,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <AppLayout title="Comentarios">
+    <component :is="isMobile ? MobileLayout : AppLayout" title="Comentarios">
         <div class="p-6">
             <div class="mb-4 flex items-center">
                 <button
@@ -146,6 +160,7 @@ onMounted(() => {
                     <span>Regresar</span>
                 </button>
             </div>
+
             <h1
                 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl"
             >
@@ -207,9 +222,9 @@ onMounted(() => {
                         <template v-else>
                             <i class="fas fa-file text-[#2EBAA1] text-2xl"></i>
                         </template>
-                        <span class="ml-2 text-sm text-gray-500">
-                            Archivo seleccionado
-                        </span>
+                        <span class="ml-2 text-sm text-gray-500"
+                            >Archivo seleccionado</span
+                        >
                     </div>
 
                     <div class="flex justify-end items-center mt-2 space-x-2">
@@ -235,12 +250,11 @@ onMounted(() => {
             </div>
 
             <div v-if="comentarios.length > 0">
-                <div v-if="comentarios.length > 1" class="text-gray-700 mb-4">
-                    {{ comentarios.length }} comentarios
-                </div>
-
-                <div v-else class="text-gray-700 mb-4">
-                    {{ comentarios.length }} comentario
+                <div class="text-gray-700 mb-4">
+                    {{ comentarios.length }} comentario<span
+                        v-if="comentarios.length > 1"
+                        >s</span
+                    >
                 </div>
 
                 <div
@@ -302,9 +316,8 @@ onMounted(() => {
                                     :href="`/storage/${comentario.com_adjunto}`"
                                     target="_blank"
                                     class="text-blue-600 hover:underline text-xs"
+                                    >Ver archivo adjunto</a
                                 >
-                                    Ver archivo adjunto
-                                </a>
                             </div>
                         </template>
                     </div>
@@ -317,5 +330,5 @@ onMounted(() => {
                 </p>
             </div>
         </div>
-    </AppLayout>
+    </component>
 </template>
