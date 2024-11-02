@@ -49,7 +49,7 @@ class TicketController extends Controller
     {
         try {
             $request->validate([
-                'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             ]);
 
             $filePath = null;

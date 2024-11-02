@@ -89,7 +89,7 @@ class UsuarioTicketController extends Controller
         $validatedData = $request->validate([
             'tic_titulo' => 'required|string|max:255',
             'tic_descripcion' => 'required|string',
-            'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'cat_id' => 'required|exists:categorias,id',
             'pab_id' => 'required|exists:pabellons,id',
             'aul_id' => 'required|exists:aulas,id',

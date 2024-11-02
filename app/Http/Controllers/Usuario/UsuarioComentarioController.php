@@ -25,7 +25,7 @@ class UsuarioComentarioController extends Controller
     {
         $request->validate([
             'com_texto' => 'required|string|max:1000',
-            'com_adjunto' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xlsx,xls|max:2048',
+            'com_adjunto' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xlsx,xls',
         ]);
 
         $archivoAdjunto = null;
