@@ -103,7 +103,7 @@ class TicketController extends Controller
     {
         $validatedData = $request->validate([
             'sop_id' => 'required|exists:users,id',
-            'sop_id' => 'required|exists:users,id',
+            'pri_id' => 'required|exists:prioridads,id',
             'es_asignado' => 'boolean',
         ]);
 
@@ -116,9 +116,11 @@ class TicketController extends Controller
                 'sop_id' => $validatedData['sop_id'],
                 'es_asignado' => $validatedData['es_asignado'] ?? true,
             ]);
+
             $ticket->update([
                 'tic_estado' => 'Asignado',
                 'sop_id' => $validatedData['sop_id'],
+                'pri_id' => $validatedData['pri_id'],
             ]);
 
             $soportes = User::role('Soporte')->get();
@@ -128,7 +130,7 @@ class TicketController extends Controller
 
             return response()->json([
                 'status' => true,
-                'msg' => 'Soporte actualizado y estado actualizado a "Asignado".',
+                'msg' => 'Soporte y prioridad actualizados, estado actualizado a "Asignado".',
                 'ticket' => $ticket,
             ]);
         } else {
@@ -141,6 +143,7 @@ class TicketController extends Controller
             $ticket->update([
                 'tic_estado' => 'Asignado',
                 'sop_id' => $validatedData['sop_id'],
+                'pri_id' => $validatedData['pri_id'],
             ]);
 
             $soportes = User::role('Soporte')->get();
@@ -150,7 +153,7 @@ class TicketController extends Controller
 
             return response()->json([
                 'status' => true,
-                'msg' => 'Soporte asignado y estado actualizado a "Asignado".',
+                'msg' => 'Soporte y prioridad asignados, estado actualizado a "Asignado".',
                 'ticket' => $ticket,
             ]);
         }
@@ -237,19 +240,17 @@ class TicketController extends Controller
                 if ($user) {
                     $user->notify(new TicketStatusChanged($ticket, 'Cerrado', $personName));
                 }
-    
+
                 if ($ticket->soporteActual && $ticket->soporteActual->soporte) {
                     $soporteAsignado = $ticket->soporteActual->soporte;
                     $soporteAsignado->notify(new TicketStatusChanged($ticket, 'Cerrado', $personName));
                 }
-            }
-
-            elseif ($request->input('tic_estado') === 'Reabierto') {
+            } elseif ($request->input('tic_estado') === 'Reabierto') {
                 $user = $ticket->user;
                 if ($user) {
                     $user->notify(new TicketStatusChanged($ticket, 'Reabierto', $personName));
                 }
-    
+
                 if ($ticket->soporteActual && $ticket->soporteActual->soporte) {
                     $soporteAsignado = $ticket->soporteActual->soporte;
                     $soporteAsignado->notify(new TicketStatusChanged($ticket, 'Reabierto', $personName));
@@ -261,7 +262,6 @@ class TicketController extends Controller
                 'msg' => 'Estado del ticket actualizado correctamente',
                 'ticket' => $ticket,
             ], 200);
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
