@@ -52,17 +52,13 @@ const closeImageModal = () => {
 };
 
 const imageUrl = computed(() => {
-    return props.item?.tic_archivo
-        ? `/storage/${props.item.tic_archivo}`
-        : null;
+    const fileField = props.formFieldsVer.find(field => field.type === 'file' && props.item[field.name]);
+    return fileField ? `/storage/${props.item[fileField.name]}` : null;
 });
 </script>
 
 <template>
-    <div
-        v-if="mostrarModalDetalles"
-        class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30"
-    >
+    <div v-if="mostrarModalDetalles" class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30">
         <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg">
             <div class="p-4 border-2 border-gray-400 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-gray-600">
@@ -71,40 +67,24 @@ const imageUrl = computed(() => {
                 <table class="w-full border-collapse">
                     <thead>
                         <tr>
-                            <th
-                                class="py-2 pr-10 text-left text-gray-600 border-b-2 border-gray-400"
-                            >
+                            <th class="py-2 pr-10 text-left text-gray-600 border-b-2 border-gray-400">
                                 Campo
                             </th>
-                            <th
-                                class="py-2 text-left text-gray-600 border-b-2 border-gray-400"
-                            >
+                            <th class="py-2 text-left text-gray-600 border-b-2 border-gray-400">
                                 Valor
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr
-                            v-for="(field, index) in visibleFields"
-                            :key="index"
-                            class="border-b border-gray-400"
-                        >
-                            <td
-                                class="py-2 pr-10 font-semibold text-left text-gray-500"
-                            >
+                        <tr v-for="(field, index) in visibleFields" :key="index" class="border-b border-gray-400">
+                            <td class="py-2 pr-10 font-semibold text-left text-gray-500">
                                 {{ field.label }}
                             </td>
-                            <td
-                                v-if="field.type === 'file'"
-                                class="py-2 text-left text-gray-600"
-                            >
+                            <td v-if="field.type === 'file'" class="py-2 text-left text-gray-600">
                                 <div v-if="imageUrl">
-                                    <img
-                                        :src="imageUrl"
-                                        :alt="field.label"
+                                    <img :src="imageUrl" :alt="field.label"
                                         class="object-cover w-32 h-32 border border-gray-300 rounded-lg cursor-pointer"
-                                        @click="openImageModal(imageUrl)"
-                                    />
+                                        @click="openImageModal(imageUrl)" />
                                 </div>
                                 <div v-else>No disponible</div>
                             </td>
@@ -121,20 +101,11 @@ const imageUrl = computed(() => {
             </div>
         </div>
 
-        <div
-            v-if="isImageModalOpen"
-            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80"
-        >
+        <div v-if="isImageModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80">
             <div class="relative max-w-4xl p-4 bg-white rounded-lg shadow-lg">
-                <img
-                    :src="selectedImageUrl"
-                    alt="Imagen ampliada"
-                    class="max-w-full max-h-screen"
-                />
-                <button
-                    @click="closeImageModal"
-                    class="absolute top-1 right-1 text-white bg-gray-800 rounded-full pr-2 pl-2 focus:outline-none"
-                >
+                <img :src="selectedImageUrl" alt="Imagen ampliada" class="max-w-full max-h-screen" />
+                <button @click="closeImageModal"
+                    class="absolute top-1 right-1 text-white bg-gray-800 rounded-full pr-2 pl-2 focus:outline-none">
                     X
                 </button>
             </div>
