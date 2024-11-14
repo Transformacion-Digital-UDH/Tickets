@@ -115,7 +115,7 @@ const formFields = [
     { name: "sed_direccion", label: "Dirección", type: "text", required: true },
     { name: "sed_ciudad", label: "Ciudad", type: "text", required: true },
     { name: "sed_telefono", label: "Teléfono", type: "number", required: true },
-    { name: "sed_imagen", label: "Imagen", type: "file", required: true },
+    { name: "sed_imagen", label: "Imagen", type: "file", required: false },
     { name: "sed_activo", label: "Estado", type: "boolean" },
 ];
 
