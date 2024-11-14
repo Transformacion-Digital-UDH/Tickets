@@ -391,7 +391,6 @@ const fetchAulas = async () => {
 };
 
 formFields.value = [
-    { name: "tic_titulo", label: "Título", type: "text", required: true },
     {
         name: "pri_id",
         label: "Prioridad",
@@ -428,6 +427,12 @@ formFields.value = [
         options: aulas.value,
     },
     {
+        name: "tic_titulo",
+        label: "Asunto",
+        type: "text",
+        required: true
+    },
+    {
         name: "tic_descripcion",
         label: "Descripción",
         type: "textarea",
@@ -452,12 +457,12 @@ formFieldsAsignar.value = [
 ];
 
 formFieldsVer.value = [
-    { name: "tic_titulo", label: "Título", type: "text" },
     { name: "pri_nombre", label: "Prioridad", type: "text" },
     { name: "name", label: "Usuario", type: "text" },
     { name: "cat_nombre", label: "Categoría", type: "text" },
     { name: "pab_nombre", label: "Pabellón", type: "text" },
     { name: "aul_numero", label: "Aula", type: "text" },
+    { name: "tic_titulo", label: "Asunto", type: "text" },
     { name: "tic_descripcion", label: "Descripción", type: "textarea" },
     { name: "tic_estado", label: "Estado", type: "text" },
     { name: "tic_archivo", label: "Imagen", type: "file" },
@@ -465,12 +470,6 @@ formFieldsVer.value = [
 
 const setFormFieldsVer = (ticket) => {
     formFieldsVer.value = [
-        {
-            name: "tic_titulo",
-            label: "Título",
-            type: "text",
-            value: ticket.tic_titulo,
-        },
         {
             name: "pri_nombre",
             label: "Prioridad",
@@ -495,6 +494,12 @@ const setFormFieldsVer = (ticket) => {
             label: "Aula",
             type: "text",
             value: ticket.aul_numero,
+        },
+        {
+            name: "tic_titulo",
+            label: "Asunto",
+            type: "text",
+            value: ticket.tic_titulo,
         },
         {
             name: "tic_descripcion",
@@ -777,91 +782,47 @@ const getEstadoLabelClass = (estado) => {
         <h1 class="mb-6 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
             Lista de Tickets
         </h1>
-        <div
-            class="flex flex-col items-center justify-between mb-2 sm:flex-row"
-        >
-            <div
-                class="relative w-full mb-2 sm:w-auto sm:mb-0 flex items-center"
-            >
-                <span
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+        <div class="flex flex-col items-center justify-between mb-2 sm:flex-row">
+            <div class="relative w-full mb-2 sm:w-auto sm:mb-0 flex items-center">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input
-                    type="text"
-                    v-model="buscarQuery"
-                    placeholder="Buscar..."
-                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-                />
-                <button
-                    @click="toggleArchivedFilter"
-                    class="ml-2 flex items-center px-2 py-1 rounded-md hover:bg-opacity-80 font-semibold"
-                    :class="
-                        archivadoActivo
-                            ? 'bg-red-500 text-white'
-                            : 'bg-[#2EBAA1] text-white'
-                    "
-                >
+                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 sm:w-auto focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
+                <button @click="toggleArchivedFilter"
+                    class="ml-2 flex items-center px-2 py-1 rounded-md hover:bg-opacity-80 font-semibold" :class="archivadoActivo
+                        ? 'bg-red-500 text-white'
+                        : 'bg-[#2EBAA1] text-white'
+                        ">
                     <i class="fas fa-filter mr-1"></i>
                     <span>{{ archivadoActivo ? "Archivado" : "Activo" }}</span>
-                    <i
-                        class="fas fa-times ml-2"
-                        v-if="archivadoActivo"
-                        @click.stop="resetArchivedFilter"
-                    ></i>
+                    <i class="fas fa-times ml-2" v-if="archivadoActivo" @click.stop="resetArchivedFilter"></i>
                 </button>
             </div>
             <div class="flex items-center space-x-1">
-                <font-awesome-icon
-                    v-if="!isMobile"
-                    @click="toggleViewMode(true)"
-                    :class="[
-                        'cursor-pointer flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
-                        isCardView
-                            ? 'bg-[#2EBAA1] text-white'
-                            : 'bg-white text-gray-600',
-                    ]"
-                    icon="th-large"
-                />
-                <font-awesome-icon
-                    v-if="!isMobile"
-                    @click="toggleViewMode(false)"
-                    :class="[
-                        'cursor-pointer flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
-                        !isCardView
-                            ? 'bg-[#2EBAA1] text-white'
-                            : 'bg-white text-gray-600',
-                    ]"
-                    icon="table"
-                />
+                <font-awesome-icon v-if="!isMobile" @click="toggleViewMode(true)" :class="[
+                    'cursor-pointer flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
+                    isCardView
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-gray-600',
+                ]" icon="th-large" />
+                <font-awesome-icon v-if="!isMobile" @click="toggleViewMode(false)" :class="[
+                    'cursor-pointer flex items-center px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg shadow-sm',
+                    !isCardView
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-gray-600',
+                ]" icon="table" />
             </div>
             <div class="w-full sm:w-auto">
-                <ButtonNuevo
-                    @click="mostrarModalCrear = true"
-                    class="w-full sm:w-auto"
-                />
+                <ButtonNuevo @click="mostrarModalCrear = true" class="w-full sm:w-auto" />
             </div>
         </div>
-        <filterTicketState
-            :estadoFilters="estadoFilters"
-            @update-filters="updateEstadoFilters"
-        />
+        <filterTicketState :estadoFilters="estadoFilters" @update-filters="updateEstadoFilters" />
 
         <div v-if="isCardView">
-            <CardTickets
-                :tickets="filtrarTickets"
-                :currentPage="currentPage"
-                :totalPages="totalPages"
-                @comment="handleVerComentarios"
-                @open="handleAbrir"
-                @close="handleCerrar"
-                @asign="handleAsign"
-                @view="handleView"
-                @edit="handleEdit"
-                @eliminar="handleEliminar"
-                @changePage="changePage"
-            />
+            <CardTickets :tickets="filtrarTickets" :currentPage="currentPage" :totalPages="totalPages"
+                @comment="handleVerComentarios" @open="handleAbrir" @close="handleCerrar" @asign="handleAsign"
+                @view="handleView" @edit="handleEdit" @eliminar="handleEliminar" @changePage="changePage" />
         </div>
 
         <div v-else>
@@ -870,149 +831,105 @@ const getEstadoLabelClass = (estado) => {
                     <thead class="bg-white">
                         <tr>
                             <th
-                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 N°
                             </th>
                             <th
-                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 Categoría
                             </th>
                             <th
-                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
-                                Título
+                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
+                                Asunto
                             </th>
                             <th
-                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 Soporte Técnico
                             </th>
                             <th
-                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 Prioridad
                             </th>
                             <th
-                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                                class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 Estado
                             </th>
                             <th
-                                class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                                class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 Acciones
                             </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        <tr
-                            v-for="ticket in filtrarTickets"
-                            :key="ticket.id"
-                            @click="handleVerComentarios(ticket)"
-                            class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
-                        >
-                            <td
-                                class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                        <tr v-for="ticket in filtrarTickets" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                            class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer">
+                            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 {{ ticket.row_number }}
                             </td>
-                            <td
-                                class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 {{ ticket.cat_nombre }}
                             </td>
-                            <td
-                                class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 {{ ticket.tic_titulo }}
                             </td>
-                            <td
-                                class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 {{ ticket.soporte_nombre }}
                             </td>
-                            <td
-                                class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
+                            <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                                 {{ ticket.pri_nombre }}
                             </td>
-                            <td
-                                class="px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                            >
-                                <span
-                                    :class="[
-                                        'px-2 py-1 text-xs font-semibold rounded-full sm:text-xs md:text-sm',
-                                        getEstadoLabelClass(ticket.tic_estado),
-                                    ]"
-                                >
+                            <td class="px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm md:text-base">
+                                <span :class="[
+                                    'px-2 py-1 text-xs font-semibold rounded-full sm:text-xs md:text-sm',
+                                    getEstadoLabelClass(ticket.tic_estado),
+                                ]">
                                     {{ ticket.tic_estado }}
                                 </span>
                             </td>
                             <td
-                                class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
-                            >
-                                <button
-                                    v-if="ticket.tic_estado === 'Cerrado'"
-                                    @click.stop="handleAbrir(ticket)"
+                                class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0">
+                                <button v-if="ticket.tic_estado === 'Cerrado'" @click.stop="handleAbrir(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-green-300 to-green-500 hover:from-green-400 hover:to-green-600 flex items-center space-x-2"
-                                    title="Reabrir Ticket"
-                                >
+                                    title="Reabrir Ticket">
                                     <i class="fa-solid fa-lock-open"></i>
                                 </button>
-                                <button
-                                    v-if="
-                                        ticket.tic_estado === 'Abierto' ||
-                                        ticket.tic_estado === 'Asignado' ||
-                                        ticket.tic_estado === 'Reabierto'
-                                    "
-                                    @click.stop="handleCerrar(ticket)"
+                                <button v-if="
+                                    ticket.tic_estado === 'Abierto' ||
+                                    ticket.tic_estado === 'Asignado' ||
+                                    ticket.tic_estado === 'Reabierto'
+                                " @click.stop="handleCerrar(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-purple-300 to-purple-500 hover:from-purple-400 hover:to-purple-600 flex items-center space-x-2"
-                                    title="Cerrar Ticket"
-                                >
+                                    title="Cerrar Ticket">
                                     <i class="fa-solid fa-lock"></i>
                                 </button>
-                                <button
-                                    v-if="
-                                        ticket.tic_estado === 'Abierto' ||
-                                        ticket.tic_estado === 'Asignado' ||
-                                        ticket.tic_estado === 'Reabierto'
-                                    "
-                                    @click.stop="handleAsign(ticket)"
+                                <button v-if="
+                                    ticket.tic_estado === 'Abierto' ||
+                                    ticket.tic_estado === 'Asignado' ||
+                                    ticket.tic_estado === 'Reabierto'
+                                " @click.stop="handleAsign(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-blue-300 to-blue-500 hover:from-blue-400 hover:to-blue-600"
-                                    title="Asignar Soporte"
-                                >
+                                    title="Asignar Soporte">
                                     <i class="fas fa-user-plus"></i>
                                 </button>
-                                <button
-                                    @click.stop="handleView(ticket)"
+                                <button @click.stop="handleView(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
-                                    title="Ver detalles"
-                                >
+                                    title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button
-                                    @click.stop="handleEdit(ticket)"
+                                <button @click.stop="handleEdit(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-teal-300 to-teal-500 hover:from-teal-400 hover:to-green-600"
-                                    title="Editar"
-                                >
+                                    title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button
-                                    @click.stop="handleEliminar(ticket)"
+                                <button @click.stop="handleEliminar(ticket)"
                                     class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-red-300 to-red-500 hover:from-red-400 hover:to-red-600"
-                                    title="Eliminar"
-                                >
+                                    title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
                         </tr>
                         <tr v-if="filtrarTickets.length === 0">
-                            <td
-                                colspan="7"
-                                class="px-4 py-3 text-xs text-center text-gray-500 sm:text-sm"
-                            >
+                            <td colspan="7" class="px-4 py-3 text-xs text-center text-gray-500 sm:text-sm">
                                 No se encontraron resultados.
                             </td>
                         </tr>
@@ -1020,104 +937,45 @@ const getEstadoLabelClass = (estado) => {
                 </table>
             </div>
             <div class="mt-4 flex justify-center">
-                <button
-                    v-for="page in Array.from(
-                        { length: totalPages },
-                        (_, i) => i + 1
-                    )"
-                    :key="page"
-                    :class="[
-                        currentPage === page
-                            ? 'bg-[#2EBAA1] text-white'
-                            : 'bg-white text-[#2EBAA1]',
-                        'mx-2 px-3 py-1 rounded-lg',
-                    ]"
-                    @click="changePage(page)"
-                >
+                <button v-for="page in Array.from(
+                    { length: totalPages },
+                    (_, i) => i + 1
+                )" :key="page" :class="[
+                    currentPage === page
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-[#2EBAA1]',
+                    'mx-2 px-3 py-1 rounded-lg',
+                ]" @click="changePage(page)">
                     {{ page }}
                 </button>
             </div>
         </div>
 
-        <ModalCrear
-            v-if="mostrarModalCrear"
-            :formFields="formFields"
-            :prioridads="prioridades"
-            :usuarios="usuarios"
-            :categorias="categorias"
-            :pabellons="pabellones"
-            :aulas="aulas"
-            itemName="Ticket"
-            endpoint="/tickets"
-            @cerrar="cerrarCrearModal"
-            @crear="fetchTickets"
-        />
+        <ModalCrear v-if="mostrarModalCrear" :formFields="formFields" :prioridads="prioridades" :usuarios="usuarios"
+            :categorias="categorias" :pabellons="pabellones" :aulas="aulas" itemName="Ticket" endpoint="/tickets"
+            @cerrar="cerrarCrearModal" @crear="fetchTickets" />
 
-        <ModalAsignar
-            v-if="mostrarModalAsignar"
-            :formFieldsAsignar="formFieldsAsignar"
-            :soportes="soportes"
-            :prioridades="prioridades"
-            :ticketId="itemSeleccionado?.id || null"
+        <ModalAsignar v-if="mostrarModalAsignar" :formFieldsAsignar="formFieldsAsignar" :soportes="soportes"
+            :prioridades="prioridades" :ticketId="itemSeleccionado?.id || null"
             :selectedSoporteId="itemSeleccionado?.sop_id || null"
-            :selectedPrioridadId="itemSeleccionado?.pri_id || null"
-            itemName="Soporte Técnico"
-            endpoint="/asignar"
-            @cerrar="cerrarAsignarModal"
-            @crear="fetchTickets"
-            @actualizar="fetchTickets"
-        />
+            :selectedPrioridadId="itemSeleccionado?.pri_id || null" itemName="Soporte Técnico" endpoint="/asignar"
+            @cerrar="cerrarAsignarModal" @crear="fetchTickets" @actualizar="fetchTickets" />
 
-        <ModalVer
-            v-if="mostrarModalDetalles"
-            :item="itemSeleccionado"
-            itemName="Ticket"
-            :formFieldsVer="formFieldsVer"
-            :mostrarModalDetalles="mostrarModalDetalles"
-            @close="cerrarDetallesModal"
-        />
+        <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Ticket" :formFieldsVer="formFieldsVer"
+            :mostrarModalDetalles="mostrarModalDetalles" @close="cerrarDetallesModal" />
 
-        <ModalEditar
-            v-if="mostrarModalEditar"
-            :item="itemSeleccionado"
-            itemName="Ticket"
-            :formFields="formFields"
-            :prioridads="prioridades"
-            :usuarios="usuarios"
-            :categorias="categorias"
-            :pabellons="pabellones"
-            :aulas="aulas"
-            :mostrarModalEditar="mostrarModalEditar"
-            endpoint="/tickets"
-            @cerrar="cerrarEditarModal"
-            @update="fetchTickets"
-        />
+        <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Ticket" :formFields="formFields"
+            :prioridads="prioridades" :usuarios="usuarios" :categorias="categorias" :pabellons="pabellones"
+            :aulas="aulas" :mostrarModalEditar="mostrarModalEditar" endpoint="/tickets" @cerrar="cerrarEditarModal"
+            @update="fetchTickets" />
 
-        <ModalEliminar
-            v-if="mostrarModalEliminar"
-            :item="itemSeleccionado"
-            itemName="Ticket"
-            fieldName="tic_titulo"
-            @cancelar="cerrarEliminarModal"
-            @confirmar="eliminarItem"
-        />
+        <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Ticket" fieldName="tic_titulo"
+            @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
 
-        <ModalCerrar
-            v-if="mostrarModalCerrar"
-            :item="itemSeleccionado"
-            itemName="Ticket"
-            fieldName="tic_titulo"
-            @cancelar="cerrarCerrarModal"
-            @close="cerrarTicket(itemSeleccionado)"
-        />
+        <ModalCerrar v-if="mostrarModalCerrar" :item="itemSeleccionado" itemName="Ticket" fieldName="tic_titulo"
+            @cancelar="cerrarCerrarModal" @close="cerrarTicket(itemSeleccionado)" />
 
-        <ModalAbrir
-            v-if="mostrarModalAbrir"
-            :item="itemSeleccionado"
-            itemName="Ticket"
-            fieldName="tic_titulo"
-            @cancelar="cerrarAbrirModal"
-            @open="abrirTicket(itemSeleccionado)"
-        />
+        <ModalAbrir v-if="mostrarModalAbrir" :item="itemSeleccionado" itemName="Ticket" fieldName="tic_titulo"
+            @cancelar="cerrarAbrirModal" @open="abrirTicket(itemSeleccionado)" />
     </div>
 </template>

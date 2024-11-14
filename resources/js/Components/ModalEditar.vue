@@ -193,6 +193,20 @@ const editarItem = async () => {
     props.formFields.forEach((field) => {
         const fieldValue = formData.value[field.name];
 
+        if (field.label === "Asunto") {
+            if (!fieldValue) {
+                errores.value[field.name] = [
+                    `El campo ${field.label} es requerido.`,
+                ];
+                isValid = false;
+            } else if (fieldValue.length > 40) {
+                errores.value[field.name] = [
+                    `El campo ${field.label} debe tener como máximo 40 caracteres.`,
+                ];
+                isValid = false;
+            }
+        }
+
         if (field.required && !fieldValue) {
             errores.value[field.name] = [
                 `El campo ${field.label} es requerido`,
@@ -342,12 +356,9 @@ const cerrarModal = () => emit("cerrar");
 </script>
 
 <template>
-    <div
-        class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30"
-    >
+    <div class="fixed inset-0 flex items-center justify-center transition-opacity bg-gray-400 bg-opacity-30">
         <div
-            class="w-full md:h-auto md:max-w-2xl p-6 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] md:max-h-[100vh]"
-        >
+            class="w-full md:h-auto md:max-w-2xl p-6 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] md:max-h-[100vh]">
             <div class="border-2 border-[#2EBAA1] p-4 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-[#2EBAA1]">
                     Editar {{ itemName }}
@@ -357,169 +368,102 @@ const cerrarModal = () => emit("cerrar");
                 </p>
 
                 <div class="grid gap-4">
-                    <div
-                        v-for="(field, index) in formFields"
-                        :key="index"
-                        :class="{
-                            'md:col-span-1 grid-cols-1':
-                                field.type !== 'textarea' &&
-                                field.type !== 'file',
-                            'md:col-span-2 grid-cols-2':
-                                field.type === 'textarea' ||
-                                field.type === 'file',
-                        }"
-                    >
-                        <label
-                            :for="`form-${field.name}`"
-                            class="block mb-2 text-gray-500"
-                        >
+                    <div v-for="(field, index) in formFields" :key="index" :class="{
+                        'md:col-span-1 grid-cols-1':
+                            field.type !== 'textarea' &&
+                            field.type !== 'file',
+                        'md:col-span-2 grid-cols-2':
+                            field.type === 'textarea' ||
+                            field.type === 'file',
+                    }">
+                        <label :for="`form-${field.name}`" class="block mb-2 text-gray-500">
                             {{ field.label }}:
                         </label>
 
                         <template v-if="field.type === 'select'">
-                            <select
-                                :id="`form-${field.name}`"
-                                v-model="formData[field.name]"
-                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                            >
+                            <select :id="`form-${field.name}`" v-model="formData[field.name]"
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
                                 <option value="" disabled>
                                     Seleccione su {{ field.label }}
                                 </option>
-                                <option
-                                    v-for="option in field.options"
-                                    :key="option.value"
-                                    :value="option.value"
-                                >
+                                <option v-for="option in field.options" :key="option.value" :value="option.value">
                                     {{ option.text }}
                                 </option>
                             </select>
-                            <span
-                                v-if="errores[field.name]"
-                                class="text-red-500 text-sm"
-                            >
+                            <span v-if="errores[field.name]" class="text-red-500 text-sm">
                                 {{ errores[field.name][0] }}
                             </span>
                         </template>
 
                         <template v-else-if="field.type === 'email'">
-                            <input
-                                :id="`form-${field.name}`"
-                                :type="field.type"
-                                v-model="formData[field.name]"
+                            <input :id="`form-${field.name}`" :type="field.type" v-model="formData[field.name]"
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
-                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                            />
-                            <span
-                                v-if="errores[field.name]"
-                                class="text-red-500 text-sm"
-                            >
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50" />
+                            <span v-if="errores[field.name]" class="text-red-500 text-sm">
                                 {{ errores[field.name][0] }}
                             </span>
                         </template>
 
-                        <template
-                            v-else-if="
-                                field.type === 'text' ||
-                                field.label.toLowerCase().includes('teléfono')
-                            "
-                        >
-                            <input
-                                :id="`form-${field.name}`"
-                                type="text"
-                                v-model="formData[field.name]"
+                        <template v-else-if="
+                            field.type === 'text' ||
+                            field.label.toLowerCase().includes('teléfono')
+                        ">
+                            <input :id="`form-${field.name}`" type="text" v-model="formData[field.name]"
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
-                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                            />
-                            <span
-                                v-if="errores[field.name]"
-                                class="text-red-500 text-sm"
-                            >
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50" />
+                            <span v-if="errores[field.name]" class="text-red-500 text-sm">
                                 {{ errores[field.name][0] }}
                             </span>
                         </template>
 
                         <template v-else-if="field.type === 'textarea'">
-                            <textarea
-                                :id="`form-${field.name}`"
-                                v-model="formData[field.name]"
+                            <textarea :id="`form-${field.name}`" v-model="formData[field.name]"
                                 :placeholder="`Ingrese ${field.label.toLowerCase()}`"
-                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                            ></textarea>
-                            <span
-                                v-if="errores[field.name]"
-                                class="text-red-500 text-sm"
-                            >
+                                class="w-full p-2 mb-1 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"></textarea>
+                            <span v-if="errores[field.name]" class="text-red-500 text-sm">
                                 {{ errores[field.name][0] }}
                             </span>
                         </template>
 
                         <template v-else-if="field.type === 'file'">
                             <div class="file-upload-wrapper">
-                                <input
-                                    :id="`form-${field.name}`"
-                                    :name="field.name"
-                                    type="file"
-                                    class="hidden"
-                                    @change="
-                                        handleFileChange($event, field.name)
-                                    "
-                                />
+                                <input :id="`form-${field.name}`" :name="field.name" type="file" class="hidden" @change="
+                                    handleFileChange($event, field.name)
+                                    " />
                                 <label
                                     class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
-                                    :for="`form-${field.name}`"
-                                >
+                                    :for="`form-${field.name}`">
                                     Seleccionar {{ field.label }}
                                 </label>
 
                                 <!-- Botón adicional para tomar foto con cámara -->
                                 <label
-                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
-                                >
-                                    <input
-                                        type="file"
-                                        capture="environment"
-                                        class="hidden"
-                                        @change="
-                                            handleFileChange($event, field.name)
-                                        "
-                                    />
+                                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]">
+                                    <input type="file" capture="environment" class="hidden" @change="
+                                        handleFileChange($event, field.name)
+                                        " />
                                     Tomar Foto
                                 </label>
 
                                 <div class="mt-2">
-                                    <div
-                                        v-if="
-                                            selectedFileName[field.name] &&
-                                            !isMobile
-                                        "
-                                        class="text-sm text-gray-500"
-                                    >
+                                    <div v-if="
+                                        selectedFileName[field.name] &&
+                                        !isMobile
+                                    " class="text-sm text-gray-500">
                                         Archivo seleccionado:
                                         {{ selectedFileName[field.name] }}
                                     </div>
 
-                                    <div
-                                        v-if="selectedFilePreviews[field.name]"
-                                        class="mt-4"
-                                    >
-                                        <img
-                                            :src="
-                                                selectedFilePreviews[field.name]
-                                                    .url
-                                            "
-                                            :alt="
-                                                selectedFilePreviews[field.name]
+                                    <div v-if="selectedFilePreviews[field.name]" class="mt-4">
+                                        <img :src="selectedFilePreviews[field.name]
+                                                .url
+                                            " :alt="selectedFilePreviews[field.name]
                                                     .name
-                                            "
-                                            class="object-cover w-full h-50"
-                                        />
+                                                " class="object-cover w-full h-50" />
                                     </div>
                                 </div>
 
-                                <span
-                                    v-if="errores[field.name]"
-                                    class="text-red-500 text-sm"
-                                >
+                                <span v-if="errores[field.name]" class="text-red-500 text-sm">
                                     {{ errores[field.name][0] }}
                                 </span>
                             </div>
@@ -527,20 +471,14 @@ const cerrarModal = () => emit("cerrar");
 
                         <template v-if="field.type === 'boolean'">
                             <div class="flex items-center mb-4">
-                                <input
-                                    type="checkbox"
-                                    :id="`form-${field.name}`"
-                                    v-model="formData[field.name]"
-                                    class="hidden peer"
-                                />
-                                <label
-                                    :for="`form-${field.name}`"
+                                <input type="checkbox" :id="`form-${field.name}`" v-model="formData[field.name]"
+                                    class="hidden peer" />
+                                <label :for="`form-${field.name}`"
                                     class="flex items-center justify-center w-10 h-6 transition-colors duration-300 bg-gray-300 rounded-full cursor-pointer"
                                     :class="{
                                         'bg-green-400': formData[field.name],
                                         'bg-red-400': !formData[field.name],
-                                    }"
-                                >
+                                    }">
                                     <span
                                         class="w-4 h-4 transition-transform duration-300 transform bg-white rounded-full shadow-md"
                                         :class="{
@@ -548,12 +486,9 @@ const cerrarModal = () => emit("cerrar");
                                                 formData[field.name],
                                             '-translate-x-[10px]':
                                                 !formData[field.name],
-                                        }"
-                                    ></span>
+                                        }"></span>
                                 </label>
-                                <span
-                                    class="ml-2 text-sm font-medium text-gray-700"
-                                >
+                                <span class="ml-2 text-sm font-medium text-gray-700">
                                     {{
                                         formData[field.name]
                                             ? "Activo"
@@ -566,11 +501,8 @@ const cerrarModal = () => emit("cerrar");
                 </div>
 
                 <div class="flex justify-end mt-6 space-x-4">
-                    <ButtonCrearActualizar
-                        @click="actualizarItemCompleto"
-                        :loading="loading"
-                        :itemName="'Actualizar'"
-                    />
+                    <ButtonCrearActualizar @click="actualizarItemCompleto" :loading="loading"
+                        :itemName="'Actualizar'" />
                     <ButtonCerrar @click="cerrarModal" />
                 </div>
             </div>

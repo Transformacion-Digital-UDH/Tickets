@@ -75,7 +75,7 @@ class TicketController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'tic_titulo' => 'required|string|max:255',
+            'tic_titulo' => 'required|string|max:40',
             'tic_descripcion' => 'required|string|max:400',
             'pri_id' => 'required|exists:prioridads,id',
             'use_id' => 'required|exists:users,id',
@@ -165,7 +165,7 @@ class TicketController extends Controller
             $ticket = Ticket::findOrFail($id);
 
             $validator = Validator::make($request->all(), [
-                'tic_titulo' => 'required|string|max:255',
+                'tic_titulo' => 'required|string|max:40',
                 'tic_descripcion' => 'required|string|max:400',
                 'use_id' => 'required|exists:users,id',
                 'cat_id' => 'required|exists:categorias,id',

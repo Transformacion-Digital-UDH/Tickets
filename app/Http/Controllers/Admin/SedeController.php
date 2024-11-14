@@ -44,7 +44,7 @@ class SedeController extends Controller
             return response()->json(['sedes' => []], 200);
         }
 
-        $sedes = Sede::where('sed_activo', true)->orderBy('created_at', 'desc')->paginate(5);
+        $sedes = Sede::orderBy('created_at', 'desc')->paginate(5);
 
         $sedes->getCollection()->transform(function ($sede, $key) use ($totalSedes, $sedes) {
             $sede->row_number = $totalSedes - (($sedes->currentPage() - 1) * $sedes->perPage() + $key);

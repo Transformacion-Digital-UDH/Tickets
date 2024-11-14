@@ -87,7 +87,7 @@ class UsuarioTicketController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'tic_titulo' => 'required|string|max:255',
+            'tic_titulo' => 'required|string|max:40',
             'tic_descripcion' => 'required|string',
             'tic_archivo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'cat_id' => 'required|exists:categorias,id',
@@ -128,7 +128,7 @@ class UsuarioTicketController extends Controller
             $ticket = Ticket::findOrFail($id);
 
             $validator = Validator::make($request->all(), [
-                'tic_titulo' => 'required|string|max:255',
+                'tic_titulo' => 'required|string|max:40',
                 'tic_descripcion' => 'required|string|max:400',
                 'cat_id' => 'required|exists:categorias,id',
                 'pab_id' => 'required|exists:pabellons,id',

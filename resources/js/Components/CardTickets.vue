@@ -146,7 +146,7 @@ const emit = defineEmits([
                     </div>
                     <div class="flex flex-col space-y-2 text-sm text-gray-600">
                         <span
-                            ><strong>Título:</strong>
+                            ><strong>Asunto:</strong>
                             {{ ticket.tic_titulo || "N/A" }}</span
                         >
                         <span
