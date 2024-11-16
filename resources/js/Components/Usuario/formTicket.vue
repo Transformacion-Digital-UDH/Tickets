@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import confetti from "canvas-confetti";
@@ -47,6 +47,44 @@ const categorias = ref([]);
 const pabellones = ref([]);
 const aulas = ref([]);
 const showModal = ref(false);
+
+const validateTituloLength = () => {
+    const wordCount = formData.value.tic_titulo.trim().split(/\s+/).length;
+    const charCount = formData.value.tic_titulo.trim().length;
+
+    if (charCount > 40) {
+        errores.value.tic_titulo = "El título no puede tener más de 40 caracteres.";
+    } else if (wordCount > 40) {
+        errores.value.tic_titulo = "El título no puede tener más de 40 palabras.";
+    } else {
+        delete errores.value.tic_titulo;
+    }
+};
+
+watch(() => formData.value.tic_titulo, validateTituloLength);
+
+const validateForm = () => {
+    errores.value = {};
+    validateTituloLength();
+
+    if (!formData.value.tic_descripcion) {
+        errores.value.tic_descripcion = "La descripción es obligatoria.";
+    }
+    if (!formData.value.tic_titulo) {
+        errores.value.tic_titulo = "El título es obligatorio.";
+    }
+    if (!formData.value.cat_id) {
+        errores.value.cat_id = "La categoría es obligatoria.";
+    }
+    if (!formData.value.pab_id) {
+        errores.value.pab_id = "El pabellón es obligatorio.";
+    }
+    if (!formData.value.aul_id) {
+        errores.value.aul_id = "El aula es obligatoria.";
+    }
+
+    return Object.keys(errores.value).length === 0;
+};
 
 const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -141,6 +179,17 @@ const fetchAulas = async () => {
 };
 
 const submitForm = () => {
+    if (!validateForm()) {
+        toast.error("Por favor, verifique o complete esos datos.", {
+            autoClose: 3000,
+            position: "bottom-right",
+            style: {
+                width: "400px",
+            },
+            className: "border-l-4 border-red-500 p-2",
+        });
+        return;
+    }
     showModal.value = true;
 };
 
@@ -160,23 +209,7 @@ const handleConfirm = async () => {
         }
     });
 
-    if (!formData.value.tic_titulo) {
-        errores.value.tic_titulo = "El título es obligatorio.";
-    }
-    if (!formData.value.tic_descripcion) {
-        errores.value.tic_descripcion = "La descripción es obligatoria.";
-    }
-    if (!formData.value.cat_id) {
-        errores.value.cat_id = "La categoría es obligatoria.";
-    }
-    if (!formData.value.pab_id) {
-        errores.value.pab_id = "El pabellón es obligatorio.";
-    }
-    if (!formData.value.aul_id) {
-        errores.value.aul_id = "El aula es obligatoria.";
-    }
-
-    if (Object.keys(errores.value).length > 0) {
+    if (!validateForm()) {
         loading.value = false;
         return;
     }
@@ -197,14 +230,31 @@ const handleConfirm = async () => {
         emit("crear", response.data);
         emit("cerrar");
     } catch (error) {
-        toast.error("Hubo un error al crear su ticket", {
-            autoClose: 3000,
-            position: "bottom-right",
-            style: {
-                width: "400px",
-            },
-            className: "border-l-4 border-red-500 p-2",
-        });
+        loading.value = false;
+
+        if (error.response && error.response.status === 422) {
+            const serverErrors = error.response.data.errors || {};
+            Object.keys(serverErrors).forEach((key) => {
+                errores.value[key] = serverErrors[key][0];
+            });
+            toast.error("Error al enviar el formulario. Revisa los campos.", {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-2",
+            });
+        } else {
+            toast.error("Ocurrió un error inesperado.", {
+                autoClose: 3000,
+                position: "bottom-right",
+                style: {
+                    width: "400px",
+                },
+                className: "border-l-4 border-red-500 p-2",
+            });
+        }
     } finally {
         loading.value = false;
     }
@@ -270,9 +320,7 @@ onMounted(() => {
             Formulario para crear Tickets
         </h1>
         <div class="overflow-x-auto rounded-lg shadow-custom p-3 pt-5">
-            <h2
-                class="dynamic-text mb-3 text-xs font-bold text-gray-500 sm:text-sm md:text-base lg:text-lg xl:text-xl"
-            >
+            <h2 class="dynamic-text mb-3 text-xs font-bold text-gray-500 sm:text-sm md:text-base lg:text-lg xl:text-xl">
                 {{ currentMessage }}
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -281,18 +329,12 @@ onMounted(() => {
                         Categoría
                         <p class="text-red-600">*</p>
                     </h3>
-                    <select
-                        v-model="formData.cat_id"
-                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                    >
+                    <select v-model="formData.cat_id"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
                         <option value="" disabled selected>
                             Seleccione su categoría
                         </option>
-                        <option
-                            v-for="categoria in categorias"
-                            :key="categoria.value"
-                            :value="categoria.value"
-                        >
+                        <option v-for="categoria in categorias" :key="categoria.value" :value="categoria.value">
                             {{ categoria.text }}
                         </option>
                     </select>
@@ -305,18 +347,12 @@ onMounted(() => {
                         Pabellón
                         <p class="text-red-600">*</p>
                     </h3>
-                    <select
-                        v-model="formData.pab_id"
-                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                    >
+                    <select v-model="formData.pab_id"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
                         <option value="" disabled selected>
                             Seleccione su pabellón
                         </option>
-                        <option
-                            v-for="pabellon in pabellones"
-                            :key="pabellon.value"
-                            :value="pabellon.value"
-                        >
+                        <option v-for="pabellon in pabellones" :key="pabellon.value" :value="pabellon.value">
                             {{ pabellon.text }}
                         </option>
                     </select>
@@ -331,18 +367,12 @@ onMounted(() => {
                         Aula
                         <p class="text-red-600">*</p>
                     </h3>
-                    <select
-                        v-model="formData.aul_id"
-                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                    >
+                    <select v-model="formData.aul_id"
+                        class="w-full p-2 border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50">
                         <option value="" disabled selected>
                             Seleccione su aula
                         </option>
-                        <option
-                            v-for="aula in aulas"
-                            :key="aula.value"
-                            :value="aula.value"
-                        >
+                        <option v-for="aula in aulas" :key="aula.value" :value="aula.value">
                             {{ aula.text }}
                         </option>
                     </select>
@@ -356,27 +386,19 @@ onMounted(() => {
                     Asunto
                     <p class="text-red-600">*</p>
                 </h3>
-                <input
-                    v-model="formData.tic_titulo"
-                    type="text"
-                    placeholder="Escribe el título..."
-                    class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                />
-                <span class="text-red-500 text-sm">{{
-                    errores.tic_titulo
-                }}</span>
+                <input v-model="formData.tic_titulo" type="text" placeholder="Escribe el título..."
+                    class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50" />
+                <span v-if="errores.tic_titulo" class="text-red-500 text-sm">
+                    {{ errores.tic_titulo }}
+                </span>
             </div>
             <div>
                 <h3 class="block mb-1 mt-4 text-gray-500 flex">
                     Descripción
                     <p class="text-red-600">*</p>
                 </h3>
-                <textarea
-                    v-model="formData.tic_descripcion"
-                    rows="4"
-                    placeholder="Escribe la descripción..."
-                    class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"
-                ></textarea>
+                <textarea v-model="formData.tic_descripcion" rows="4" placeholder="Escribe la descripción..."
+                    class="w-full p-2 placeholder-[#2EBAA1] border border-[#2EBAA1] rounded-md focus:border-[#2EBAA1] focus:ring focus:ring-[#2EBAA1] focus:ring-opacity-50"></textarea>
                 <span class="text-red-500 text-sm">{{
                     errores.tic_descripcion
                 }}</span>
@@ -384,25 +406,14 @@ onMounted(() => {
             <div class="file-upload-wrapper">
                 <h3 class="block mb-1 mt-2 text-gray-500 flex">Imagen</h3>
                 <label
-                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
-                >
+                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]">
                     Seleccionar archivo
-                    <input
-                        type="file"
-                        @change="handleFileChange"
-                        class="hidden"
-                    />
+                    <input type="file" @change="handleFileChange" class="hidden" />
                 </label>
                 <!-- Botón para tomar foto -->
                 <label
-                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]"
-                >
-                    <input
-                        type="file"
-                        capture="environment"
-                        class="hidden"
-                        @change="handleFileChange"
-                    />
+                    class="block w-full p-2 mb-1 text-center text-white bg-[#2EBAA1] rounded-md cursor-pointer hover:bg-[#28a890]">
+                    <input type="file" capture="environment" class="hidden" @change="handleFileChange" />
                     Tomar Foto
                 </label>
                 <div class="mt-2">
@@ -411,33 +422,19 @@ onMounted(() => {
                     </div>
 
                     <div v-if="selectedFilePreview" class="mt-4">
-                        <img
-                            :src="selectedFilePreview"
-                            alt="Vista previa del archivo"
-                            class="object-cover w-full h-50"
-                        />
+                        <img :src="selectedFilePreview" alt="Vista previa del archivo"
+                            class="object-cover w-full h-50" />
                     </div>
                 </div>
-                <span
-                    v-if="errores['tic_archivo']"
-                    class="text-red-500 text-sm"
-                >
+                <span v-if="errores['tic_archivo']" class="text-red-500 text-sm">
                     {{ errores["tic_archivo"] }}
                 </span>
             </div>
             <div class="flex justify-end mt-6 space-x-4">
-                <ButtonCrearActualizar
-                    @click="submitForm"
-                    :loading="loading"
-                    :itemName="'Crear'"
-                />
+                <ButtonCrearActualizar @click="submitForm" :loading="loading" :itemName="'Crear'" />
             </div>
         </div>
-        <ModalConfirm
-            :visible="showModal"
-            @confirm="handleConfirm"
-            @cancel="handleCancel"
-        />
+        <ModalConfirm :visible="showModal" @confirm="handleConfirm" @cancel="handleCancel" />
     </div>
 </template>
 
@@ -454,10 +451,12 @@ onMounted(() => {
 }
 
 @keyframes blink {
+
     0%,
     100% {
         border-color: transparent;
     }
+
     50% {
         border-color: #2ebaa1;
     }
