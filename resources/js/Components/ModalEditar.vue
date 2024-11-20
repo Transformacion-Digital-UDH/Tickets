@@ -87,6 +87,12 @@ const updateSelectOptions = (fieldName, options) => {
     }
 };
 
+const imageLoadError = (event) => {
+    event.target.src = "";
+    event.target.alt = "No carga la imagen";
+    event.target.parentNode.innerHTML = '<p class="text-gray-500 text-sm">No carga la imagen</p>';
+};
+
 ["prioridads", "usuarios", "sedes", "categorias", "pabellons", "aulas"].forEach(
     (prop) => {
         watch(
@@ -449,7 +455,7 @@ const cerrarModal = () => emit("cerrar");
                                     <div v-if="selectedFilePreviews[field.name]" class="mt-4">
                                         <img :src="selectedFilePreviews[field.name].url"
                                             :alt="selectedFilePreviews[field.name].name"
-                                            class="object-cover w-full h-50" />
+                                            class="object-cover w-full h-50" @error="imageLoadError" />
                                     </div>
                                     <div v-else class="mt-4 text-gray-500 text-sm">
                                         No hay imagen
