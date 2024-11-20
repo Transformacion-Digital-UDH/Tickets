@@ -447,11 +447,12 @@ const cerrarModal = () => emit("cerrar");
 
                                 <div class="mt-2">
                                     <div v-if="selectedFilePreviews[field.name]" class="mt-4">
-                                        <img :src="selectedFilePreviews[field.name]
-                                                .url
-                                            " :alt="selectedFilePreviews[field.name]
-                                                    .name
-                                                " class="object-cover w-full h-50" />
+                                        <img :src="selectedFilePreviews[field.name].url"
+                                            :alt="selectedFilePreviews[field.name].name"
+                                            class="object-cover w-full h-50" />
+                                    </div>
+                                    <div v-else class="mt-4 text-gray-500 text-sm">
+                                        No hay imagen
                                     </div>
                                 </div>
 
