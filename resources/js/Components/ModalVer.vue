@@ -11,7 +11,9 @@ const props = defineProps({
 
 const formData = ref({});
 const isImageModalOpen = ref(false);
+const isTextModalOpen = ref(false);
 const selectedImageUrl = ref("");
+const selectedFieldText = ref("");
 
 const visibleFields = computed(() => {
     return props.formFieldsVer.filter((field) => field.type !== "boolean");
@@ -51,15 +53,28 @@ const closeImageModal = () => {
     selectedImageUrl.value = "";
 };
 
+const openTextModal = (text) => {
+    selectedFieldText.value = text;
+    isTextModalOpen.value = true;
+};
+
+const closeTextModal = () => {
+    isTextModalOpen.value = false;
+    selectedFieldText.value = "";
+};
+
 const imageUrl = computed(() => {
-    const fileField = props.formFieldsVer.find(field => field.type === 'file' && props.item[field.name]);
+    const fileField = props.formFieldsVer.find(
+        (field) => field.type === "file" && props.item[field.name]
+    );
     return fileField ? `/storage/${props.item[fileField.name]}` : null;
 });
 </script>
 
 <template>
     <div v-if="mostrarModalDetalles" class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30">
-        <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg">
+        <div
+            class="w-full md:h-auto md:max-w-2xl p-6 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] md:max-h-[100vh]">
             <div class="p-4 border-2 border-gray-400 rounded-lg">
                 <h2 class="mb-4 text-xl font-bold text-gray-600">
                     Detalles {{ itemName }}
@@ -89,7 +104,10 @@ const imageUrl = computed(() => {
                                 <div v-else>No disponible</div>
                             </td>
                             <td v-else class="py-2 text-left text-gray-600">
-                                {{ item[field.name] || "No disponible" }}
+                                <div class="truncate-custom cursor-pointer" :title="item[field.name] || 'No disponible'"
+                                    @click="openTextModal(item[field.name] || 'No disponible')">
+                                    {{ item[field.name] || "No disponible" }}
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -101,6 +119,7 @@ const imageUrl = computed(() => {
             </div>
         </div>
 
+        <!-- Modal para la imagen -->
         <div v-if="isImageModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80">
             <div class="relative max-w-4xl p-4 bg-white rounded-lg shadow-lg">
                 <img :src="selectedImageUrl" alt="Imagen ampliada" class="max-w-full max-h-screen" />
@@ -110,11 +129,36 @@ const imageUrl = computed(() => {
                 </button>
             </div>
         </div>
+
+        <!-- Modal para texto completo -->
+        <div v-if="isTextModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 p-4">
+            <div class="relative max-w-lg w-full bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="mb-4 text-lg font-semibold text-gray-700">Texto completo</h3>
+                <p class="text-gray-600 break-words overflow-y-auto max-h-[50vh]">
+                    {{ selectedFieldText }}
+                </p>
+                <div class="flex justify-end mt-4">
+                    <button @click="closeTextModal"
+                        class="px-4 py-2 text-white bg-[#2EBAA1] rounded-md hover:bg-[#28a890] focus:outline-none">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <style scoped>
 option[disabled] {
     color: #2ebaa1;
+}
+
+@media (max-width: 660px) {
+    .truncate-custom {
+        max-width: 180px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 }
 </style>
