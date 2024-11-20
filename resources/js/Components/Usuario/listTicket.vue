@@ -377,7 +377,7 @@ const cerrarEliminarModal = () => {
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
-                                    Título
+                                    Asunto
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
@@ -447,7 +447,7 @@ const cerrarEliminarModal = () => {
 
                         <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]"
                             :title="ticket.tic_titulo">
-                            Título: {{ ticket.tic_titulo }}
+                            Asunto: {{ ticket.tic_titulo }}
                         </p>
                         <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
@@ -492,7 +492,7 @@ const cerrarEliminarModal = () => {
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
-                                    Título
+                                    Asunto
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
@@ -562,7 +562,7 @@ const cerrarEliminarModal = () => {
                         </p>
 
                         <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
-                            Título: {{ ticket.tic_titulo }}
+                            Asunto: {{ ticket.tic_titulo }}
                         </p>
                         <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
@@ -607,7 +607,7 @@ const cerrarEliminarModal = () => {
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
-                                    Título
+                                    Asunto
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
@@ -667,7 +667,7 @@ const cerrarEliminarModal = () => {
                         </p>
 
                         <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
-                            Título: {{ ticket.tic_titulo }}
+                            Asunto: {{ ticket.tic_titulo }}
                         </p>
                         <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
@@ -704,7 +704,7 @@ const cerrarEliminarModal = () => {
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
-                                    Título
+                                    Asunto
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
@@ -763,7 +763,7 @@ const cerrarEliminarModal = () => {
                         </p>
 
                         <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
-                            Título: {{ ticket.tic_titulo }}
+                            Asunto: {{ ticket.tic_titulo }}
                         </p>
                         <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
@@ -801,7 +801,7 @@ const cerrarEliminarModal = () => {
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
-                                    Título
+                                    Asunto
                                 </th>
                                 <th
                                     class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
@@ -860,7 +860,7 @@ const cerrarEliminarModal = () => {
                         </p>
 
                         <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
-                            Título: {{ ticket.tic_titulo }}
+                            Asunto: {{ ticket.tic_titulo }}
                         </p>
                         <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
