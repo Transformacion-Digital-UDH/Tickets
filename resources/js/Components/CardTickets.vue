@@ -144,21 +144,21 @@ const emit = defineEmits([
                         </h2>
                         <hr class="my-2 border-gray-200" />
                     </div>
-                    <div class="flex flex-col space-y-2 text-sm text-gray-600">
+                    <div class="truncate flex flex-col space-y-2 text-sm text-gray-600">
                         <span
-                            ><strong>Asunto:</strong>
+                            ><strong class="truncate block max-w-full">Asunto:</strong>
                             {{ ticket.tic_titulo || "N/A" }}</span
                         >
                         <span
-                            ><strong>Prioridad:</strong>
+                            ><strong class="truncate block max-w-full">Prioridad:</strong>
                             {{ ticket.pri_nombre || "N/A" }}</span
                         >
                         <span>
-                            <strong>Soporte:</strong>
+                            <strong class="truncate block max-w-full">Soporte:</strong>
                             {{ ticket.soporte_nombre || "N/A" }}
                         </span>
                         <span>
-                            <strong>Creado el:</strong>
+                            <strong class="truncate block max-w-full">Creado el:</strong>
                             {{
                                 new Date(ticket.created_at).toLocaleDateString()
                             }}

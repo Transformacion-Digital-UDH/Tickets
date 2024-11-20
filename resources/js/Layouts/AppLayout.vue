@@ -101,8 +101,8 @@ const linkClasses = (isActive) => [
             ? "w-40 bg-gradient-to-r from-[#2EBAA1] to-green-400 text-white border-[#2EBAA1] rounded-r-full"
             : "w-40 text-white hover:border-l-4 hover:border-[#2EBAA1]"
         : isActive
-        ? "w-full bg-gradient-to-r from-[#2EBAA1] to-green-400 text-white"
-        : "w-full text-white hover:border-l-4 hover:border-[#2EBAA1]",
+            ? "w-full bg-gradient-to-r from-[#2EBAA1] to-green-400 text-white"
+            : "w-full text-white hover:border-l-4 hover:border-[#2EBAA1]",
     { "justify-center": !abrirSidebar.value },
 ];
 
@@ -126,131 +126,74 @@ defineProps({ title: String });
 
 <template>
     <!--APPLAYOUT PARA ADMINISTRADOR-->
-    <div
-        v-if="
-            $page.props.auth.user &&
-            $page.props.auth.user.rol &&
-            $page.props.auth.user.rol.name === 'Admin'
-        "
-    >
+    <div v-if="
+        $page.props.auth.user &&
+        $page.props.auth.user.rol &&
+        $page.props.auth.user.rol.name === 'Admin'
+    ">
+
         <Head :title="title" />
         <Banner />
         <div class="flex min-h-screen bg-white">
-            <nav
-                class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
-                :class="abrirSidebar ? 'w-48' : 'w-20'"
-            >
+            <nav class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
+                :class="abrirSidebar ? 'w-48' : 'w-20'">
                 <div class="w-full py-4">
                     <div class="flex items-center justify-center mb-6">
                         <Link :href="route('dashboard')">
-                            <ApplicationMark class="block w-auto h-8" />
+                        <ApplicationMark class="block w-auto h-8" />
                         </Link>
                     </div>
 
-                    <div
-                        v-if="
-                            $page.props.auth.user &&
-                            $page.props.auth.user.rol &&
-                            $page.props.auth.user.rol.name === 'Admin'
-                        "
-                        class="flex flex-col"
-                    >
-                        <NavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                            :class="linkClasses(route().current('dashboard'))"
-                        >
-                            <font-awesome-icon
-                                icon="tachometer-alt"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Dashboard</span
-                            >
+                    <div v-if="
+                        $page.props.auth.user &&
+                        $page.props.auth.user.rol &&
+                        $page.props.auth.user.rol.name === 'Admin'
+                    " class="flex flex-col">
+                        <NavLink :href="route('dashboard')" :active="route().current('dashboard')"
+                            :class="linkClasses(route().current('dashboard'))">
+                            <font-awesome-icon icon="tachometer-alt" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Dashboard</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('ticket')"
-                            :active="route().current('ticket')"
-                            :class="linkClasses(route().current('ticket'))"
-                        >
+                        <NavLink :href="route('ticket')" :active="route().current('ticket')"
+                            :class="linkClasses(route().current('ticket'))">
                             <font-awesome-icon icon="ticket" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Tickets</span
-                            >
+                            <span v-if="abrirSidebar" class="ml-2">Tickets</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('sede')"
-                            :active="route().current('sede')"
-                            :class="linkClasses(route().current('sede'))"
-                        >
+                        <NavLink :href="route('sede')" :active="route().current('sede')"
+                            :class="linkClasses(route().current('sede'))">
                             <font-awesome-icon icon="city" class="text-lg" />
                             <span v-if="abrirSidebar" class="ml-2">Sedes</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('soporte')"
-                            :active="route().current('soporte')"
-                            :class="linkClasses(route().current('soporte'))"
-                        >
-                            <font-awesome-icon
-                                icon="user-shield"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Soportes</span
-                            >
+                        <NavLink :href="route('soporte')" :active="route().current('soporte')"
+                            :class="linkClasses(route().current('soporte'))">
+                            <font-awesome-icon icon="user-shield" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Soportes</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('usuario')"
-                            :active="route().current('usuario')"
-                            :class="linkClasses(route().current('usuario'))"
-                        >
-                            <font-awesome-icon
-                                icon="user-graduate"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Usuarios</span
-                            >
+                        <NavLink :href="route('usuario')" :active="route().current('usuario')"
+                            :class="linkClasses(route().current('usuario'))">
+                            <font-awesome-icon icon="user-graduate" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Usuarios</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('categoria')"
-                            :active="route().current('categoria')"
-                            :class="linkClasses(route().current('categoria'))"
-                        >
+                        <NavLink :href="route('categoria')" :active="route().current('categoria')"
+                            :class="linkClasses(route().current('categoria'))">
                             <font-awesome-icon icon="tags" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Categoria</span
-                            >
+                            <span v-if="abrirSidebar" class="ml-2">Categoria</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('pabellon')"
-                            :active="route().current('pabellon')"
-                            :class="linkClasses(route().current('pabellon'))"
-                        >
-                            <font-awesome-icon
-                                icon="building"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Pabellones</span
-                            >
+                        <NavLink :href="route('pabellon')" :active="route().current('pabellon')"
+                            :class="linkClasses(route().current('pabellon'))">
+                            <font-awesome-icon icon="building" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Pabellones</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('aula')"
-                            :active="route().current('aula')"
-                            :class="linkClasses(route().current('aula'))"
-                        >
-                            <font-awesome-icon
-                                icon="chalkboard"
-                                class="text-lg"
-                            />
+                        <NavLink :href="route('aula')" :active="route().current('aula')"
+                            :class="linkClasses(route().current('aula'))">
+                            <font-awesome-icon icon="chalkboard" class="text-lg" />
                             <span v-if="abrirSidebar" class="ml-2">Aulas</span>
                         </NavLink>
                     </div>
@@ -259,60 +202,29 @@ defineProps({ title: String });
 
             <div class="flex flex-col flex-1">
                 <nav class="bg-[#222D32] border-b border-[#222D32]">
-                    <div
-                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
-                    >
-                        <button
-                            @click="interactuarSidebar"
-                            class="text-white focus:outline-none"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="w-6 h-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    v-if="abrirSidebar"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                                <path
-                                    v-else
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
+                    <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+                        <button @click="interactuarSidebar" class="text-white focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path v-if="abrirSidebar" stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6 18L18 6M6 6l12 12" />
+                                <path v-else stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
 
                         <div class="flex items-center space-x-1">
-                            <Dropdown
-                                align="right"
-                                width="78"
-                                v-model="mostrarNotificaciones"
-                            >
+                            <Dropdown align="right" width="78" v-model="mostrarNotificaciones">
                                 <template #trigger>
-                                    <button
-                                        @click="verNotificaciones"
-                                        class="relative focus:outline-none mr-4"
-                                        title="Notificaciones"
-                                    >
-                                        <font-awesome-icon
-                                            icon="bell"
-                                            class="text-white"
-                                            style="font-size: 1.5rem"
-                                        />
+                                    <button @click="verNotificaciones" class="relative focus:outline-none mr-4"
+                                        title="Notificaciones">
+                                        <font-awesome-icon icon="bell" class="text-white" style="font-size: 1.5rem" />
                                         <span
                                             class="absolute top-0 right-0 min-w-[1rem] h-4 bg-red-600 rounded-full text-xs flex items-center justify-center text-white"
                                             v-if="
                                                 notificaciones.length > 0 ||
                                                 !hayNotificaciones
-                                            "
-                                        >
+                                            ">
                                             {{
                                                 notificaciones.length > 0
                                                     ? notificaciones.length
@@ -327,78 +239,68 @@ defineProps({ title: String });
                                             Notificaciones
                                         </h4>
                                         <ul>
-                                            <li
-                                                v-for="notification in notificaciones"
-                                                :key="notification.id"
-                                                class="border-b border-gray-200 py-2"
-                                                :class="{
+                                            <li v-for="notification in notificaciones" :key="notification.id"
+                                                class="border-b border-gray-200 py-2" :class="{
                                                     'bg-gray-100':
                                                         !notification.read_at,
-                                                }"
-                                            >
-                                                <template
-                                                    v-if="
+                                                }">
+                                                <div class="text-sm text-gray-800 truncate">
+                                                    <template v-if="
                                                         notification.data
                                                             .new_status ===
                                                         'Resuelto'
-                                                    "
-                                                >
-                                                    {{
-                                                        notification.data
-                                                            .person_name
-                                                    }}
-                                                    ha finalizado el ticket
-                                                    <strong>{{
-                                                        notification.data
-                                                            .tic_title
-                                                    }}</strong
-                                                    >.
-                                                </template>
-                                                <template
-                                                    v-else-if="
+                                                    ">
+                                                        {{
+                                                            notification.data
+                                                                .person_name
+                                                        }}
+                                                        ha finalizado el ticket
+                                                        <strong class="truncate block max-w-full"
+                                                            title="{{ notification.data.tic_title }}">{{
+                                                                notification.data
+                                                                    .tic_title
+                                                            }}</strong>.
+                                                    </template>
+                                                    <template v-else-if="
                                                         notification.data
                                                             .new_status ===
                                                         'En progreso'
-                                                    "
-                                                >
-                                                    {{
-                                                        notification.data
-                                                            .person_name
-                                                    }}
-                                                    ha aceptado el ticket
-                                                    <strong>{{
-                                                        notification.data
-                                                            .tic_title
-                                                    }}</strong
-                                                    >, ahora está en progreso.
-                                                </template>
-                                                <template
-                                                    v-else-if="
+                                                    ">
+                                                        {{
+                                                            notification.data
+                                                                .person_name
+                                                        }}
+                                                        ha aceptado el ticket
+                                                        <strong class="truncate block max-w-full"
+                                                            title="{{ notification.data.tic_title }}">{{
+                                                                notification.data
+                                                                    .tic_title
+                                                            }}</strong>, ahora está en progreso.
+                                                    </template>
+                                                    <template v-else-if="
                                                         notification.data
                                                             .new_status ===
                                                         'Abierto'
-                                                    "
-                                                >
-                                                    El usuario
-                                                    {{
-                                                        notification.data
-                                                            .person_name
-                                                    }}
-                                                    ha creado el ticket
-                                                    <strong>{{
-                                                        notification.data
-                                                            .tic_title
-                                                    }}</strong
-                                                    >.
-                                                </template>
-                                                <div
-                                                    class="text-gray-500 text-sm"
-                                                >
-                                                    {{
-                                                        new Date(
-                                                            notification.created_at
-                                                        ).toLocaleString()
-                                                    }}
+                                                    ">
+                                                        El usuario
+                                                        {{
+                                                            notification.data
+                                                                .person_name
+                                                        }}
+                                                        ha creado el ticket
+                                                        <strong class="truncate block max-w-full"
+                                                            title="{{ notification.data.tic_title }}">{{
+                                                                notification.data
+                                                                    .tic_title
+                                                            }}</strong>.
+                                                    </template>
+                                                    <div class="text-gray-500 text-xs mt-1">
+                                                        {{
+                                                            new Date(
+                                                                notification.created_at
+                                                            ).toLocaleString()
+                                                        }}
+                                                    </div>
                                                 </div>
                                             </li>
                                         </ul>
@@ -411,31 +313,20 @@ defineProps({ title: String });
 
                             <Dropdown align="right" width="48">
                                 <template #trigger>
-                                    <button
-                                        @click="interactuarDropdown"
-                                        class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
-                                    >
-                                        <template
-                                            v-if="
-                                                $page.props.auth.user
-                                                    .profile_photo_url
-                                            "
-                                        >
-                                            <img
-                                                class="w-8 h-8 rounded-full"
-                                                :src="
-                                                    $page.props.auth.user
-                                                        .profile_photo_url
-                                                "
-                                                :alt="
-                                                    $page.props.auth.user.name
-                                                "
-                                            />
+                                    <button @click="interactuarDropdown"
+                                        class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none">
+                                        <template v-if="
+                                            $page.props.auth.user
+                                                .profile_photo_url
+                                        ">
+                                            <img class="w-8 h-8 rounded-full" :src="$page.props.auth.user
+                                                .profile_photo_url
+                                                " :alt="$page.props.auth.user.name
+                                                    " />
                                         </template>
                                         <template v-else>
                                             <div
-                                                class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full"
-                                            >
+                                                class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full">
                                                 {{
                                                     getInitials(
                                                         $page.props.auth.user
@@ -445,34 +336,20 @@ defineProps({ title: String });
                                             </div>
                                         </template>
 
-                                        <span
-                                            class="hidden ml-2 font-semibold text-white lg:block"
-                                            >{{
-                                                $page.props.auth.user.name
-                                            }}</span
-                                        >
-                                        <font-awesome-icon
-                                            icon="chevron-down"
-                                            class="ml-2 text-white"
-                                        />
+                                        <span class="hidden ml-2 font-semibold text-white lg:block">{{
+                                            $page.props.auth.user.name
+                                            }}</span>
+                                        <font-awesome-icon icon="chevron-down" class="ml-2 text-white" />
                                     </button>
                                 </template>
                                 <template #content>
-                                    <DropdownLink :href="route('profile.show')"
-                                        >Perfil</DropdownLink
-                                    >
-                                    <DropdownLink
-                                        v-if="
-                                            $page.props.jetstream.hasApiFeatures
-                                        "
-                                        :href="route('api-tokens.index')"
-                                        >API Tokens</DropdownLink
-                                    >
+                                    <DropdownLink :href="route('profile.show')">Perfil</DropdownLink>
+                                    <DropdownLink v-if="
+                                        $page.props.jetstream.hasApiFeatures
+                                    " :href="route('api-tokens.index')">API Tokens</DropdownLink>
                                     <div class="border-t border-gray-200"></div>
                                     <form @submit.prevent="logout">
-                                        <DropdownLink as="button"
-                                            >Cerrar sesión</DropdownLink
-                                        >
+                                        <DropdownLink as="button">Cerrar sesión</DropdownLink>
                                     </form>
                                 </template>
                             </Dropdown>
@@ -486,22 +363,16 @@ defineProps({ title: String });
                     </div>
                 </header>
 
-                <main
-                    v-if="
-                        $page.props.auth.user &&
-                        $page.props.auth.user.rol &&
-                        $page.props.auth.user.rol.name === 'Admin'
-                    "
-                    class="flex-1"
-                >
+                <main v-if="
+                    $page.props.auth.user &&
+                    $page.props.auth.user.rol &&
+                    $page.props.auth.user.rol.name === 'Admin'
+                " class="flex-1">
                     <slot />
                 </main>
 
                 <!-- Mensaje de error si el usuario no está autenticado o no tiene el rol adecuado -->
-                <div
-                    v-else
-                    class="flex items-center justify-center min-h-screen bg-white"
-                >
+                <div v-else class="flex items-center justify-center min-h-screen bg-white">
                     <h1 class="text-xl font-semibold text-gray-800">
                         No tienes acceso a esta página o no estás autenticado.
                     </h1>
@@ -510,79 +381,51 @@ defineProps({ title: String });
         </div>
     </div>
     <!-- APPLAYOUT PARA SOPORTE -->
-    <div
-        v-else-if="
-            $page.props.auth.user &&
-            $page.props.auth.user.rol &&
-            $page.props.auth.user.rol.name === 'Soporte'
-        "
-    >
+    <div v-else-if="
+        $page.props.auth.user &&
+        $page.props.auth.user.rol &&
+        $page.props.auth.user.rol.name === 'Soporte'
+    ">
+
         <Head :title="title" />
         <Banner />
         <div class="flex min-h-screen bg-white">
-            <nav
-                class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
-                :class="abrirSidebar ? 'w-48' : 'w-20'"
-            >
+            <nav class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
+                :class="abrirSidebar ? 'w-48' : 'w-20'">
                 <div class="w-full py-4">
                     <div class="flex items-center justify-center mb-6">
                         <Link :href="route('support-dashboard')">
-                            <ApplicationMark class="block w-auto h-8" />
+                        <ApplicationMark class="block w-auto h-8" />
                         </Link>
                     </div>
 
-                    <div
-                        v-if="
-                            $page.props.auth.user &&
-                            $page.props.auth.user.rol &&
-                            $page.props.auth.user.rol.name === 'Soporte'
-                        "
-                        class="flex flex-col"
-                    >
-                        <NavLink
-                            :href="route('support-dashboard')"
-                            :active="route().current('support-dashboard')"
-                            :class="
-                                linkClasses(
-                                    route().current('support-dashboard')
-                                )
-                            "
-                        >
-                            <font-awesome-icon
-                                icon="tachometer-alt"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Dashboard</span
-                            >
+                    <div v-if="
+                        $page.props.auth.user &&
+                        $page.props.auth.user.rol &&
+                        $page.props.auth.user.rol.name === 'Soporte'
+                    " class="flex flex-col">
+                        <NavLink :href="route('support-dashboard')" :active="route().current('support-dashboard')"
+                            :class="linkClasses(
+                                route().current('support-dashboard')
+                            )
+                                ">
+                            <font-awesome-icon icon="tachometer-alt" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Dashboard</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('support-ticket')"
-                            :active="route().current('support-ticket')"
-                            :class="
-                                linkClasses(route().current('support-ticket'))
-                            "
-                        >
+                        <NavLink :href="route('support-ticket')" :active="route().current('support-ticket')" :class="linkClasses(route().current('support-ticket'))
+                            ">
                             <font-awesome-icon icon="ticket" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Tickets</span
-                            >
+                            <span v-if="abrirSidebar" class="ml-2">Tickets</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('support-historial')"
-                            :active="route().current('support-historial')"
-                            :class="
-                                linkClasses(
-                                    route().current('support-historial')
-                                )
-                            "
-                        >
+                        <NavLink :href="route('support-historial')" :active="route().current('support-historial')"
+                            :class="linkClasses(
+                                route().current('support-historial')
+                            )
+                                ">
                             <font-awesome-icon icon="tags" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Historial</span
-                            >
+                            <span v-if="abrirSidebar" class="ml-2">Historial</span>
                         </NavLink>
                     </div>
                 </div>
@@ -590,60 +433,29 @@ defineProps({ title: String });
 
             <div class="flex flex-col flex-1">
                 <nav class="bg-[#222D32] border-b border-[#222D32]">
-                    <div
-                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
-                    >
-                        <button
-                            @click="interactuarSidebar"
-                            class="text-white focus:outline-none"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="w-6 h-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    v-if="abrirSidebar"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                                <path
-                                    v-else
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
+                    <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+                        <button @click="interactuarSidebar" class="text-white focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path v-if="abrirSidebar" stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6 18L18 6M6 6l12 12" />
+                                <path v-else stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
 
                         <div class="flex items-center space-x-1">
-                            <Dropdown
-                                align="right"
-                                width="78"
-                                v-model="mostrarNotificaciones"
-                            >
+                            <Dropdown align="right" width="78" v-model="mostrarNotificaciones">
                                 <template #trigger>
-                                    <button
-                                        @click="verNotificaciones"
-                                        class="relative focus:outline-none mr-4"
-                                        title="Notificaciones"
-                                    >
-                                        <font-awesome-icon
-                                            icon="bell"
-                                            class="text-white"
-                                            style="font-size: 1.5rem"
-                                        />
+                                    <button @click="verNotificaciones" class="relative focus:outline-none mr-4"
+                                        title="Notificaciones">
+                                        <font-awesome-icon icon="bell" class="text-white" style="font-size: 1.5rem" />
                                         <span
                                             class="absolute top-0 right-0 min-w-[1rem] h-4 bg-red-600 rounded-full text-xs flex items-center justify-center text-white"
                                             v-if="
                                                 notificaciones.length > 0 ||
                                                 !hayNotificaciones
-                                            "
-                                        >
+                                            ">
                                             {{
                                                 notificaciones.length > 0
                                                     ? notificaciones.length
@@ -658,22 +470,16 @@ defineProps({ title: String });
                                             Notificaciones
                                         </h4>
                                         <ul>
-                                            <li
-                                                v-for="notification in notificaciones"
-                                                :key="notification.id"
-                                                class="border-b border-gray-200 py-2"
-                                                :class="{
+                                            <li v-for="notification in notificaciones" :key="notification.id"
+                                                class="border-b border-gray-200 py-2" :class="{
                                                     'bg-gray-100':
                                                         !notification.read_at,
-                                                }"
-                                            >
-                                                <template
-                                                    v-if="
-                                                        notification.data
-                                                            .new_status ===
-                                                        'Asignado'
-                                                    "
-                                                >
+                                                }">
+                                                <template v-if="
+                                                    notification.data
+                                                        .new_status ===
+                                                    'Asignado'
+                                                ">
                                                     <strong>
                                                         {{
                                                             notification.data
@@ -685,16 +491,13 @@ defineProps({ title: String });
                                                     <strong>{{
                                                         notification.data
                                                             .tic_title
-                                                    }}</strong
-                                                    >.
+                                                    }}</strong>.
                                                 </template>
-                                                <template
-                                                    v-else-if="
-                                                        notification.data
-                                                            .new_status ===
-                                                        'Cerrado'
-                                                    "
-                                                >
+                                                <template v-else-if="
+                                                    notification.data
+                                                        .new_status ===
+                                                    'Cerrado'
+                                                ">
                                                     <strong>
                                                         {{
                                                             notification.data
@@ -706,12 +509,9 @@ defineProps({ title: String });
                                                     <strong>{{
                                                         notification.data
                                                             .tic_title
-                                                    }}</strong
-                                                    >.
+                                                    }}</strong>.
                                                 </template>
-                                                <div
-                                                    class="text-gray-500 text-sm"
-                                                >
+                                                <div class="text-gray-500 text-sm">
                                                     {{
                                                         new Date(
                                                             notification.created_at
@@ -729,31 +529,20 @@ defineProps({ title: String });
 
                             <Dropdown align="right" width="48">
                                 <template #trigger>
-                                    <button
-                                        @click="interactuarDropdown"
-                                        class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
-                                    >
-                                        <template
-                                            v-if="
-                                                $page.props.auth.user
-                                                    .profile_photo_url
-                                            "
-                                        >
-                                            <img
-                                                class="w-8 h-8 rounded-full"
-                                                :src="
-                                                    $page.props.auth.user
-                                                        .profile_photo_url
-                                                "
-                                                :alt="
-                                                    $page.props.auth.user.name
-                                                "
-                                            />
+                                    <button @click="interactuarDropdown"
+                                        class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none">
+                                        <template v-if="
+                                            $page.props.auth.user
+                                                .profile_photo_url
+                                        ">
+                                            <img class="w-8 h-8 rounded-full" :src="$page.props.auth.user
+                                                .profile_photo_url
+                                                " :alt="$page.props.auth.user.name
+                                                    " />
                                         </template>
                                         <template v-else>
                                             <div
-                                                class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full"
-                                            >
+                                                class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full">
                                                 {{
                                                     getInitials(
                                                         $page.props.auth.user
@@ -763,34 +552,20 @@ defineProps({ title: String });
                                             </div>
                                         </template>
 
-                                        <span
-                                            class="hidden ml-2 font-semibold text-white lg:block"
-                                            >{{
-                                                $page.props.auth.user.name
-                                            }}</span
-                                        >
-                                        <font-awesome-icon
-                                            icon="chevron-down"
-                                            class="ml-2 text-white"
-                                        />
+                                        <span class="hidden ml-2 font-semibold text-white lg:block">{{
+                                            $page.props.auth.user.name
+                                            }}</span>
+                                        <font-awesome-icon icon="chevron-down" class="ml-2 text-white" />
                                     </button>
                                 </template>
                                 <template #content>
-                                    <DropdownLink :href="route('profile.show')"
-                                        >Perfil</DropdownLink
-                                    >
-                                    <DropdownLink
-                                        v-if="
-                                            $page.props.jetstream.hasApiFeatures
-                                        "
-                                        :href="route('api-tokens.index')"
-                                        >API Tokens</DropdownLink
-                                    >
+                                    <DropdownLink :href="route('profile.show')">Perfil</DropdownLink>
+                                    <DropdownLink v-if="
+                                        $page.props.jetstream.hasApiFeatures
+                                    " :href="route('api-tokens.index')">API Tokens</DropdownLink>
                                     <div class="border-t border-gray-200"></div>
                                     <form @submit.prevent="logout">
-                                        <DropdownLink as="button"
-                                            >Cerrar sesión</DropdownLink
-                                        >
+                                        <DropdownLink as="button">Cerrar sesión</DropdownLink>
                                     </form>
                                 </template>
                             </Dropdown>
@@ -804,22 +579,16 @@ defineProps({ title: String });
                     </div>
                 </header>
 
-                <main
-                    v-if="
-                        $page.props.auth.user &&
-                        $page.props.auth.user.rol &&
-                        $page.props.auth.user.rol.name === 'Soporte'
-                    "
-                    class="flex-1"
-                >
+                <main v-if="
+                    $page.props.auth.user &&
+                    $page.props.auth.user.rol &&
+                    $page.props.auth.user.rol.name === 'Soporte'
+                " class="flex-1">
                     <slot />
                 </main>
 
                 <!-- Mensaje de error si el usuario no está autenticado o no tiene el rol adecuado -->
-                <div
-                    v-else
-                    class="flex items-center justify-center min-h-screen bg-white"
-                >
+                <div v-else class="flex items-center justify-center min-h-screen bg-white">
                     <h1 class="text-xl font-semibold text-gray-800">
                         No tienes acceso a esta página o no estás autenticado.
                     </h1>
@@ -828,73 +597,45 @@ defineProps({ title: String });
         </div>
     </div>
     <!--APPLAYOUT PARA USUARIO-->
-    <div
-        v-else-if="
-            $page.props.auth.user &&
-            $page.props.auth.user.rol &&
-            $page.props.auth.user.rol.name === 'Usuario'
-        "
-    >
+    <div v-else-if="
+        $page.props.auth.user &&
+        $page.props.auth.user.rol &&
+        $page.props.auth.user.rol.name === 'Usuario'
+    ">
+
         <Head :title="title" />
         <Banner />
         <div class="flex min-h-screen bg-white">
-            <nav
-                class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
-                :class="abrirSidebar ? 'w-48' : 'w-20'"
-            >
+            <nav class="transition-all duration-160 ease-in-out bg-[#222D32] shadow-md"
+                :class="abrirSidebar ? 'w-48' : 'w-20'">
                 <div class="w-full py-4">
                     <div class="flex items-center justify-center mb-6">
                         <Link :href="route('user-dashboard')">
-                            <ApplicationMark class="block w-auto h-8" />
+                        <ApplicationMark class="block w-auto h-8" />
                         </Link>
                     </div>
 
-                    <div
-                        v-if="
-                            $page.props.auth.user &&
-                            $page.props.auth.user.rol &&
-                            $page.props.auth.user.rol.name === 'Usuario'
-                        "
-                        class="flex flex-col"
-                    >
-                        <NavLink
-                            :href="route('user-dashboard')"
-                            :active="route().current('user-dashboard')"
-                            :class="
-                                linkClasses(route().current('user-dashboard'))
-                            "
-                        >
-                            <font-awesome-icon
-                                icon="tachometer-alt"
-                                class="text-lg"
-                            />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Dashboard</span
-                            >
+                    <div v-if="
+                        $page.props.auth.user &&
+                        $page.props.auth.user.rol &&
+                        $page.props.auth.user.rol.name === 'Usuario'
+                    " class="flex flex-col">
+                        <NavLink :href="route('user-dashboard')" :active="route().current('user-dashboard')" :class="linkClasses(route().current('user-dashboard'))
+                            ">
+                            <font-awesome-icon icon="tachometer-alt" class="text-lg" />
+                            <span v-if="abrirSidebar" class="ml-2">Dashboard</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('create-tickets')"
-                            :active="route().current('create-tickets')"
-                            :class="
-                                linkClasses(route().current('create-tickets'))
-                            "
-                        >
+                        <NavLink :href="route('create-tickets')" :active="route().current('create-tickets')" :class="linkClasses(route().current('create-tickets'))
+                            ">
                             <font-awesome-icon icon="ticket" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Crear Ticket</span
-                            >
+                            <span v-if="abrirSidebar" class="ml-2">Crear Ticket</span>
                         </NavLink>
 
-                        <NavLink
-                            :href="route('user-ticket')"
-                            :active="route().current('user-ticket')"
-                            :class="linkClasses(route().current('user-ticket'))"
-                        >
+                        <NavLink :href="route('user-ticket')" :active="route().current('user-ticket')"
+                            :class="linkClasses(route().current('user-ticket'))">
                             <font-awesome-icon icon="list" class="text-lg" />
-                            <span v-if="abrirSidebar" class="ml-2"
-                                >Mis Tickets</span
-                            >
+                            <span v-if="abrirSidebar" class="ml-2">Mis Tickets</span>
                         </NavLink>
                     </div>
                 </div>
@@ -902,60 +643,29 @@ defineProps({ title: String });
 
             <div class="flex flex-col flex-1">
                 <nav class="bg-[#222D32] border-b border-[#222D32]">
-                    <div
-                        class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8"
-                    >
-                        <button
-                            @click="interactuarSidebar"
-                            class="text-white focus:outline-none"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="w-6 h-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    v-if="abrirSidebar"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                                <path
-                                    v-else
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
+                    <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+                        <button @click="interactuarSidebar" class="text-white focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" stroke-width="2">
+                                <path v-if="abrirSidebar" stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6 18L18 6M6 6l12 12" />
+                                <path v-else stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
 
                         <div class="flex items-center space-x-1">
-                            <Dropdown
-                                align="right"
-                                width="78"
-                                v-model="mostrarNotificaciones"
-                            >
+                            <Dropdown align="right" width="78" v-model="mostrarNotificaciones">
                                 <template #trigger>
-                                    <button
-                                        @click="verNotificaciones"
-                                        class="relative focus:outline-none mr-4"
-                                        title="Notificaciones"
-                                    >
-                                        <font-awesome-icon
-                                            icon="bell"
-                                            class="text-white"
-                                            style="font-size: 1.5rem"
-                                        />
+                                    <button @click="verNotificaciones" class="relative focus:outline-none mr-4"
+                                        title="Notificaciones">
+                                        <font-awesome-icon icon="bell" class="text-white" style="font-size: 1.5rem" />
                                         <span
                                             class="absolute top-0 right-0 min-w-[1rem] h-4 bg-red-600 rounded-full text-xs flex items-center justify-center text-white"
                                             v-if="
                                                 notificaciones.length > 0 ||
                                                 !hayNotificaciones
-                                            "
-                                        >
+                                            ">
                                             {{
                                                 notificaciones.length > 0
                                                     ? notificaciones.length
@@ -970,22 +680,16 @@ defineProps({ title: String });
                                             Notificaciones
                                         </h4>
                                         <ul>
-                                            <li
-                                                v-for="notification in notificaciones"
-                                                :key="notification.id"
-                                                class="border-b border-gray-200 py-2"
-                                                :class="{
+                                            <li v-for="notification in notificaciones" :key="notification.id"
+                                                class="border-b border-gray-200 py-2" :class="{
                                                     'bg-gray-100':
                                                         !notification.read_at,
-                                                }"
-                                            >
-                                                <template
-                                                    v-if="
-                                                        notification.data
-                                                            .new_status ===
-                                                        'Cerrado'
-                                                    "
-                                                >
+                                                }">
+                                                <template v-if="
+                                                    notification.data
+                                                        .new_status ===
+                                                    'Cerrado'
+                                                ">
                                                     <strong>
                                                         {{
                                                             notification.data
@@ -997,16 +701,13 @@ defineProps({ title: String });
                                                     <strong>{{
                                                         notification.data
                                                             .tic_title
-                                                    }}</strong
-                                                    >.
+                                                    }}</strong>.
                                                 </template>
-                                                <template
-                                                    v-else-if="
-                                                        notification.data
-                                                            .new_status ===
-                                                        'Reabierto'
-                                                    "
-                                                >
+                                                <template v-else-if="
+                                                    notification.data
+                                                        .new_status ===
+                                                    'Reabierto'
+                                                ">
                                                     <strong>
                                                         {{
                                                             notification.data
@@ -1018,16 +719,13 @@ defineProps({ title: String });
                                                     <strong>{{
                                                         notification.data
                                                             .tic_title
-                                                    }}</strong
-                                                    >.
+                                                    }}</strong>.
                                                 </template>
-                                                <template
-                                                    v-else-if="
-                                                        notification.data
-                                                            .new_status ===
-                                                        'En progreso'
-                                                    "
-                                                >
+                                                <template v-else-if="
+                                                    notification.data
+                                                        .new_status ===
+                                                    'En progreso'
+                                                ">
                                                     {{
                                                         notification.data
                                                             .person_name
@@ -1036,16 +734,13 @@ defineProps({ title: String });
                                                     <strong>{{
                                                         notification.data
                                                             .tic_title
-                                                    }}</strong
-                                                    >, ahora está en progreso.
+                                                    }}</strong>, ahora está en progreso.
                                                 </template>
-                                                <template
-                                                    v-else-if="
-                                                        notification.data
-                                                            .new_status ===
-                                                        'Resuelto'
-                                                    "
-                                                >
+                                                <template v-else-if="
+                                                    notification.data
+                                                        .new_status ===
+                                                    'Resuelto'
+                                                ">
                                                     {{
                                                         notification.data
                                                             .person_name
@@ -1054,12 +749,9 @@ defineProps({ title: String });
                                                     <strong>{{
                                                         notification.data
                                                             .tic_title
-                                                    }}</strong
-                                                    >, trabajo concluido.
+                                                    }}</strong>, trabajo concluido.
                                                 </template>
-                                                <div
-                                                    class="text-gray-500 text-sm"
-                                                >
+                                                <div class="text-gray-500 text-sm">
                                                     {{
                                                         new Date(
                                                             notification.created_at
@@ -1077,31 +769,20 @@ defineProps({ title: String });
 
                             <Dropdown align="right" width="48">
                                 <template #trigger>
-                                    <button
-                                        @click="interactuarDropdown"
-                                        class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none"
-                                    >
-                                        <template
-                                            v-if="
-                                                $page.props.auth.user
-                                                    .profile_photo_url
-                                            "
-                                        >
-                                            <img
-                                                class="w-8 h-8 rounded-full"
-                                                :src="
-                                                    $page.props.auth.user
-                                                        .profile_photo_url
-                                                "
-                                                :alt="
-                                                    $page.props.auth.user.name
-                                                "
-                                            />
+                                    <button @click="interactuarDropdown"
+                                        class="flex items-center text-sm transition border-2 border-transparent rounded-full focus:outline-none">
+                                        <template v-if="
+                                            $page.props.auth.user
+                                                .profile_photo_url
+                                        ">
+                                            <img class="w-8 h-8 rounded-full" :src="$page.props.auth.user
+                                                .profile_photo_url
+                                                " :alt="$page.props.auth.user.name
+                                                    " />
                                         </template>
                                         <template v-else>
                                             <div
-                                                class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full"
-                                            >
+                                                class="flex items-center justify-center w-8 h-8 font-bold text-[#2EBAA1] bg-white rounded-full">
                                                 {{
                                                     getInitials(
                                                         $page.props.auth.user
@@ -1111,34 +792,20 @@ defineProps({ title: String });
                                             </div>
                                         </template>
 
-                                        <span
-                                            class="hidden ml-2 font-semibold text-white lg:block"
-                                            >{{
-                                                $page.props.auth.user.name
-                                            }}</span
-                                        >
-                                        <font-awesome-icon
-                                            icon="chevron-down"
-                                            class="ml-2 text-white"
-                                        />
+                                        <span class="hidden ml-2 font-semibold text-white lg:block">{{
+                                            $page.props.auth.user.name
+                                            }}</span>
+                                        <font-awesome-icon icon="chevron-down" class="ml-2 text-white" />
                                     </button>
                                 </template>
                                 <template #content>
-                                    <DropdownLink :href="route('profile.show')"
-                                        >Perfil</DropdownLink
-                                    >
-                                    <DropdownLink
-                                        v-if="
-                                            $page.props.jetstream.hasApiFeatures
-                                        "
-                                        :href="route('api-tokens.index')"
-                                        >API Tokens</DropdownLink
-                                    >
+                                    <DropdownLink :href="route('profile.show')">Perfil</DropdownLink>
+                                    <DropdownLink v-if="
+                                        $page.props.jetstream.hasApiFeatures
+                                    " :href="route('api-tokens.index')">API Tokens</DropdownLink>
                                     <div class="border-t border-gray-200"></div>
                                     <form @submit.prevent="logout">
-                                        <DropdownLink as="button"
-                                            >Cerrar sesión</DropdownLink
-                                        >
+                                        <DropdownLink as="button">Cerrar sesión</DropdownLink>
                                     </form>
                                 </template>
                             </Dropdown>
@@ -1152,22 +819,16 @@ defineProps({ title: String });
                     </div>
                 </header>
 
-                <main
-                    v-if="
-                        $page.props.auth.user &&
-                        $page.props.auth.user.rol &&
-                        $page.props.auth.user.rol.name === 'Usuario'
-                    "
-                    class="flex-1"
-                >
+                <main v-if="
+                    $page.props.auth.user &&
+                    $page.props.auth.user.rol &&
+                    $page.props.auth.user.rol.name === 'Usuario'
+                " class="flex-1">
                     <slot />
                 </main>
 
                 <!-- Mensaje de error si el usuario no está autenticado o no tiene el rol adecuado -->
-                <div
-                    v-else
-                    class="flex items-center justify-center min-h-screen bg-white"
-                >
+                <div v-else class="flex items-center justify-center min-h-screen bg-white">
                     <h1 class="text-xl font-semibold text-gray-800">
                         No tienes acceso a esta página o no estás autenticado.
                     </h1>

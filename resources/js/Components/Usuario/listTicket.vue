@@ -318,148 +318,104 @@ const cerrarEliminarModal = () => {
 
 <template>
     <div class="p-6 flex justify-center">
-        <div
-            class="shadow-custom bg-white rounded-lg shadow-lg p-4 w-full max-w-6xl"
-        >
-            <h1
-                class="mb-2 text-sm font-bold text-gray-500 sm:text-lg md:text-xl"
-            >
+        <div class="shadow-custom bg-white rounded-lg shadow-lg p-4 w-full max-w-6xl">
+            <h1 class="mb-2 text-sm font-bold text-gray-500 sm:text-lg md:text-xl">
                 Mis Tickets
             </h1>
 
-            <div
-                class="overflow-x-auto pl-1 pt-5 pb-1 flex justify-center flex-wrap"
-            >
-                <button
-                    :class="[
-                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
-                        activeTab === 'open'
-                            ? 'bg-[#2EBAA1] text-white'
-                            : 'bg-white text-[#2EBAA1]',
-                    ]"
-                    @click="showTickets('open')"
-                >
+            <div class="overflow-x-auto pl-1 pt-5 pb-1 flex justify-center flex-wrap">
+                <button :class="[
+                    'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                    activeTab === 'open'
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-[#2EBAA1]',
+                ]" @click="showTickets('open')">
                     Mis Tickets Recientes
                 </button>
-                <button
-                    :class="[
-                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
-                        activeTab === 'reopen'
-                            ? 'bg-[#2EBAA1] text-white'
-                            : 'bg-white text-[#2EBAA1]',
-                    ]"
-                    @click="showTickets('reopen')"
-                >
+                <button :class="[
+                    'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                    activeTab === 'reopen'
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-[#2EBAA1]',
+                ]" @click="showTickets('reopen')">
                     Mis Tickets Reabiertos
                 </button>
-                <button
-                    :class="[
-                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
-                        activeTab === 'in-progress'
-                            ? 'bg-[#2EBAA1] text-white'
-                            : 'bg-white text-[#2EBAA1]',
-                    ]"
-                    @click="showTickets('in-progress')"
-                >
+                <button :class="[
+                    'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                    activeTab === 'in-progress'
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-[#2EBAA1]',
+                ]" @click="showTickets('in-progress')">
                     Mis Tickets En Progreso
                 </button>
-                <button
-                    :class="[
-                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
-                        activeTab === 'result'
-                            ? 'bg-[#2EBAA1] text-white'
-                            : 'bg-white text-[#2EBAA1]',
-                    ]"
-                    @click="showTickets('result')"
-                >
+                <button :class="[
+                    'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                    activeTab === 'result'
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-[#2EBAA1]',
+                ]" @click="showTickets('result')">
                     Mis Tickets Resueltos
                 </button>
-                <button
-                    :class="[
-                        'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
-                        activeTab === 'closed'
-                            ? 'bg-[#2EBAA1] text-white'
-                            : 'bg-white text-[#2EBAA1]',
-                    ]"
-                    @click="showTickets('closed')"
-                >
+                <button :class="[
+                    'mr-2 mb-3 w-full sm:w-auto flex justify-center items-center px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 rounded-lg shadow',
+                    activeTab === 'closed'
+                        ? 'bg-[#2EBAA1] text-white'
+                        : 'bg-white text-[#2EBAA1]',
+                ]" @click="showTickets('closed')">
                     Mis Tickets Cerrados
                 </button>
             </div>
 
             <div class="overflow-x-auto">
                 <div class="hidden sm:block" v-if="activeTab === 'open'">
-                    <table
-                        class="min-w-full divide-y divide-gray-200 table-auto"
-                    >
+                    <table class="min-w-full divide-y divide-gray-200 table-auto">
                         <thead class="bg-white">
                             <tr>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     N°
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Título
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Descripción
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                v-for="ticket in tickets.open"
-                                :key="ticket.id"
-                                @click="handleVerComentarios(ticket)"
-                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
-                            >
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                            <tr v-for="ticket in tickets.open" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer">
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.row_number }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_titulo }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
-                                >
-                                    <button
-                                        @click.stop="viewTicket(ticket)"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2">
+                                    <button @click.stop="viewTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
-                                        title="Ver detalles"
-                                    >
+                                        title="Ver detalles">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button
-                                        @click.stop="editTicket(ticket)"
+                                    <button @click.stop="editTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-teal-300 to-teal-500 hover:from-teal-400 hover:to-green-600"
-                                        title="Editar"
-                                    >
+                                        title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button
-                                        @click.stop="deleteTicket(ticket)"
+                                    <button @click.stop="deleteTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-red-300 to-red-500 hover:from-red-400 hover:to-red-600"
-                                        title="Eliminar"
-                                    >
+                                        title="Eliminar">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -467,160 +423,115 @@ const cerrarEliminarModal = () => {
                         </tbody>
                     </table>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
 
                 <div class="block sm:hidden" v-if="activeTab === 'open'">
-                    <div
-                        v-for="ticket in tickets.open"
-                        :key="ticket.id"
-                        @click="handleVerComentarios(ticket)"
-                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer"
-                    >
+                    <div v-for="ticket in tickets.open" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer">
                         <p
-                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
-                        >
+                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full">
                             {{ ticket.row_number }}
                         </p>
 
-                        <p class="text-sm font-semibold text-gray-700">
+                        <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]"
+                            :title="ticket.tic_titulo">
                             Título: {{ ticket.tic_titulo }}
                         </p>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
                         </p>
                         <div class="flex space-x-4 mt-3">
-                            <button
-                                @click.stop="viewTicket(ticket)"
-                                class="text-teal-600 hover:text-teal-800"
-                                title="Ver detalles"
-                            >
+                            <button @click.stop="viewTicket(ticket)" class="text-teal-600 hover:text-teal-800"
+                                title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button
-                                @click.stop="editTicket(ticket)"
-                                class="text-green-600 hover:text-green-800"
-                                title="Editar"
-                            >
+                            <button @click.stop="editTicket(ticket)" class="text-green-600 hover:text-green-800"
+                                title="Editar">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button
-                                @click.stop="deleteTicket(ticket)"
-                                class="text-red-600 hover:text-red-800"
-                                title="Eliminar"
-                            >
+                            <button @click.stop="deleteTicket(ticket)" class="text-red-600 hover:text-red-800"
+                                title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
 
                 <div class="hidden sm:block" v-if="activeTab === 'reopen'">
-                    <table
-                        class="min-w-full divide-y divide-gray-200 table-auto"
-                    >
+                    <table class="min-w-full divide-y divide-gray-200 table-auto">
                         <thead class="bg-white">
                             <tr>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     N°
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Título
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Descripción
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                v-for="ticket in tickets.reAbierto"
-                                :key="ticket.id"
+                            <tr v-for="ticket in tickets.reAbierto" :key="ticket.id"
                                 @click="handleVerComentarios(ticket)"
-                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
-                            >
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer">
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.row_number }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_titulo }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
-                                >
-                                    <button
-                                        @click.stop="viewTicket(ticket)"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2">
+                                    <button @click.stop="viewTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
-                                        title="Ver detalles"
-                                    >
+                                        title="Ver detalles">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button
-                                        @click.stop="editTicket(ticket)"
+                                    <button @click.stop="editTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-teal-300 to-teal-500 hover:from-teal-400 hover:to-green-600"
-                                        title="Editar"
-                                    >
+                                        title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button
-                                        @click.stop="deleteTicket(ticket)"
+                                    <button @click.stop="deleteTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-red-300 to-red-500 hover:from-red-400 hover:to-red-600"
-                                        title="Eliminar"
-                                    >
+                                        title="Eliminar">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -628,146 +539,104 @@ const cerrarEliminarModal = () => {
                         </tbody>
                     </table>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
 
                 <div class="block sm:hidden" v-if="activeTab === 'reopen'">
-                    <div
-                        v-for="ticket in tickets.reAbierto"
-                        :key="ticket.id"
-                        @click="handleVerComentarios(ticket)"
-                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer"
-                    >
+                    <div v-for="ticket in tickets.reAbierto" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer">
                         <p
-                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
-                        >
+                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full">
                             {{ ticket.row_number }}
                         </p>
 
-                        <p class="text-sm font-semibold text-gray-700">
+                        <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
                             Título: {{ ticket.tic_titulo }}
                         </p>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
                         </p>
                         <div class="flex space-x-4 mt-3">
-                            <button
-                                @click.stop="viewTicket(ticket)"
-                                class="text-teal-600 hover:text-teal-800"
-                                title="Ver detalles"
-                            >
+                            <button @click.stop="viewTicket(ticket)" class="text-teal-600 hover:text-teal-800"
+                                title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button
-                                @click.stop="editTicket(ticket)"
-                                class="text-green-600 hover:text-green-800"
-                                title="Editar"
-                            >
+                            <button @click.stop="editTicket(ticket)" class="text-green-600 hover:text-green-800"
+                                title="Editar">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button
-                                @click.stop="deleteTicket(ticket)"
-                                class="text-red-600 hover:text-red-800"
-                                title="Eliminar"
-                            >
+                            <button @click.stop="deleteTicket(ticket)" class="text-red-600 hover:text-red-800"
+                                title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
 
                 <div class="hidden sm:block" v-if="activeTab === 'in-progress'">
-                    <table
-                        class="min-w-full divide-y divide-gray-200 table-auto"
-                    >
+                    <table class="min-w-full divide-y divide-gray-200 table-auto">
                         <thead class="bg-white">
                             <tr>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     N°
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Título
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Descripción
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                v-for="ticket in tickets.inProgress"
-                                :key="ticket.id"
+                            <tr v-for="ticket in tickets.inProgress" :key="ticket.id"
                                 @click="handleVerComentarios(ticket)"
-                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
-                            >
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer">
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.row_number }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_titulo }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
-                                >
-                                    <button
-                                        @click.stop="viewTicket(ticket)"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2">
+                                    <button @click.stop="viewTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
-                                        title="Ver detalles"
-                                    >
+                                        title="Ver detalles">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </td>
@@ -775,132 +644,95 @@ const cerrarEliminarModal = () => {
                         </tbody>
                     </table>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
 
                 <div class="block sm:hidden" v-if="activeTab === 'in-progress'">
-                    <div
-                        v-for="ticket in tickets.inProgress"
-                        :key="ticket.id"
-                        @click="handleVerComentarios(ticket)"
-                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer"
-                    >
+                    <div v-for="ticket in tickets.inProgress" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer">
                         <p
-                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
-                        >
+                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full">
                             {{ ticket.row_number }}
                         </p>
 
-                        <p class="text-sm font-semibold text-gray-700">
+                        <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
                             Título: {{ ticket.tic_titulo }}
                         </p>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
                         </p>
                         <div class="flex space-x-4 mt-3">
-                            <button
-                                @click.stop="viewTicket(ticket)"
-                                class="text-teal-600 hover:text-teal-800"
-                                title="Ver detalles"
-                            >
+                            <button @click.stop="viewTicket(ticket)" class="text-teal-600 hover:text-teal-800"
+                                title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                     </div>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
 
                 <div class="hidden sm:block" v-if="activeTab === 'result'">
-                    <table
-                        class="min-w-full divide-y divide-gray-200 table-auto"
-                    >
+                    <table class="min-w-full divide-y divide-gray-200 table-auto">
                         <thead class="bg-white">
                             <tr>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     N°
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Título
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Descripción
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                v-for="ticket in tickets.result"
-                                :key="ticket.id"
-                                @click="handleVerComentarios(ticket)"
-                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
-                            >
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                            <tr v-for="ticket in tickets.result" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer">
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.row_number }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_titulo }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
-                                >
-                                    <button
-                                        @click.stop="viewTicket(ticket)"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2">
+                                    <button @click.stop="viewTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
-                                        title="Ver detalles"
-                                    >
+                                        title="Ver detalles">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </td>
@@ -908,69 +740,51 @@ const cerrarEliminarModal = () => {
                         </tbody>
                     </table>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
 
                 <div class="block sm:hidden" v-if="activeTab === 'result'">
-                    <div
-                        v-for="ticket in tickets.result"
-                        :key="ticket.id"
-                        @click="handleVerComentarios(ticket)"
-                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer"
-                    >
+                    <div v-for="ticket in tickets.result" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer">
                         <p
-                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
-                        >
+                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full">
                             {{ ticket.row_number }}
                         </p>
 
-                        <p class="text-sm font-semibold text-gray-700">
+                        <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
                             Título: {{ ticket.tic_titulo }}
                         </p>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
                         </p>
 
                         <div class="flex space-x-4 mt-3">
-                            <button
-                                @click.stop="viewTicket(ticket)"
-                                class="text-teal-600 hover:text-teal-800"
-                                title="Ver detalles"
-                            >
+                            <button @click.stop="viewTicket(ticket)" class="text-teal-600 hover:text-teal-800"
+                                title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                         <div class="mt-4 flex justify-center">
-                            <button
-                                v-for="page in Array.from(
-                                    { length: totalPages },
-                                    (_, i) => i + 1
-                                )"
-                                :key="page"
-                                :class="[
+                            <button v-for="page in Array.from(
+                                { length: totalPages },
+                                (_, i) => i + 1
+                            )" :key="page" :class="[
                                     currentPage === page
                                         ? 'bg-[#2EBAA1] text-white'
                                         : 'bg-white text-[#2EBAA1]',
                                     'mx-2 px-3 py-1 rounded-lg',
-                                ]"
-                                @click="changePage(page)"
-                            >
+                                ]" @click="changePage(page)">
                                 {{ page }}
                             </button>
                         </div>
@@ -978,63 +792,44 @@ const cerrarEliminarModal = () => {
                 </div>
 
                 <div class="hidden sm:block" v-if="activeTab === 'closed'">
-                    <table
-                        class="min-w-full divide-y divide-gray-200 table-auto"
-                    >
+                    <table class="min-w-full divide-y divide-gray-200 table-auto">
                         <thead class="bg-white">
                             <tr>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     N°
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Título
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Descripción
                                 </th>
                                 <th
-                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                    class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                v-for="ticket in tickets.closed"
-                                :key="ticket.id"
-                                @click="handleVerComentarios(ticket)"
-                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
-                            >
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                            <tr v-for="ticket in tickets.closed" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                                class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer">
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.row_number }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_titulo }}
                                 </td>
-                                <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm"
-                                >
+                                <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm">
                                     {{ ticket.tic_descripcion }}
                                 </td>
                                 <td
-                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2"
-                                >
-                                    <button
-                                        @click.stop="viewTicket(ticket)"
+                                    class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm text-center space-x-2">
+                                    <button @click.stop="viewTicket(ticket)"
                                         class="text-transparent transition-all duration-300 bg-clip-text bg-gradient-to-r from-gray-300 to-gray-500 hover:from-gray-400 hover:to-gray-600"
-                                        title="Ver detalles"
-                                    >
+                                        title="Ver detalles">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </td>
@@ -1042,107 +837,68 @@ const cerrarEliminarModal = () => {
                         </tbody>
                     </table>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="block sm:hidden" v-if="activeTab === 'closed'">
-                    <div
-                        v-for="ticket in tickets.closed"
-                        :key="ticket.id"
-                        @click="handleVerComentarios(ticket)"
-                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer"
-                    >
+                    <div v-for="ticket in tickets.closed" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                        class="relative border rounded-lg p-4 mb-4 shadow-sm cursor-pointer">
                         <p
-                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full"
-                        >
+                            class="absolute top-0 right-0 mt-2 mr-2 px-3 py-1 text-xs font-bold text-white uppercase bg-green-500 rounded-full">
                             {{ ticket.row_number }}
                         </p>
 
-                        <p class="text-sm font-semibold text-gray-700">
+                        <p class="text-sm font-semibold text-gray-700 truncate max-w-[200px]">
                             Título: {{ ticket.tic_titulo }}
                         </p>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-sm text-gray-500 truncate max-w-[200px]">
                             Descripción: {{ ticket.tic_descripcion }}
                         </p>
 
                         <div class="flex space-x-4 mt-3">
-                            <button
-                                @click.stop="viewTicket(ticket)"
-                                class="text-teal-600 hover:text-teal-800"
-                                title="Ver detalles"
-                            >
+                            <button @click.stop="viewTicket(ticket)" class="text-teal-600 hover:text-teal-800"
+                                title="Ver detalles">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                     </div>
                     <div class="mt-4 flex justify-center">
-                        <button
-                            v-for="page in Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1
-                            )"
-                            :key="page"
-                            :class="[
+                        <button v-for="page in Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        )" :key="page" :class="[
                                 currentPage === page
                                     ? 'bg-[#2EBAA1] text-white'
                                     : 'bg-white text-[#2EBAA1]',
                                 'mx-2 px-3 py-1 rounded-lg',
-                            ]"
-                            @click="changePage(page)"
-                        >
+                            ]" @click="changePage(page)">
                             {{ page }}
                         </button>
                     </div>
                 </div>
             </div>
 
-            <ModalVer
-                v-if="mostrarModalDetalles"
-                :item="itemSeleccionado"
-                itemName="Ticket"
-                :formFieldsVer="formFieldsVer"
-                :mostrarModalDetalles="mostrarModalDetalles"
-                @close="cerrarDetallesModal"
-            />
+            <ModalVer v-if="mostrarModalDetalles" :item="itemSeleccionado" itemName="Ticket"
+                :formFieldsVer="formFieldsVer" :mostrarModalDetalles="mostrarModalDetalles"
+                @close="cerrarDetallesModal" />
 
-            <ModalEditar
-                v-if="mostrarModalEditar"
-                :item="itemSeleccionado"
-                itemName="Ticket"
-                :formFields="formFields"
-                :categorias="categorias"
-                :pabellons="pabellones"
-                :aulas="aulas"
-                :mostrarModalEditar="mostrarModalEditar"
-                endpoint="/user-tickets"
-                @cerrar="cerrarEditarModal"
-                @update="loadTickets"
-            />
+            <ModalEditar v-if="mostrarModalEditar" :item="itemSeleccionado" itemName="Ticket" :formFields="formFields"
+                :categorias="categorias" :pabellons="pabellones" :aulas="aulas" :mostrarModalEditar="mostrarModalEditar"
+                endpoint="/user-tickets" @cerrar="cerrarEditarModal" @update="loadTickets" />
 
-            <ModalEliminar
-                v-if="mostrarModalEliminar"
-                :item="itemSeleccionado"
-                itemName="Ticket"
-                fieldName="tic_titulo"
-                @cancelar="cerrarEliminarModal"
-                @confirmar="eliminarItem"
-            />
+            <ModalEliminar v-if="mostrarModalEliminar" :item="itemSeleccionado" itemName="Ticket" fieldName="tic_titulo"
+                @cancelar="cerrarEliminarModal" @confirmar="eliminarItem" />
         </div>
     </div>
 </template>

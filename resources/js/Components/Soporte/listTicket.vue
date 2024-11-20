@@ -2,6 +2,7 @@
 import { ref, onMounted, computed, nextTick } from "vue";
 import ModalFinalizar from "@/Components/ModalFinalizar.vue";
 import ModalAceptar from "../ModalAceptar.vue";
+import ButtonCerrar from "../ButtonCerrar.vue";
 
 const props = defineProps({
     success: String,
@@ -27,6 +28,13 @@ const currentPage = ref(1);
 const ticketsPerPage = ref(10);
 
 const isMobile = ref(window.innerWidth < 768);
+
+const emit = defineEmits(["close"]);
+
+const cerrarDetallesModal = () => {
+    mostrarModal.value = false;
+    emit("close");
+};
 
 const handleVerComentarios = (ticket) => {
     window.location.href = `/soporte/comentario/${ticket.id}`;
@@ -297,52 +305,30 @@ const getEstadoLabelClass = (estado) => {
         <h1 class="text-xl font-bold text-left mb-4">Tickets Asignados</h1>
 
         <!-- Barra de búsqueda y Filtros -->
-        <div
-            class="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between mb-4"
-        >
+        <div class="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between mb-4">
             <!-- Barra de búsqueda -->
             <div class="relative w-full sm:w-auto">
-                <span
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </span>
-                <input
-                    type="text"
-                    v-model="buscarQuery"
-                    placeholder="Buscar..."
-                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5"
-                />
+                <input type="text" v-model="buscarQuery" placeholder="Buscar..."
+                    class="w-full py-2 placeholder-gray-400 border border-gray-300 rounded-md px-9 focus:border-gray-400 focus:ring focus:ring-gray-400 focus:ring-opacity-5" />
             </div>
 
             <!-- Filtro por Estado con Dropdown y Checkboxes -->
             <div class="relative w-full sm:w-auto">
-                <button
-                    @click="toggleDropdown"
-                    class="flex items-center px-4 py-2 bg-white border rounded-md shadow-md"
-                >
-                    <i
-                        class="fas fa-sliders-h cursor-pointer text-gray-500 mr"
-                    ></i>
+                <button @click="toggleDropdown"
+                    class="flex items-center px-4 py-2 bg-white border rounded-md shadow-md">
+                    <i class="fas fa-sliders-h cursor-pointer text-gray-500 mr"></i>
                 </button>
 
                 <!-- Dropdown de checkboxes -->
-                <div
-                    v-if="dropdownOpen"
-                    class="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50"
-                >
+                <div v-if="dropdownOpen" class="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
                     <div class="p-2">
-                        <label
-                            v-for="estado in estadosDisponibles"
-                            :key="estado"
-                            class="flex items-center space-x-2 py-1"
-                        >
-                            <input
-                                type="checkbox"
-                                v-model="filtroEstado"
-                                :value="estado"
-                                class="form-checkbox h-4 w-4 text-blue-600"
-                            />
+                        <label v-for="estado in estadosDisponibles" :key="estado"
+                            class="flex items-center space-x-2 py-1">
+                            <input type="checkbox" v-model="filtroEstado" :value="estado"
+                                class="form-checkbox h-4 w-4 text-blue-600" />
                             <span>{{ estado }}</span>
                         </label>
                     </div>
@@ -352,22 +338,15 @@ const getEstadoLabelClass = (estado) => {
 
         <!-- Botón para cambiar la vista -->
         <div class="text-right mb-4" v-if="!isMobile">
-            <button
-                @click="toggleView"
-                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition-colors duration-300"
-            >
-                <i
-                    :class="isTableView ? 'fas fa-th-large' : 'fas fa-table'"
-                ></i>
+            <button @click="toggleView"
+                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition-colors duration-300">
+                <i :class="isTableView ? 'fas fa-th-large' : 'fas fa-table'"></i>
             </button>
         </div>
 
         <!-- Modal de detalles del ticket -->
-        <div
-            v-if="mostrarModal"
-            class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30 z-50"
-        >
-            <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg z-50">
+        <div v-if="mostrarModal" class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-30 z-50">
+            <div class="w-full max-w-lg p-2 bg-white rounded-lg shadow-lg overflow-y-auto max-h-[90vh] z-50">
                 <div class="p-4 border-2 border-gray-400 rounded-lg">
                     <h2 class="mb-4 text-xl font-bold text-gray-600">
                         Detalles del Ticket
@@ -375,108 +354,72 @@ const getEstadoLabelClass = (estado) => {
                     <table class="w-full border-collapse">
                         <thead>
                             <tr>
-                                <th
-                                    class="py-2 pr-10 text-left text-gray-600 border-b-2 border-gray-400"
-                                >
+                                <th class="py-2 pr-10 text-left text-gray-600 border-b-2 border-gray-400">
                                     Campo
                                 </th>
-                                <th
-                                    class="py-2 text-left text-gray-600 border-b-2 border-gray-400"
-                                >
+                                <th class="py-2 text-left text-gray-600 border-b-2 border-gray-400">
                                     Valor
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                v-for="(field, index) in formFieldsVer"
-                                :key="index"
-                                class="border-b border-gray-400"
-                            >
-                                <td
-                                    class="py-2 pr-10 font-semibold text-left text-gray-500"
-                                >
+                            <tr v-for="(field, index) in formFieldsVer" :key="index" class="border-b border-gray-400">
+                                <td class="py-2 pr-10 font-semibold text-left text-gray-500">
                                     {{ field.label }}
                                 </td>
                                 <td class="py-2 text-left text-gray-600">
                                     <!-- Mostrar fecha con formato si es 'created_at' -->
-                                    <span v-if="field.name === 'created_at'">
+                                    <span v-if="field.name === 'created_at'" class="truncate block max-w-[200px]">
                                         {{
                                             ticketSeleccionado[field.name]
-                                                ? new Date(
-                                                      ticketSeleccionado[
-                                                          field.name
-                                                      ]
-                                                  ).toLocaleString()
+                                                ? new Date(ticketSeleccionado[field.name]).toLocaleString()
                                                 : "No disponible"
                                         }}
                                     </span>
 
                                     <!-- Mostrar la imagen si el campo es 'tic_archivo' -->
-                                    <span
-                                        v-else-if="field.name === 'tic_archivo'"
-                                    >
-                                        <div
-                                            v-if="
-                                                ticketSeleccionado[field.name]
-                                            "
-                                        >
-                                            <img
-                                                :src="`/storage/${ticketSeleccionado[field.name]}`"
+                                    <span v-else-if="field.name === 'tic_archivo'">
+                                        <div v-if="ticketSeleccionado[field.name]">
+                                            <img :src="`/storage/${ticketSeleccionado[field.name]}`"
                                                 alt="Archivo asociado"
                                                 class="object-cover w-32 h-32 border border-gray-300 rounded-lg cursor-pointer"
-                                                @click="openImageModal(`/storage/${ticketSeleccionado[field.name]}`)"
-                                            />
+                                                @click="openImageModal(`/storage/${ticketSeleccionado[field.name]}`)" />
                                         </div>
                                         <div v-else>No disponible</div>
                                     </span>
 
-                                    <!-- Mostrar texto por defecto para otros campos -->
-                                    <span v-else>{{
-                                        ticketSeleccionado[field.name] ||
-                                        "No disponible"
-                                    }}</span>
+                                    <!-- Mostrar texto por defecto para otros campos (truncar aquí) -->
+                                    <span
+                                        class="truncate block max-w-[200px] text-ellipsis overflow-hidden whitespace-nowrap"
+                                        v-else>
+                                        {{ ticketSeleccionado[field.name] || "No disponible" }}
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
                     <div class="flex justify-end mt-4">
-                        <button
-                            @click="cerrarModal"
-                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-                        >
-                            Cerrar
-                        </button>
+                        <ButtonCerrar @click="cerrarDetallesModal" />
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Vista de Tarjetas -->
-        <div
-            v-if="!isTableView && paginatedTickets.length > 0"
-            class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-        >
-            <div
-                v-for="ticket in paginatedTickets"
-                :key="ticket.id"
-                @click="handleVerComentarios(ticket)"
-                class="relative w-full cursor-pointer transition duration-300 transform hover:scale-105 hover:shadow-lg z-10.stop"
-            >
-                <span
-                    class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg"
-                    :class="{
-                        'bg-orange-600': ticket.tic_estado === 'Abierto',
-                        'bg-gray-600': ticket.tic_estado === 'Asignado',
-                        'bg-blue-600': ticket.tic_estado === 'En progreso',
-                        'bg-green-600': ticket.tic_estado === 'Resuelto',
-                        'bg-red-600': ticket.tic_estado === 'Cerrado',
-                        'bg-yellow-600': ticket.tic_estado === 'Reabierto',
-                    }"
-                ></span>
-                <div
-                    class="relative h-full p-4 bg-white border-2 rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl z-10"
+        <div v-if="!isTableView && paginatedTickets.length > 0"
+            class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            <div v-for="ticket in paginatedTickets" :key="ticket.id" @click="handleVerComentarios(ticket)"
+                class="relative w-full cursor-pointer transition duration-300 transform hover:scale-105 hover:shadow-lg z-10.stop">
+                <span class="absolute top-0 left-0 w-full h-full mt-1 ml-1 rounded-lg" :class="{
+                    'bg-orange-600': ticket.tic_estado === 'Abierto',
+                    'bg-gray-600': ticket.tic_estado === 'Asignado',
+                    'bg-blue-600': ticket.tic_estado === 'En progreso',
+                    'bg-green-600': ticket.tic_estado === 'Resuelto',
+                    'bg-red-600': ticket.tic_estado === 'Cerrado',
+                    'bg-yellow-600': ticket.tic_estado === 'Reabierto',
+                }"></span>
+                <div class="relative h-full p-4 bg-white border-2 rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl z-10"
                     :class="{
                         'border-orange-600': ticket.tic_estado === 'Abierto',
                         'border-gray-600': ticket.tic_estado === 'Asignado',
@@ -484,10 +427,8 @@ const getEstadoLabelClass = (estado) => {
                         'border-green-600': ticket.tic_estado === 'Resuelto',
                         'border-red-600': ticket.tic_estado === 'Cerrado',
                         'border-yellow-600': ticket.tic_estado === 'Reabierto',
-                    }"
-                >
-                    <div
-                        class="absolute px-3 py-1 text-xs font-semibold transition-colors duration-300 rounded-full shadow-md top-2 right-2"
+                    }">
+                    <div class="absolute px-3 py-1 text-xs font-semibold transition-colors duration-300 rounded-full shadow-md top-2 right-2"
                         :class="{
                             'bg-orange-600 text-white':
                                 ticket.tic_estado === 'Abierto',
@@ -501,64 +442,47 @@ const getEstadoLabelClass = (estado) => {
                                 ticket.tic_estado === 'Cerrado',
                             'bg-yellow-600 text-white':
                                 ticket.tic_estado === 'Reabierto',
-                        }"
-                    >
+                        }">
                         {{ ticket.tic_estado }}
                     </div>
 
                     <div class="mt-4">
-                        <h2
-                            class="text-lg font-bold text-gray-800 uppercase truncate"
-                        >
+                        <h2 class="text-lg font-bold text-gray-800 uppercase truncate">
                             {{ ticket.tic_titulo }}
                         </h2>
                         <hr class="my-2 border-gray-200" />
                     </div>
 
                     <div class="flex flex-col space-y-2 text-sm text-gray-600">
-                        <span
-                            ><strong>Prioridad:</strong>
-                            {{ ticket.prioridad }}</span
-                        >
-                        <span
-                            ><strong>Categoría:</strong>
-                            {{ ticket.categoria }}</span
-                        >
-                        <span
-                            ><strong>Creado el:</strong>
+                        <span><strong>Prioridad:</strong>
+                            {{ ticket.prioridad }}</span>
+                        <span><strong>Categoría:</strong>
+                            {{ ticket.categoria }}</span>
+                        <span><strong>Creado el:</strong>
                             {{
                                 new Date(ticket.created_at).toLocaleDateString()
-                            }}</span
-                        >
+                            }}</span>
                     </div>
 
                     <!-- Acciones -->
                     <div class="flex justify-end mt-auto space-x-3">
-                        <button
-                            v-if="
-                                ticket.tic_estado === 'Asignado' ||
-                                ticket.tic_estado === 'Reabierto'
-                            "
-                            @click.stop="aceptarTicket(ticket)"
-                            class="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-                        >
+                        <button v-if="
+                            ticket.tic_estado === 'Asignado' ||
+                            ticket.tic_estado === 'Reabierto'
+                        " @click.stop="aceptarTicket(ticket)"
+                            class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
                             <i class="fas fa-check mr-1"></i> Aceptar
                         </button>
 
                         <!-- Botón de finalizar -->
-                        <button
-                            v-if="ticket.tic_estado === 'En progreso'"
-                            @click.stop="finalizarTicket(ticket)"
-                            class="text-green-500 hover:text-green-700 transition-colors duration-200"
-                        >
+                        <button v-if="ticket.tic_estado === 'En progreso'" @click.stop="finalizarTicket(ticket)"
+                            class="text-green-500 hover:text-green-700 transition-colors duration-200">
                             <i class="fas fa-check-circle mr-1"></i> Finalizar
                         </button>
 
                         <!-- Botón para ver detalles -->
-                        <button
-                            @click.stop="verDetalles(ticket)"
-                            class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                        >
+                        <button @click.stop="verDetalles(ticket)"
+                            class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
                             <i class="mr-1 fas fa-eye"></i> Ver
                         </button>
                     </div>
@@ -567,115 +491,79 @@ const getEstadoLabelClass = (estado) => {
         </div>
 
         <!-- Vista de Tabla -->
-        <div
-            v-if="isTableView && paginatedTickets.length > 0"
-            class="overflow-x-auto bg-white rounded-lg shadow-md"
-        >
+        <div v-if="isTableView && paginatedTickets.length > 0" class="overflow-x-auto bg-white rounded-lg shadow-md">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-white">
                     <tr>
                         <th
-                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             N°
                         </th>
                         <th
-                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             Categoría
                         </th>
                         <th
-                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
-                            Título
+                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
+                            Asunto
                         </th>
                         <th
-                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             Prioridad
                         </th>
                         <th
-                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                            class="px-2 py-2 text-xs font-bold text-left text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             Estado
                         </th>
                         <th
-                            class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                            class="px-2 py-2 text-xs font-bold text-center text-gray-500 uppercase sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             Acciones
                         </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    <tr
-                        v-for="(ticket, index) in paginatedTickets"
-                        :key="ticket.id"
+                    <tr v-for="(ticket, index) in paginatedTickets" :key="ticket.id"
                         class="transition-colors duration-200 border-b hover:bg-gray-100 cursor-pointer"
-                        @click="handleVerComentarios(ticket)"
-                    >
-                        <td
-                            class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                        @click="handleVerComentarios(ticket)">
+                        <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             {{ index + 1 }}
                         </td>
-                        <td
-                            class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                        <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             {{ ticket.categoria }}
                         </td>
-                        <td
-                            class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                        <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             {{ ticket.tic_titulo }}
                         </td>
-                        <td
-                            class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
+                        <td class="px-2 py-2 text-xs text-gray-400 sm:px-4 sm:py-3 sm:text-sm md:text-base">
                             {{ ticket.prioridad }}
                         </td>
-                        <td
-                            class="px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm md:text-base"
-                        >
-                            <span
-                                :class="[
-                                    'px-2 py-1 text-xs font-semibold rounded-full sm:text-xs md:text-sm',
-                                    getEstadoLabelClass(ticket.tic_estado),
-                                ]"
-                            >
+                        <td class="px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm md:text-base">
+                            <span :class="[
+                                'px-2 py-1 text-xs font-semibold rounded-full sm:text-xs md:text-sm',
+                                getEstadoLabelClass(ticket.tic_estado),
+                            ]">
                                 {{ ticket.tic_estado }}
                             </span>
                         </td>
                         <td
-                            class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0"
-                        >
-                            <button
-                                v-if="ticket.tic_estado === 'Asignado'"
-                                @click.stop="aceptarTicket(ticket)"
-                                class="text-blue-500 hover:text-blue-700 transition-colors duration-200"
-                            >
+                            class="flex flex-col items-center justify-center py-2 space-y-2 sm:py-3 sm:flex-row sm:space-x-3 sm:space-y-0">
+                            <button v-if="ticket.tic_estado === 'Asignado'" @click.stop="aceptarTicket(ticket)"
+                                class="text-blue-500 hover:text-blue-700 transition-colors duration-200">
                                 <i class="fas fa-check mr-1"></i> Aceptar
                             </button>
-                            <button
-                                v-if="ticket.tic_estado === 'En progreso'"
-                                @click.stop="finalizarTicket(ticket)"
-                                class="text-green-500 hover:text-green-700 transition-colors duration-200"
-                            >
+                            <button v-if="ticket.tic_estado === 'En progreso'" @click.stop="finalizarTicket(ticket)"
+                                class="text-green-500 hover:text-green-700 transition-colors duration-200">
                                 <i class="fas fa-check-circle mr-1"></i>
                                 Finalizar
                             </button>
-                            <button
-                                @click.stop="verDetalles(ticket)"
-                                class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                            >
+                            <button @click.stop="verDetalles(ticket)"
+                                class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
                                 <i class="fas fa-eye mr-1"></i> Ver
                             </button>
                         </td>
                     </tr>
                     <tr v-if="paginatedTickets.length === 0">
-                        <td
-                            colspan="7"
-                            class="px-4 py-3 text-xs text-center text-gray-500 sm:text-sm"
-                        >
+                        <td colspan="7" class="px-4 py-3 text-xs text-center text-gray-500 sm:text-sm">
                             No se encontraron resultados.
                         </td>
                     </tr>
@@ -685,51 +573,28 @@ const getEstadoLabelClass = (estado) => {
 
         <!-- Paginación -->
         <div class="flex justify-center items-center mt-6">
-            <button
-                v-for="page in totalPages"
-                :key="page"
-                @click="goToPage(page)"
-                :class="{
-                    'bg-green-500 text-white': currentPage === page,
-                    'bg-gray-200 text-gray-600': currentPage !== page,
-                }"
-                class="mx-1 px-4 py-2 rounded hover:bg-gray-300"
-            >
+            <button v-for="page in totalPages" :key="page" @click="goToPage(page)" :class="{
+                'bg-green-500 text-white': currentPage === page,
+                'bg-gray-200 text-gray-600': currentPage !== page,
+            }" class="mx-1 px-4 py-2 rounded hover:bg-gray-300">
                 {{ page }}
             </button>
         </div>
 
         <!-- Modal de Imagen Ampliada -->
-        <div
-            v-if="isImageModalOpen"
-            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50"
-        >
+        <div v-if="isImageModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
             <div class="relative max-w-4xl p-4 bg-white rounded-lg shadow-lg">
-                <img
-                    :src="selectedImageUrl"
-                    alt="Imagen ampliada"
-                    class="max-w-full max-h-screen"
-                />
-                <button
-                    @click="closeImageModal"
-                    class="absolute top-2 right-2 text-white text-2xl font-bold bg-gray-800 rounded-full px-2 focus:outline-none"
-                >
+                <img :src="selectedImageUrl" alt="Imagen ampliada" class="max-w-full max-h-screen" />
+                <button @click="closeImageModal"
+                    class="absolute top-2 right-2 text-white text-2xl font-bold bg-gray-800 rounded-full px-2 focus:outline-none">
                     &times;
                 </button>
             </div>
         </div>
-        <ModalAceptar
-            v-if="mostrarModalAceptar"
-            :visible="mostrarModalAceptar"
-            @confirm="confirmarAceptacion"
-            @cancel="cancelarAceptacion"
-        />
+        <ModalAceptar v-if="mostrarModalAceptar" :visible="mostrarModalAceptar" @confirm="confirmarAceptacion"
+            @cancel="cancelarAceptacion" />
 
-        <ModalFinalizar
-            v-if="mostrarModalFinalizar"
-            :visible="mostrarModalFinalizar"
-            @confirm="confirmarFinalizacion"
-            @cancel="cancelarFinalizacion"
-        />
+        <ModalFinalizar v-if="mostrarModalFinalizar" :visible="mostrarModalFinalizar" @confirm="confirmarFinalizacion"
+            @cancel="cancelarFinalizacion" />
     </div>
 </template>
