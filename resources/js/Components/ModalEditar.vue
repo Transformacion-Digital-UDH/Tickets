@@ -446,14 +446,6 @@ const cerrarModal = () => emit("cerrar");
                                 </label>
 
                                 <div class="mt-2">
-                                    <div v-if="
-                                        selectedFileName[field.name] &&
-                                        !isMobile
-                                    " class="text-sm text-gray-500">
-                                        Archivo seleccionado:
-                                        {{ selectedFileName[field.name] }}
-                                    </div>
-
                                     <div v-if="selectedFilePreviews[field.name]" class="mt-4">
                                         <img :src="selectedFilePreviews[field.name]
                                                 .url
